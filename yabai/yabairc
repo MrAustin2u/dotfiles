@@ -74,8 +74,4 @@ yabai -m rule --add app="^Microsoft Excel$" space=migrations
 yabai -m rule --add app="^Calendar$" space=conference
 yabai -m rule --add app="^Messages$" space=misc
 
-# limelight addon
-killall limelight &> /dev/null
-limelight &> /dev/null &
-
 echo "yabai configuration loaded.."
