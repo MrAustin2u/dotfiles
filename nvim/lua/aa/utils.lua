@@ -1,5 +1,7 @@
 local api = vim.api
-local fn, vcmd = vim.fn, vim.cmd
+local fn, vcmd, lsp = vim.fn, vim.cmd, vim.lsp
+local nnoremap, noremap, au = aa.nnoremap, aa.nmap, aa.au
+
 local utils = {
   lsp = {}
 }
@@ -129,7 +131,62 @@ utils.has_module = function(name)
   end
 end
 
+-- lsp setup -----------------------------------------------------------
+utils.lsp.on_attach = function(client, bufnr)
+  local opts = {bufnr = bufnr}
+  require("lsp-status").on_attach(client)
+  utils.lsp.format_setup(client, bufnr)
+
+  nnoremap("K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+  nnoremap("gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+  nnoremap("<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
+  nnoremap("<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
+  nnoremap("<space>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", opts)
+  nnoremap("<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+  nnoremap("<space>nr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+  nnoremap("<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
+  nnoremap("<leader>,", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
+  nnoremap("<leader>.", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
+  noremap("<space>f", "<cmd>lua vim.lsp.buf.formatting_sync()<CR>", opts)
+
+  ---  autocommands/autocmds
+  au([[CursorHold,CursorHoldI <buffer> lua require('aa.utils').lsp.line_diagnostics()]])
+  au([[CursorMoved,BufLeave <buffer> lua vim.lsp.buf.clear_references()]])
+  vcmd([[command! FormatDisable lua require('aa.utils').lsp.formatToggle(true)]])
+  vcmd([[command! FormatEnable lua require('aa.utils').lsp.formatToggle(false)]])
+
+  if client.resolved_capabilities.code_lens then
+    au("CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()")
+  end
+
+   --- # commands
+  FormatRange = function()
+    local start_pos = api.nvim_buf_get_mark(0, "<")
+    local end_pos = api.nvim_buf_get_mark(0, ">")
+    lsp.buf.range_formatting({}, start_pos, end_pos)
+  end
+  vcmd([[ command! -range FormatRange execute 'lua FormatRange()' ]])
+  vcmd([[ command! Format execute 'lua vim.lsp.buf.formatting_sync(nil, 1000)' ]])
+  vcmd([[ command! LspLog lua vim.cmd('vnew'..vim.lsp.get_log_path()) ]])
+
+  local disabled_formatting_ls = { "jsonls", "tailwindcss", "html" }
+  for i = 1, #disabled_formatting_ls do
+    if disabled_formatting_ls[i] == client.name then
+      client.resolved_capabilities.document_formatting = false
+      client.resolved_capabilities.document_range_formatting = false
+    end
+  end
+
+  api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+end
+
 -- save and formatting -----------------------------------------------------------
+utils.lsp.has_formatter = function(ft)
+  local sources = require("null-ls.sources")
+  local available = sources.get_available(ft, "NULL_LS_FORMATTING")
+  return #available > 0
+end
+
 utils.save_and_source = function()
   if vim.bo.filetype == "vim" then
     vcmd("silent! write")
@@ -155,16 +212,16 @@ end
 
 utils.lsp.format = function()
   if utils.lsp.autoformat then
+    aa.log("Saving and formatting...")
     vim.lsp.buf.formatting_sync()
   end
 end
 
 utils.lsp.format_setup = function(client, buf)
   local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-  local nls = aa.load("aa.plugins.null-ls")
 
   local enable = false
-  if nls.has_formatter(ft) then
+  if utils.lsp.has_formatter(ft) then
     enable = client.name == "null-ls"
   else
     enable = not client.name == "null-ls"

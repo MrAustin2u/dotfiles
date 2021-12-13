@@ -1,7 +1,6 @@
 local nvim_lsp = require("lspconfig")
 local utils = require("aa.utils")
-local fn, api, vcmd, lsp = vim.fn, vim.api, vim.cmd, vim.lsp
-local nnoremap, noremap, au = aa.nnoremap, aa.nmap, aa.au
+local fn, api = vim.fn, vim.api
 
   local function setup_diagnostics()
   local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
@@ -60,68 +59,16 @@ local function root_pattern(...)
   end
  end
 
-local on_attach = function(client, bufnr)
-  local opts = {bufnr = bufnr}
-  require("lsp-status").on_attach(client)
-  utils.lsp.format_setup(client, bufnr)
-
-  nnoremap("K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  nnoremap("gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  nnoremap("<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
-  nnoremap("<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
-  nnoremap("<space>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", opts)
-  nnoremap("<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-  nnoremap("<space>nr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-  nnoremap("<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
-  nnoremap("<leader>,", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
-  nnoremap("<leader>.", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
-  noremap("<space>f", "<cmd>lua vim.lsp.buf.formatting_sync()<CR>", opts)
-
-  --- # autocommands/autocmds
-  au([[CursorHold,CursorHoldI <buffer> lua require('aa.utils').lsp.line_diagnostics()]])
-  au([[CursorMoved,BufLeave <buffer> lua vim.lsp.buf.clear_references()]])
-  vcmd([[command! FormatDisable lua require('aa.utils').lsp.formatToggle(true)]])
-  vcmd([[command! FormatEnable lua require('aa.utils').lsp.formatToggle(false)]])
-
-  if client.resolved_capabilities.code_lens then
-    au("CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()")
-  end
-
-   --- # commands
-  FormatRange = function()
-    local start_pos = api.nvim_buf_get_mark(0, "<")
-    local end_pos = api.nvim_buf_get_mark(0, ">")
-    lsp.buf.range_formatting({}, start_pos, end_pos)
-  end
-  vcmd([[ command! -range FormatRange execute 'lua FormatRange()' ]])
-  vcmd([[ command! Format execute 'lua vim.lsp.buf.formatting_sync(nil, 1000)' ]])
-  vcmd([[ command! LspLog lua vim.cmd('vnew'..vim.lsp.get_log_path()) ]])
-
-  local disabled_formatting_ls = { "jsonls", "tailwindcss", "html" }
-  for i = 1, #disabled_formatting_ls do
-    if disabled_formatting_ls[i] == client.name then
-      client.resolved_capabilities.document_formatting = false
-      client.resolved_capabilities.document_range_formatting = false
-    end
-  end
-
-  api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-end
-
-local function setup_lsp_capabilities()
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities.textDocument.codeLens = { dynamicRegistration = false }
-  capabilities.textDocument.completion.completionItem.documentationFormat = { "markdown" }
-  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
-end
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 
 local function setup_lsp_servers()
   local function lsp_with_defaults(opts)
     opts = opts or {}
     return vim.tbl_deep_extend("keep", opts, {
       autostart = true,
-      on_attach = on_attach,
-      capabilities = setup_lsp_capabilities(),
+      on_attach = utils.lsp.on_attach,
+      capabilities = capabilities,
       flags = { debounce_text_changes = 150 },
       root_dir = vim.loop.cwd,
     })
@@ -139,7 +86,6 @@ local function setup_lsp_servers()
       elixirLS = {
         dialyzerEnabled = true,
         fetchDeps = false,
-        dialyzerEnabled = false,
         dialyzerFormat = "dialyxir_short",
         enableTestLenses = true,
         suggestSpecs = true,
@@ -178,9 +124,6 @@ local function setup_lsp_servers()
           }
       }
   }))
-
-  require"aa.plugins.null-ls".setup()
-  nvim_lsp["null-ls"].setup(lsp_with_defaults())
 end
 
 setup_diagnostics()

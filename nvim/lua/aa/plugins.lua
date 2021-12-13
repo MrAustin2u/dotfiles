@@ -17,7 +17,11 @@ require("packer").startup(function(use)
     "folke/trouble.nvim",
     requires = "kyazdani42/nvim-web-devicons"
   }
-  use "jose-elias-alvarez/null-ls.nvim"
+  use{
+    "jose-elias-alvarez/null-ls.nvim",
+    config = [[ require "aa.plugins.null-ls" ]],
+    requires = { "nvim-lua/plenary.nvim" },
+  }
   use "ray-x/lsp_signature.nvim"
   use "nvim-lua/lsp_extensions.nvim"
   use "nvim-lua/lsp-status.nvim"
