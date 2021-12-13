@@ -1,0 +1,15 @@
+*~
+
+.DS_Store
+
+AWSVPNClient/
+iterm2/
+karabiner/
+limelight/
+yarn/
+expressvpn/
+configstore/
+
+nvim/lua-language-server/
+nvim/plugin/
+
