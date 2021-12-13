@@ -46,24 +46,6 @@ nnoremap("gd", "<cmd>lua require'telescope.builtin'.lsp_definitions{}<CR>")
 nnoremap("ca", "<cmd>lua require'telescope.builtin'.lsp_code_actions(require('telescope.themes').get_cursor({}))<CR>")
 nnoremap("<space>E", "<cmd>lua require'telescope.builtin'.lsp_document_diagnostics{}<CR>")
 
--- ===================================
--- # FZF
--- ===================================
--- nnoremap("<leader>ff", "<cmd>lua require('fzf-lua').git_files()<cr>")
--- nnoremap("<leader>fb", "<cmd>lua require('fzf-lua').buffers()<cr>")
--- nnoremap("<leader>fo", "<cmd>lua require('fzf-lua').oldfiles()<cr>")
--- nnoremap("<leader>fk", "<cmd>lua require('fzf-lua').keymaps()<cr>")
--- nnoremap("<leader>fh", "<cmd>lua require('fzf-lua').help_tags()<cr>")
--- nnoremap("<leader>a", "<cmd>lua require('fzf-lua').live_grep()<cr>")
--- nnoremap("<leader>A", "<cmd>lua require('fzf-lua').grep_cword()<cr>")
--- nnoremap("<leader>gd", "<cmd>lua require('fzf-lua').lsp_definitions()<cr>")
--- nnoremap("<leader>gr", "<cmd>lua require('fzf-lua').lsp_references()<cr>")
--- -- TODO: figure out how to use shortened paths
--- nnoremap("<leader>vrc", [[<cmd>lua require("fzf-lua").files({ cwd = "~/.config/nvim/", prompt = "NVIM Config  " })<cr>]])
--- ===================================
--- # Searching, Pasting, Highlighting
--- ===================================
-
 -- Shut up already
 nnoremap("<Leader>,", ":noh<CR>")
 
