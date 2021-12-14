@@ -67,6 +67,7 @@ local function setup_lsp_servers()
     opts = opts or {}
     return vim.tbl_deep_extend("keep", opts, {
       autostart = true,
+      autorstart = true,
       on_attach = utils.lsp.on_attach,
       capabilities = capabilities,
       flags = { debounce_text_changes = 150 },
@@ -88,7 +89,6 @@ local function setup_lsp_servers()
         fetchDeps = false,
         dialyzerFormat = "dialyxir_short",
         enableTestLenses = true,
-        suggestSpecs = true,
       }
     },
     filetypes = { "elixir", "eelixir", "heex" },

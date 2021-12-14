@@ -16,7 +16,9 @@ nls.setup({
     b.diagnostics.eslint_d,
     b.code_actions.gitsigns,
     b.formatting.stylua.with({
-      extra_args = { "--config-path", vim.fn.expand("~/.config/stylua.toml") },
+      condition = function(utils)
+        return aa.executable("stylua") and utils.root_has_file("stylua.toml")
+      end,
     }),
   }
 })
