@@ -212,7 +212,6 @@ end
 
 utils.lsp.format = function()
   if utils.lsp.autoformat then
-    aa.log("Saving and formatting...")
     vim.lsp.buf.formatting_sync()
   end
 end
