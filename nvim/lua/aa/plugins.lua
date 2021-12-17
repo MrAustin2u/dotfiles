@@ -142,7 +142,11 @@ require("packer").startup(function(use)
     config = [[ require "aa.plugins.indent-blankline" ]]
 
   }
-  use "phaazon/hop.nvim"
+  use {
+    "phaazon/hop.nvim",
+    config = [[ require "aa.plugins.hop" ]]
+  }
+
   use {
     "antoinemadec/FixCursorHold.nvim",
     run = function()
