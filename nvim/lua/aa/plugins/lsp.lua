@@ -66,7 +66,6 @@ local function setup_lsp_servers()
   local function lsp_with_defaults(opts)
     opts = opts or {}
     return vim.tbl_deep_extend("keep", opts, {
-      autostart = true,
       autorstart = true,
       on_attach = utils.lsp.on_attach,
       capabilities = capabilities,
