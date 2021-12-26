@@ -16,11 +16,13 @@ local fn, api = vim.fn, vim.api
     update_in_insert = false,
     severity_sort = true,
     float = {
-      show_header = true,
-      source = "if_many",
-      border = "single",
+      border = "rounded",
       focusable = false,
+      header = "",
+      prefix = "",
       severity_sort = true,
+      source = "if_many",
+      style= "minimal"
     },
   })
 
