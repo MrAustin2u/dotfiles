@@ -14,5 +14,6 @@ end
 ------------------------------------------------------------------------
 R "aa.globals"
 R "aa.plugins"
+R "aa.lsp"
 R "aa.options"
 R "aa.keybindings"

@@ -11,7 +11,7 @@ require("packer").startup(function(use)
   -- LSP
   use {
     "neovim/nvim-lspconfig",
-    config = [[ require "aa.plugins.lsp" ]]
+    config = [[ require "aa.lsp" ]]
   }
   use {
     "folke/trouble.nvim",
@@ -19,12 +19,14 @@ require("packer").startup(function(use)
   }
   use{
     "jose-elias-alvarez/null-ls.nvim",
-    config = [[ require "aa.plugins.null-ls" ]],
+    "jose-elias-alvarez/nvim-lsp-ts-utils",
     requires = { "nvim-lua/plenary.nvim" },
   }
+  use "williamboman/nvim-lsp-installer"
   use "ray-x/lsp_signature.nvim"
   use "nvim-lua/lsp_extensions.nvim"
   use "nvim-lua/lsp-status.nvim"
+  use "b0o/SchemaStore.nvim"
 
   -- Completion
   use {
@@ -97,7 +99,7 @@ require("packer").startup(function(use)
 
   -- Theme
   use {
-    "olimorris/onedarkpro.nvim",
+    "EdenEast/nightfox.nvim",
     config = [[ require "aa.plugins.colorscheme" ]]
   }
 
@@ -142,10 +144,6 @@ require("packer").startup(function(use)
     config = [[ require "aa.plugins.indent-blankline" ]]
 
   }
-  use {
-    "phaazon/hop.nvim",
-    config = [[ require "aa.plugins.hop" ]]
-  }
 
   use {
     "antoinemadec/FixCursorHold.nvim",
@@ -153,6 +151,14 @@ require("packer").startup(function(use)
       vim.g.curshold_updatime = 1000
     end
   }
+
+  use {
+   'akinsho/bufferline.nvim',
+    requires = 'kyazdani42/nvim-web-devicons',
+    config = [[ require "aa.plugins.bufferline"]]
+  }
+
+  use "ojroques/nvim-bufdel"
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins

@@ -1,12 +1,12 @@
 local api = vim.api
 local fn, vcmd, lsp = vim.fn, vim.cmd, vim.lsp
-local nnoremap, noremap, au = aa.nnoremap, aa.nmap, aa.au
+local nnoremap, au = aa.nnoremap, aa.au
 
 local utils = {
   lsp = {}
 }
 
--- # [ diagnostics ] -----------------------------------------------------------
+-- # [ lsp diagnostics ] -----------------------------------------------------------
 local serverity_map = {
   "DiagnosticError",
   "DiagnosticWarn",
@@ -89,9 +89,8 @@ end
 ---Override diagnostics signs helper to only show the single most relevant sign
 ---@see: http://reddit.com/r/neovim/comments/mvhfw7/can_built_in_lsp_diagnostics_be_limited_to_show_a
 ---@param diagnostics table[]
----@param bufnr number
 ---@return table[]
-utils.lsp.filter_diagnostics = function(diagnostics, bufnr)
+utils.lsp.filter_diagnostics = function(diagnostics, _)
   if not diagnostics then
     return {}
   end
@@ -116,7 +115,7 @@ utils.lsp.filter_diagnostics = function(diagnostics, bufnr)
   return filtered_diagnostics
 end
 
--- module loaders -----------------------------------------------------------
+-- [ module loaders ] -----------------------------------------------------------
 utils.has_module = function(name)
   if
     pcall(
@@ -131,11 +130,10 @@ utils.has_module = function(name)
   end
 end
 
--- lsp setup -----------------------------------------------------------
+-- [ lsp setup ] -----------------------------------------------------------
 utils.lsp.on_attach = function(client, bufnr)
   local opts = {bufnr = bufnr}
   require("lsp-status").on_attach(client)
-  utils.lsp.format_setup(client, bufnr)
 
   nnoremap("K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
   nnoremap("gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
@@ -147,46 +145,52 @@ utils.lsp.on_attach = function(client, bufnr)
   nnoremap("<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
   nnoremap("<leader>,", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
   nnoremap("<leader>.", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
-  noremap("<space>f", "<cmd>lua vim.lsp.buf.formatting_sync()<CR>", opts)
+  nnoremap("<space>f", "<cmd>lua vim.lsp.buf.formatting_sync()<CR>", opts)
 
   ---  autocommands/autocmds
   au([[CursorHold,CursorHoldI <buffer> lua require('aa.utils').lsp.line_diagnostics()]])
   au([[CursorMoved,BufLeave <buffer> lua vim.lsp.buf.clear_references()]])
-  vcmd([[command! FormatDisable lua require('aa.utils').lsp.formatToggle(true)]])
-  vcmd([[command! FormatEnable lua require('aa.utils').lsp.formatToggle(false)]])
 
   if client.resolved_capabilities.code_lens then
     au("CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()")
   end
 
-   --- # commands
-  FormatRange = function()
-    local start_pos = api.nvim_buf_get_mark(0, "<")
-    local end_pos = api.nvim_buf_get_mark(0, ">")
-    lsp.buf.range_formatting({}, start_pos, end_pos)
-  end
-  vcmd([[ command! -range FormatRange execute 'lua FormatRange()' ]])
-  vcmd([[ command! Format execute 'lua vim.lsp.buf.formatting_sync(nil, 1000)' ]])
-  vcmd([[ command! LspLog lua vim.cmd('vnew'..vim.lsp.get_log_path()) ]])
-
-  local disabled_formatting_ls = { "jsonls", "tailwindcss", "html" }
-  for i = 1, #disabled_formatting_ls do
-    if disabled_formatting_ls[i] == client.name then
-      client.resolved_capabilities.document_formatting = false
-      client.resolved_capabilities.document_range_formatting = false
-    end
+  if client.resolved_capabilities.document_formatting then
+    vim.cmd([[
+      augroup LspFormat
+        autocmd! * <buffer>
+        autocmd BufWritePre <buffer> lua require("aa.utils").lsp.formatting()
+      augroup END
+    ]])
   end
 
   api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
 end
 
--- save and formatting -----------------------------------------------------------
-utils.lsp.has_formatter = function(ft)
-  local sources = require("null-ls.sources")
-  local available = sources.get_available(ft, "NULL_LS_FORMATTING")
-  return #available > 0
+utils.lsp.capabilities = function()
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
+  capabilities.textDocument.completion.completionItem.snippetSupport = true
+  capabilities.textDocument.completion.completionItem.documentationFormat = { "markdown" }
+
+  return capabilities
 end
 
+
+utils.lsp.defaults = function(opts)
+  opts = opts or {}
+  local config = vim.tbl_deep_extend("keep", opts, {
+    autorstart = true,
+    on_attach = utils.lsp.on_attach,
+    capabilities = utils.lsp.capabilities(),
+    flags = { debounce_text_changes = 150 },
+    root_dir = vim.loop.cwd,
+  })
+
+  return config
+end
+
+-- [ save and formatting ] -----------------------------------------------------------
 utils.save_and_source = function()
   if vim.bo.filetype == "vim" then
     vcmd("silent! write")
@@ -199,54 +203,45 @@ utils.save_and_source = function()
   end
 end
 
-utils.lsp.autoformat = true
+utils.lsp.formatting = function()
+local preferred_formatting_clients = { "eslint" }
+local fallback_formatting_client = "null-ls"
 
-utils.lsp.format_toggle = function()
-  utils.lsp.autoformat = not utils.lsp.autoformat
-  if utils.lsp.autoformat then
-    aa.log("enabled format on save", nil, "Formatting")
-  else
-    aa.warn("disabled format on save", "Formatting")
+local bufnr = api.nvim_get_current_buf()
+
+  local selected_client
+  for _, client in ipairs(lsp.get_active_clients()) do
+    if vim.tbl_contains(preferred_formatting_clients, client.name) then
+      selected_client = client
+      break
+    end
+
+    if client.name == fallback_formatting_client then
+      selected_client = client
+    end
+  end
+
+  if not selected_client then
+    return
+  end
+
+  local params = lsp.util.make_formatting_params()
+  local result, err = selected_client.request_sync("textDocument/formatting", params, 5000, bufnr)
+  if result and result.result then
+    lsp.util.apply_text_edits(result.result, bufnr)
+  elseif err then
+    vim.notify("lsp formatting: " .. err, vim.log.levels.WARN)
   end
 end
 
-utils.lsp.format = function()
-  if utils.lsp.autoformat then
-    vim.lsp.buf.formatting_sync()
-  end
-end
-
-utils.lsp.format_setup = function(client, buf)
-  local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-
-  local enable = false
-  if utils.lsp.has_formatter(ft) then
-    enable = client.name == "null-ls"
-  else
-    enable = not client.name == "null-ls"
-  end
-
-  client.resolved_capabilities.document_formatting = enable
-
-  -- format on save
-  if client.resolved_capabilities.document_formatting then
-    vim.cmd([[
-      augroup LspFormat
-        autocmd! * <buffer>
-        autocmd BufWritePre <buffer> lua require("aa.utils").lsp.format()
-      augroup END
-    ]])
-  end
-end
-
--- files/paths -----------------------------------------------------------
+-- [ files/paths ] -----------------------------------------------------------
 utils.root_has_file = function(name)
   local cwd = vim.loop.cwd()
   local lsputil = require("lspconfig.util")
   return lsputil.path.exists(lsputil.path.join(cwd, name)), lsputil.path.join(cwd, name)
 end
 
--- misc. -----------------------------------------------------------
+-- [ misc. ] -----------------------------------------------------------
 utils.termcodes = function (str)
   return api.nvim_replace_termcodes(str, true, true, true)
 end

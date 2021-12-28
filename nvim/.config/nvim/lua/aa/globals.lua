@@ -38,6 +38,14 @@ function _G.dump_text(...)
   return ...
 end
 
+local get_map_options = function(custom_options)
+    local options = { noremap = true, silent = true }
+    if custom_options then
+        options = vim.tbl_extend("force", options, custom_options)
+    end
+    return options
+end
+
 local L = vim.log.levels
 
 aa._create = function(f)
@@ -149,6 +157,10 @@ end
 aa.safe_require = function(module, opts)
   opts = vim.tbl_extend("keep", { safe = true }, opts or {})
   return aa.load(module, opts)
+end
+
+aa.buf_map = function(bufnr, mode, target, source, opts)
+  api.nvim_buf_set_keymap(bufnr or 0, mode, target, source, get_map_options(opts))
 end
 
 -- autocommands

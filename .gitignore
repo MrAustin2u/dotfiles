@@ -1,6 +1,7 @@
 *~
 
 .DS_Store
+.luarc.json
 
 AWSVPNClient/
 iterm2/
@@ -10,6 +11,5 @@ yarn/
 expressvpn/
 configstore/
 
-nvim/lua-language-server/
-nvim/plugin/
+nvim/.config/nvim/plugin/
 
