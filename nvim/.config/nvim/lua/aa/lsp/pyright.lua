@@ -2,7 +2,7 @@ local M = {
 	setup = function(on_attach, capabilities)
 		local lspconfig = require("lspconfig")
 
-		lspconfig["cssls"].setup({
+		lspconfig["pyright"].setup({
 			on_attach = on_attach,
 			capabilities = capabilities,
 		})

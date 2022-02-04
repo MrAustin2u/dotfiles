@@ -1,3 +1,3 @@
-require"surround".setup {
-  mappings_style = "sandwich"
-}
+require("surround").setup({
+	mappings_style = "sandwich",
+})

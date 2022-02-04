@@ -1,1 +1,1 @@
-require"nvim-terminal".setup
+require("terminal").setup()

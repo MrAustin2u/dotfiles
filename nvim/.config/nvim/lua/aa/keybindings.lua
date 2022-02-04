@@ -1,4 +1,4 @@
-local utils = require "aa.utils"
+local utils = require("aa.utils")
 local nnoremap = aa.nnoremap
 local vnoremap = aa.vnoremap
 
@@ -34,7 +34,10 @@ nnoremap("nr", "<cmd>:NvimTreeRefresh<CR>")
 -- # Telescope
 -- ===================================
 
-nnoremap("<leader>vrc", "<cmd>lua require'telescope.builtin'.find_files({ prompt_title = '< VimRC >', cwd = '~/.config/nvim/', hidden = true,})<CR>")
+nnoremap(
+	"<leader>vrc",
+	"<cmd>lua require'telescope.builtin'.find_files({ prompt_title = '< VimRC >', cwd = '~/.config/nvim/', hidden = true,})<CR>"
+)
 nnoremap("<leader>ff", "<cmd>Telescope git_files<CR>")
 nnoremap("<leader>fg", "<cmd>Telescope live_grep<CR>")
 nnoremap("<leader>fs", "<cmd>Telescope grep_string<CR>")
@@ -65,10 +68,10 @@ nnoremap("<Leader>P", '"*P')
 -- ================================
 
 -- Autocenter file jumps
-vim.cmd [[
+vim.cmd([[
 nnoremap("n", "nzzzv")
 nnoremap("N", "Nzzzv")
-]]
+]])
 -- ================================
 -- # Learn how to spell stupid!
 -- ================================
@@ -136,7 +139,6 @@ nnoremap("<leader>xd", "<cmd>Trouble document_diagnostics<CR>")
 nnoremap("<leader>xl", "<cmd>Trouble loclist<CR>")
 nnoremap("<leader>xq", "<cmd>Trouble quickfix<CR>")
 nnoremap("gR", "<cmd>Trouble lsp_references<CR>")
-
 
 -- ================================
 -- # Bufferline
