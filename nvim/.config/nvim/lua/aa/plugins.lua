@@ -133,8 +133,6 @@ require("packer").startup(function(use)
 		config = [[ require "aa.plugins.vimtest" ]],
 	})
 
-	use("blackCauldron7/surround.nvim")
-
 	use("aserowy/tmux.nvim")
 	use("windwp/nvim-autopairs")
 	use("lewis6991/impatient.nvim")
