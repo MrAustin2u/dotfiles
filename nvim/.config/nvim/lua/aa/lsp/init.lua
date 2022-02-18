@@ -55,7 +55,7 @@ for _, server in
 		"eslint",
 		"elixirls",
 		"graphql",
-		-- "html",
+		"html",
 		"tailwindcss",
 		"jsonls",
 		"null-ls",
