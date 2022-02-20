@@ -29,7 +29,6 @@ require("packer").startup(function(use)
 		"jose-elias-alvarez/nvim-lsp-ts-utils",
 		requires = { "nvim-lua/plenary.nvim" },
 	})
-	use("williamboman/nvim-lsp-installer")
 	use("ray-x/lsp_signature.nvim")
 	use("nvim-lua/lsp_extensions.nvim")
 	use("nvim-lua/lsp-status.nvim")
