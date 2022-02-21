@@ -8,7 +8,7 @@ local sources = {
 	b.code_actions.gitsigns,
 	b.diagnostics.credo,
 	b.formatting.mix,
-	b.formatting.prettierd.with({
+	b.formatting.prettier_d_slim.with({
 		filetypes = { "css", "scss", "html", "json", "yaml", "markdown" },
 	}),
 	b.formatting.stylua,
