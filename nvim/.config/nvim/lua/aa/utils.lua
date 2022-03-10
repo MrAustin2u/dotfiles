@@ -158,10 +158,6 @@ utils.lsp.on_attach = function(client, bufnr)
 
 	nnoremap("<space>f", "<cmd>lua vim.lsp.buf.formatting_sync(nil, 2000)<CR>", opts)
 
-	---  autocommands/autocmds
-	-- au([[CursorHold,CursorHoldI <buffer> lua require('aa.utils').lsp.line_diagnostics()]])
-	-- au([[CursorMoved,BufLeave <buffer> lua vim.lsp.buf.clear_references()]])
-
 	if client.resolved_capabilities.code_lens then
 		au("CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()")
 	end
@@ -170,12 +166,12 @@ utils.lsp.on_attach = function(client, bufnr)
 		vim.cmd([[
       augroup LspFormatting
         autocmd! * <buffer>
-        autocmd BufWritePre <buffer> lua require("aa.utils").lsp.formatting()
+        autocmd BufWritePost <buffer> silent! lua require("aa.utils").lsp.formatting(vim.fn.expand("<abuf>"))
       augroup END
     ]])
 	end
 
-	api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+	require("illuminate").on_attach(client)
 end
 
 utils.lsp.capabilities = function()
@@ -210,11 +206,11 @@ utils.save_and_source = function()
 	end
 end
 
-utils.lsp.formatting = function()
-	local preferred_formatting_clients = { "eslint" }
+utils.lsp.formatting = function(bufnr)
+	local preferred_formatting_clients = { "eslint", "eslint_d", "tsserver" }
 	local fallback_formatting_client = "null-ls"
 
-	local bufnr = api.nvim_get_current_buf()
+	bufnr = tonumber(bufnr) or api.nvim_get_current_buf()
 
 	local selected_client
 	for _, client in ipairs(lsp.get_active_clients()) do
@@ -245,7 +241,7 @@ utils.lsp.formatting = function()
 		end
 
 		if res then
-			lsp.util.apply_text_edits(res, bufnr)
+			lsp.util.apply_text_edits(res, bufnr, selected_client.offset_encoding or "utf-16")
 			api.nvim_buf_call(bufnr, function()
 				vim.cmd("silent noautocmd update")
 			end)

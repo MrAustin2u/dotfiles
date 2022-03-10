@@ -4,7 +4,7 @@ local sumneko_root_path = ""
 local sumneko_binary = ""
 
 sumneko_root_path = "/Users/" .. USER .. "/.config/nvim/lua-language-server"
-sumneko_binary = "/Users/" .. USER .. "/.config/nvim/lua-language-server/bin/macOS/lua-language-server"
+sumneko_binary = "/Users/" .. USER .. "/opt/homebrew/bin/lua-language-server"
 
 local M = {}
 

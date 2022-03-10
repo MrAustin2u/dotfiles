@@ -49,6 +49,7 @@ nnoremap("gd", "<cmd>lua require'telescope.builtin'.lsp_definitions{}<CR>")
 nnoremap("gt", "<cmd>lua require'telescope.builtin'.lsp_type_definitions{}<CR>")
 nnoremap("ca", "<cmd>lua require'telescope.builtin'.lsp_code_actions(require('telescope.themes').get_cursor({}))<CR>")
 nnoremap("<space>E", "<cmd>lua require'telescope.builtin'.diagnostics({ bufnr = 0 })<CR>")
+nnoremap("<leader>os", "<cmd>lua require('session-lens').search_session()<CR>")
 
 -- Shut up already
 nnoremap("<Leader>,", ":noh<CR>")
@@ -116,7 +117,7 @@ nnoremap("<leader>pc", "<cmd>PackerClean<CR>")
 -- # Git
 -- ================================
 
-nnoremap("gb", "<cmd>Gitsigns blame_line<CR>")
+nnoremap("gb", "<cmd>lua require'gitsigns'.blame_line{full=true}<CR>")
 nnoremap("<leader>dv", "<cmd>DiffviewOpen<CR>")
 nnoremap("<leader>dc", "<cmd>DiffviewClose<CR>")
 nnoremap("<leader>ng", "<cmd>Neogit<CR>")
@@ -127,7 +128,7 @@ nnoremap("<leader>gl", "<cmd>diffget //3<CR>")
 -- # Dash
 -- ================================
 
-nnoremap("<leader>da", "<cmd>Dash<CR>")
+nnoremap("<leader>da", "<cmd>lua require('dash.providers.telescope').dash({ bang = false, initial_text = '' }) <CR>")
 
 -- ================================
 -- # LSP
@@ -147,3 +148,9 @@ nnoremap("<leader>bd", "<cmd>BufDel<CR>")
 nnoremap("<leader>bp", "<Cmd>BufferLinePick<CR>")
 nnoremap("<S-l>", "<cmd>BufferLineCycleNext<CR>")
 nnoremap("<S-h>", "<cmd>BufferLineCyclePrev<CR>")
+
+-- ================================
+-- # Illuminate
+-- ================================
+nnoremap("<M-n>", "<cmd>lua require'illuminate'.next_reference{wrap=true}<CR>")
+nnoremap("<M-p>", "<cmd>lua require'illuminate'.next_reference{reverse=true,wrap=true}<CR>")

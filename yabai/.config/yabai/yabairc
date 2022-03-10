@@ -18,8 +18,7 @@ yabai -m space 1 --label dev
 yabai -m space 2 --label web
 yabai -m space 3 --label conference
 yabai -m space 4 --label tools
-yabai -m space 5 --label migrations
-yabai -m space 6 --label misc
+yabai -m space 5 --label misc
 
 yabai -m rule --add app="^System Preferences$" sticky=on layer=above manage=off
 yabai -m rule --add app="^Finder$" sticky=on layer=above manage=off

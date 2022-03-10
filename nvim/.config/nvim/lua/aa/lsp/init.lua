@@ -1,6 +1,5 @@
 local utils = require("aa.utils")
 local lspconfig = require("lspconfig")
-local api = vim.api
 
 local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 
@@ -26,26 +25,6 @@ vim.diagnostic.config({
 	},
 })
 
---- This overwrites the diagnostic show/set_signs function to replace it with a custom function
---- that restricts nvim's diagnostic signs to only the singe most severe one per line
-local ns = api.nvim_create_namespace("severe-diagnostics")
-local show = vim.diagnostic.show
-local function display_signs(bufnr)
-	-- Get all diagnostics from the current buffer
-	local diagnostics = vim.diagnostic.get(bufnr)
-	local filtered = utils.lsp.filter_diagnostics(diagnostics, bufnr)
-	show(ns, bufnr, filtered, {
-		virtual_text = false,
-		underline = false,
-		signs = true,
-	})
-end
-
-function vim.diagnostic.show(namespace, bufnr, ...)
-	show(namespace, bufnr, ...)
-	display_signs(bufnr)
-end
-
 local on_attach = require("aa.utils").lsp.on_attach
 local capabilities = require("aa.utils").lsp.capabilities()
 
@@ -68,4 +47,14 @@ do
 	else
 		lspconfig[server].setup(utils.lsp.defaults())
 	end
+end
+
+-- suppress lspconfig messages
+local notify = vim.notify
+vim.notify = function(msg, ...)
+	if msg:match("%[lspconfig%]") then
+		return
+	end
+
+	notify(msg, ...)
 end

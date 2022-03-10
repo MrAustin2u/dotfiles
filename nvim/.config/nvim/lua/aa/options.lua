@@ -34,6 +34,7 @@ g.markdown_fenced_languages = {
 -- opts
 o.termguicolors = true
 o.mouse = "nva"
+o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal"
 wo.wrap = false
 opt.autoindent = true
 opt.backup = false

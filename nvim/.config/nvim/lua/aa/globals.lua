@@ -201,7 +201,7 @@ local function make_keymap_fn(mode, o)
 			_opts = vim.tbl_extend("keep", _opts, parent_opts)
 			api.nvim_buf_set_keymap(bufnr, mode, combo, mapping, _opts)
 		else
-			api.nvim_set_keymap(mode, combo, mapping, vim.tbl_extend("keep", _opts, parent_opts))
+			vim.keymap.set(mode, combo, mapping, vim.tbl_extend("keep", _opts, parent_opts))
 		end
 	end
 end

@@ -33,6 +33,13 @@ require("packer").startup(function(use)
 	use("nvim-lua/lsp_extensions.nvim")
 	use("nvim-lua/lsp-status.nvim")
 	use("b0o/SchemaStore.nvim")
+	use("RRethy/vim-illuminate")
+	use({
+		"j-hui/fidget.nvim",
+		config = function()
+			require("fidget").setup({})
+		end,
+	})
 
 	-- Completion
 	use({
@@ -94,6 +101,7 @@ require("packer").startup(function(use)
 		"lewis6991/gitsigns.nvim",
 		requires = { "nvim-lua/plenary.nvim" },
 		config = [[ require "aa.plugins.gitsigns" ]],
+		tag = "release",
 	})
 	use({
 		"TimUntersberger/neogit",
@@ -104,6 +112,7 @@ require("packer").startup(function(use)
 		config = [[ require "aa.plugins.neogit" ]],
 	})
 	use("rhysd/conflict-marker.vim")
+	use("tpope/vim-fugitive")
 
 	-- Theme
 	use({
@@ -133,10 +142,23 @@ require("packer").startup(function(use)
 	})
 
 	use("aserowy/tmux.nvim")
+	use({
+		"rmagatti/auto-session",
+		config = [[ require "aa.plugins.auto-session" ]],
+	})
+	use({
+		"rmagatti/session-lens",
+		requires = { "rmagatti/auto-session", "nvim-telescope/telescope.nvim" },
+		config = [[ require "aa.plugins.session-lens" ]],
+	})
 	use("windwp/nvim-autopairs")
 	use("lewis6991/impatient.nvim")
 	use("folke/lua-dev.nvim")
-	use("rizzatti/dash.vim")
+	use({
+		"mrjones2014/dash.nvim",
+		run = "make install",
+		config = [[ require "aa.plugins.dash" ]],
+	})
 	use({
 		"andymass/vim-matchup",
 		run = function()

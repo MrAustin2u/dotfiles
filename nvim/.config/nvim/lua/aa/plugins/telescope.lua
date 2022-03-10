@@ -10,4 +10,9 @@ require("telescope").setup({
 			},
 		},
 	},
+	extensions = {
+		dash = {
+			search_engine = "google",
+		},
+	},
 })
