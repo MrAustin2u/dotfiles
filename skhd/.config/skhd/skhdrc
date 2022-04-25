@@ -1,6 +1,7 @@
 # services
 rshift + ralt - y : brew services restart yabai
 rshift + ralt - s : brew services restart skhd
+rshift + ralt - b : brew services restart spacebar
 
 # open terminal
 shift + alt - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~ &> /dev/null
