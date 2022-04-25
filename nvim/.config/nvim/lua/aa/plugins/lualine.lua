@@ -25,7 +25,7 @@ lualine.setup({
 				},
 			},
 		},
-		lualine_y = { require("auto-session-library").current_session_name },
-		lualine_z = { "location", "mode" },
+		lualine_y = { "location", "mode" },
+		lualine_z = {},
 	},
 })

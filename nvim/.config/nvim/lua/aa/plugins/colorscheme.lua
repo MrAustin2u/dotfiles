@@ -1,3 +1,3 @@
-local nightfox = require("nightfox")
+require("nightfox").setup({})
 
-nightfox.load("nordfox")
+vim.cmd("colorscheme nordfox")

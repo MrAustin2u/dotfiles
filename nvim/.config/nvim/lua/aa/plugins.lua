@@ -97,19 +97,31 @@ require("packer").startup(function(use)
 	use("elixir-editors/vim-elixir")
 
 	-- Git
-	use({
-		"lewis6991/gitsigns.nvim",
-		requires = { "nvim-lua/plenary.nvim" },
-		config = [[ require "aa.plugins.gitsigns" ]],
-		tag = "release",
-	})
+
 	use({
 		"TimUntersberger/neogit",
 		requires = {
 			"nvim-lua/plenary.nvim",
 			"sindrets/diffview.nvim",
 		},
-		config = [[ require "aa.plugins.neogit" ]],
+		config = function()
+			require("neogit").setup({ integrations = { diffview = true } })
+		end,
+	})
+
+	use({
+		"lewis6991/gitsigns.nvim",
+		requires = { "nvim-lua/plenary.nvim" },
+		config = [[ require "aa.plugins.gitsigns" ]],
+		tag = "release",
+	})
+
+	use({
+		"sindrets/diffview.nvim",
+		requires = "nvim-lua/plenary.nvim",
+		config = function()
+			require("diffview").setup({})
+		end,
 	})
 	use("rhysd/conflict-marker.vim")
 	use("tpope/vim-fugitive")
@@ -142,15 +154,6 @@ require("packer").startup(function(use)
 	})
 
 	use("aserowy/tmux.nvim")
-	use({
-		"rmagatti/auto-session",
-		config = [[ require "aa.plugins.auto-session" ]],
-	})
-	use({
-		"rmagatti/session-lens",
-		requires = { "rmagatti/auto-session", "nvim-telescope/telescope.nvim" },
-		config = [[ require "aa.plugins.session-lens" ]],
-	})
 	use("windwp/nvim-autopairs")
 	use("lewis6991/impatient.nvim")
 	use("folke/lua-dev.nvim")
@@ -179,8 +182,9 @@ require("packer").startup(function(use)
 
 	use({
 		"akinsho/bufferline.nvim",
+		tag = "*",
 		requires = "kyazdani42/nvim-web-devicons",
-		config = [[ require "aa.plugins.bufferline"]],
+		config = [[ require "aa.plugins.bufferline" ]],
 	})
 
 	use("ojroques/nvim-bufdel")

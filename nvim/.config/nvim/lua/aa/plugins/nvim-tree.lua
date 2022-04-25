@@ -1,21 +1,36 @@
 local g = vim.g
 
-g.nvim_tree_indent_markers = 1
 g.nvim_tree_git_hl = 1
-g.nvim_tree_highlight_opened_files = 1
+g.nvim_tree_highlight_opened_files = 2
 
-require("nvim-tree").setup({
+local ok, nvimtree = aa.safe_require("nvim-tree")
+if not ok then
+	return
+end
+
+nvimtree.setup({
+	actions = {
+		open_file = {
+			quit_on_open = true,
+			window_picker = {
+				enable = false,
+			},
+		},
+	},
 	view = {
 		width = 45,
 		side = "right",
 	},
 	filters = {
-		dotfiles = false,
 		custom = { ".DS_Store", "*.un~" },
 	},
 	git = {
 		enable = true,
 		ignore = false,
-		timeout = 500,
+	},
+	renderer = {
+		indent_markers = {
+			enable = true,
+		},
 	},
 })
