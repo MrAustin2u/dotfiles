@@ -1,6 +1,6 @@
 local api = vim.api
 local fn, vcmd, lsp = vim.fn, vim.cmd, vim.lsp
-local nnoremap, au = aa.nnoremap, aa.au
+local au = aa.au
 
 local utils = {
 	lsp = {},
@@ -135,13 +135,19 @@ utils.border_opts = {
 	scope = "line",
 }
 
--- [ lsp setup ] -----------------------------------------------------------
-utils.lsp.on_attach = function(client, bufnr)
-	local opts = { bufnr = bufnr }
-	require("lsp-status").on_attach(client)
+local function lsp_highlight_document(client)
+	if client.resolved_capabilities.document_highlight then
+		local status_ok, illuminate = pcall(require, "illuminate")
+		if not status_ok then
+			return
+		end
+		illuminate.on_attach(client)
+	end
+end
 
-	-- commands
+local function lsp_keymaps(bufnr)
 	aa.lua_command("LspFormatting", "vim.lsp.buf.formatting()")
+	aa.lua_command("LspFormattingSync", "vim.lsp.buf.formatting_sync(nil, 2000)")
 	aa.lua_command("LspHover", "vim.lsp.buf.hover()")
 	aa.lua_command("LspRename", "vim.lsp.buf.rename()")
 	aa.lua_command("LspTypeDef", "vim.lsp.buf.type_definition()")
@@ -155,8 +161,12 @@ utils.lsp.on_attach = function(client, bufnr)
 	aa.buf_map(bufnr, "n", "]a", ":LspDiagNext<CR>")
 	aa.buf_map(bufnr, "n", "K", ":LspHover<CR>")
 	aa.buf_map(bufnr, "n", "e", ":LspDiagLine<CR>")
+	aa.buf_map(bufnr, "n", "<space>f", ":LspFormattingSync<CR>")
+end
 
-	nnoremap("<space>f", "<cmd>lua vim.lsp.buf.formatting_sync(nil, 2000)<CR>", opts)
+-- [ lsp setup ] -----------------------------------------------------------
+utils.lsp.on_attach = function(client, bufnr)
+	require("lsp-status").on_attach(client)
 
 	if client.resolved_capabilities.code_lens then
 		au("CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()")
@@ -166,16 +176,18 @@ utils.lsp.on_attach = function(client, bufnr)
 		vim.cmd([[
       augroup LspFormatting
         autocmd! * <buffer>
-        autocmd BufWritePost <buffer> silent! lua require("aa.utils").lsp.formatting(vim.fn.expand("<abuf>"))
+        autocmd BufWritePre <buffer> lua require("aa.utils").lsp.formatting(vim.fn.expand("<abuf>"))
       augroup END
     ]])
 	end
 
-	require("illuminate").on_attach(client)
+	lsp_keymaps(bufnr)
+	lsp_highlight_document(client)
 end
 
 utils.lsp.capabilities = function()
 	local capabilities = vim.lsp.protocol.make_client_capabilities()
+	capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 	return capabilities
 end
@@ -210,23 +222,32 @@ utils.lsp.formatting = function(bufnr)
 	local preferred_formatting_clients = { "eslint", "eslint_d", "tsserver" }
 	local fallback_formatting_client = "null-ls"
 
+	-- prevent repeated lookups
+	local buffer_client_ids = {}
+
 	bufnr = tonumber(bufnr) or api.nvim_get_current_buf()
 
 	local selected_client
-	for _, client in ipairs(lsp.get_active_clients()) do
-		if vim.tbl_contains(preferred_formatting_clients, client.name) then
-			selected_client = client
-			break
-		end
+	if buffer_client_ids[bufnr] then
+		selected_client = lsp.get_client_by_id(buffer_client_ids[bufnr])
+	else
+		for _, client in pairs(lsp.buf_get_clients(bufnr)) do
+			if vim.tbl_contains(preferred_formatting_clients, client.name) then
+				selected_client = client
+				break
+			end
 
-		if client.name == fallback_formatting_client then
-			selected_client = client
+			if client.name == fallback_formatting_client then
+				selected_client = client
+			end
 		end
 	end
 
 	if not selected_client then
 		return
 	end
+
+	buffer_client_ids[bufnr] = selected_client.id
 
 	local params = lsp.util.make_formatting_params()
 	selected_client.request("textDocument/formatting", params, function(err, res)
@@ -243,7 +264,7 @@ utils.lsp.formatting = function(bufnr)
 		if res then
 			lsp.util.apply_text_edits(res, bufnr, selected_client.offset_encoding or "utf-16")
 			api.nvim_buf_call(bufnr, function()
-				vim.cmd("silent noautocmd update")
+				vcmd("silent! noautocmd update")
 			end)
 		end
 	end, bufnr)

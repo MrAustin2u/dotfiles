@@ -36,6 +36,7 @@ o.termguicolors = true
 o.mouse = "nva"
 o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal"
 wo.wrap = false
+opt.shell = "/opt/homebrew/bin/zsh" -- Use zsh as the default shell
 opt.autoindent = true
 opt.backup = false
 opt.cmdheight = 2

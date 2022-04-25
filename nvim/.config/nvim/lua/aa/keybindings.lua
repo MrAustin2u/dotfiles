@@ -117,10 +117,9 @@ nnoremap("<leader>pc", "<cmd>PackerClean<CR>")
 -- # Git
 -- ================================
 
-nnoremap("gb", "<cmd>lua require'gitsigns'.blame_line{full=true}<CR>")
+nnoremap("<leader>gb", "<cmd>lua require'gitsigns'.blame_line{full=true}<CR>")
 nnoremap("<leader>dv", "<cmd>DiffviewOpen<CR>")
 nnoremap("<leader>dc", "<cmd>DiffviewClose<CR>")
-nnoremap("<leader>ng", "<cmd>Neogit<CR>")
 nnoremap("<leader>gh", "<cmd>diffget //2<CR>")
 nnoremap("<leader>gl", "<cmd>diffget //3<CR>")
 
@@ -128,7 +127,7 @@ nnoremap("<leader>gl", "<cmd>diffget //3<CR>")
 -- # Dash
 -- ================================
 
-nnoremap("<leader>da", "<cmd>lua require('dash.providers.telescope').dash({ bang = false, initial_text = '' }) <CR>")
+nnoremap("<leader>da", "<cmd>lua require('dash.providers.telescope').dash({ bang = false, initial_text = '' })<CR>")
 
 -- ================================
 -- # LSP
