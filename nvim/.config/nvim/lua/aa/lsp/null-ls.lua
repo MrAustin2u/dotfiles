@@ -4,6 +4,7 @@ local b = null_ls.builtins
 local M = {}
 
 local sources = {
+	b.formatting.trim_whitespace.with({ filetypes = { "*" } }),
 	b.code_actions.eslint_d,
 	b.code_actions.gitsigns,
 	b.diagnostics.credo,
