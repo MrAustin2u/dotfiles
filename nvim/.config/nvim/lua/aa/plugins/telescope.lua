@@ -14,5 +14,10 @@ require("telescope").setup({
 		dash = {
 			search_engine = "google",
 		},
+		["ui-select"] = {
+			require("telescope.themes").get_dropdown({}),
+		},
 	},
 })
+
+require("telescope").load_extension("ui-select")

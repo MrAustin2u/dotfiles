@@ -17,9 +17,11 @@ require("packer").startup(function(use)
 
 	-- LSP
 	use({
+		"williamboman/nvim-lsp-installer",
 		"neovim/nvim-lspconfig",
 		config = [[ require "aa.lsp" ]],
 	})
+
 	use({
 		"folke/trouble.nvim",
 		requires = "kyazdani42/nvim-web-devicons",
@@ -80,6 +82,7 @@ require("packer").startup(function(use)
 			"kyazdani42/nvim-web-devicons",
 		}, -- optional for icons
 	})
+	use({ "nvim-telescope/telescope-ui-select.nvim" })
 
 	--Syntax
 	use({
@@ -171,13 +174,6 @@ require("packer").startup(function(use)
 	use({
 		"lukas-reineke/indent-blankline.nvim",
 		config = [[ require "aa.plugins.indent-blankline" ]],
-	})
-
-	use({
-		"antoinemadec/FixCursorHold.nvim",
-		run = function()
-			vim.g.curshold_updatime = 1000
-		end,
 	})
 
 	use({

@@ -47,7 +47,6 @@ nnoremap("<leader>km", "<cmd>Telescope keymaps<CR>")
 nnoremap("gr", "<cmd>lua require'telescope.builtin'.lsp_references{}<CR>")
 nnoremap("gd", "<cmd>lua require'telescope.builtin'.lsp_definitions{}<CR>")
 nnoremap("gt", "<cmd>lua require'telescope.builtin'.lsp_type_definitions{}<CR>")
-nnoremap("ca", "<cmd>lua require'telescope.builtin'.lsp_code_actions(require('telescope.themes').get_cursor({}))<CR>")
 nnoremap("<space>E", "<cmd>lua require'telescope.builtin'.diagnostics({ bufnr = 0 })<CR>")
 nnoremap("<leader>os", "<cmd>lua require('session-lens').search_session()<CR>")
 
