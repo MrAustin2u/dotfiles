@@ -35,8 +35,8 @@ nnoremap("nr", "<cmd>:NvimTreeRefresh<CR>")
 -- ===================================
 
 nnoremap(
-	"<leader>vrc",
-	"<cmd>lua require'telescope.builtin'.find_files({ prompt_title = '< VimRC >', cwd = '~/.config/nvim/', hidden = true,})<CR>"
+  "<leader>vrc",
+  "<cmd>lua require'telescope.builtin'.find_files({ prompt_title = '< VimRC >', cwd = '~/.config/nvim/', hidden = true,})<CR>"
 )
 nnoremap("<leader>ff", "<cmd>Telescope git_files<CR>")
 nnoremap("<leader>fg", "<cmd>Telescope live_grep<CR>")

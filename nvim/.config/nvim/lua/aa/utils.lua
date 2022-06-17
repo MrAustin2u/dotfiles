@@ -188,16 +188,21 @@ end
 utils.lsp.on_attach = function(client, bufnr)
   require("lsp-status").on_attach(client)
 
+  local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
   if client.server_capabilities.code_lens then
     au("CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()")
   end
 
   if client.supports_method("textDocument/formatting") then
+
+
+    vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+
     aa.buf_command(bufnr, "LspFormatting", function()
       lsp_formatting(bufnr)
     end)
 
-    vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
     vim.api.nvim_create_autocmd("BufWritePre", {
       group = augroup,
       buffer = bufnr,
@@ -243,7 +248,7 @@ utils.save_and_source = function()
 end
 
 utils.lsp.formatting = function(bufnr)
-  local preferred_formatting_clients = { "eslint", "eslint_d", "tsserver" }
+  local preferred_formatting_clients = { "eslint", "tsserver", "elixirls" }
   local fallback_formatting_client = "null-ls"
 
   -- prevent repeated lookups
@@ -255,7 +260,7 @@ utils.lsp.formatting = function(bufnr)
   if buffer_client_ids[bufnr] then
     selected_client = lsp.get_client_by_id(buffer_client_ids[bufnr])
   else
-    for _, client in pairs(lsp.buf_get_clients(bufnr)) do
+    for _, client in pairs(lsp.get_active_clients({ bufnr = bufnr })) do
       if vim.tbl_contains(preferred_formatting_clients, client.name) then
         selected_client = client
         break
