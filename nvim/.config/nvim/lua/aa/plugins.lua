@@ -29,13 +29,13 @@ require("packer").startup(function(use)
   use({
     "jose-elias-alvarez/null-ls.nvim",
     "jose-elias-alvarez/nvim-lsp-ts-utils",
+    "jose-elias-alvarez/typescript.nvim",
     requires = { "nvim-lua/plenary.nvim" },
   })
   use("ray-x/lsp_signature.nvim")
   use("nvim-lua/lsp_extensions.nvim")
   use("nvim-lua/lsp-status.nvim")
   use("b0o/SchemaStore.nvim")
-  use("RRethy/vim-illuminate")
   use({
     "j-hui/fidget.nvim",
     config = function()
@@ -166,11 +166,6 @@ require("packer").startup(function(use)
   use("lewis6991/impatient.nvim")
   use("folke/lua-dev.nvim")
   use({
-    "mrjones2014/dash.nvim",
-    run = "make install",
-    config = [[ require "aa.plugins.dash" ]],
-  })
-  use({
     "andymass/vim-matchup",
     run = function()
       vim.g.loaded_matchit = 1
@@ -183,7 +178,7 @@ require("packer").startup(function(use)
 
   use({
     "akinsho/bufferline.nvim",
-    tag = "*",
+    tag = "v2.*",
     requires = "kyazdani42/nvim-web-devicons",
     config = [[ require "aa.plugins.bufferline" ]],
   })

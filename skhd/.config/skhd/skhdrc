@@ -2,12 +2,16 @@
 rshift + ralt - y : brew services restart yabai
 rshift + ralt - s : brew services restart skhd
 rshift + ralt - b : brew services restart spacebar
+rshift + ralt - p : brew services restart postgresql
 
 # open terminal
 shift + alt - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~ &> /dev/null
 
 #close window
 shift + alt - backspace : $(yabai -m window $(yabai -m query --windows --window | jq -re ".id") --close)
+
+# open chrome 
+cmd + shift - return : open -n -a "Google Chrome"
 
 # Navigation
 alt - h : yabai -m window --focus west

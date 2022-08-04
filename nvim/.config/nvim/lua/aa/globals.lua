@@ -1,4 +1,4 @@
-local api, fn, vcmd = vim.api, vim.fn, vim.cmd
+local api, fn, vcmd, keymap = vim.api, vim.fn, vim.cmd, vim.keymap
 
 _G.__aa_global_callbacks = __aa_global_callbacks or {}
 _G.aa = {
@@ -41,7 +41,7 @@ end
 local get_map_options = function(custom_options)
   local options = { noremap = true, silent = true }
   if custom_options then
-    options = vim.tbl_extend("force", options, custom_options)
+    options = vim.tbl_extend("force", options, custom_options) or options
   end
   return options
 end
@@ -63,27 +63,6 @@ aa.table = {
     return false
   end,
 }
-
-aa.inspect = function(label, v, opts)
-  opts = opts or {}
-  opts = vim.tbl_deep_extend("keep", opts, { data_before = true, level = L.INFO })
-
-  local log_str, hl = aa.get_log_string(label, opts.level)
-
-  -- presently no better API to get the current lsp log level
-  -- L.DEBUG == 3
-  if opts.level == L.DEBUG and (aa.get_log_level() == L.DEBUG or aa.get_log_level() == 3) then
-    if opts.data_before then
-      aa.P(v)
-      aa.log(log_str, hl)
-    else
-      aa.log(log_str, hl)
-      aa.P(v)
-    end
-  end
-
-  return v
-end
 
 aa.log = function(msg, hl, reason)
   if hl == nil and reason == nil then
@@ -169,10 +148,6 @@ aa.safe_require = function(module, opts)
   return aa.load(module, opts)
 end
 
-aa.buf_map = function(bufnr, mode, target, source, opts)
-  api.nvim_buf_set_keymap(bufnr or 0, mode, target, source, get_map_options(opts))
-end
-
 -- commands
 
 aa.au = function(s, override)
@@ -198,51 +173,58 @@ end
 
 -- mappings
 
-local function make_keymap_fn(mode, o)
-  -- copy the opts table as extends will mutate opts
-  local parent_opts = vim.deepcopy(o)
-  return function(combo, mapping, opts)
-    assert(combo ~= mode, string.format("The combo should not be the same as the mode for %s", combo))
-    local _opts = opts and vim.deepcopy(opts) or {}
-
-    if type(mapping) == "function" then
-      local fn_id = aa._create(mapping)
-      mapping = string.format("<cmd>lua aa._execute(%s)<cr>", fn_id)
-    end
-
-    if _opts.bufnr then
-      local bufnr = _opts.bufnr
-      _opts.bufnr = nil
-      _opts = vim.tbl_extend("keep", _opts, parent_opts)
-      api.nvim_buf_set_keymap(bufnr, mode, combo, mapping, _opts)
-    else
-      vim.keymap.set(mode, combo, mapping, vim.tbl_extend("keep", _opts, parent_opts))
-    end
-  end
+aa.buf_map = function(bufnr, mode, target, source)
+  keymap.set(mode, target, source, get_map_options({ buffer = bufnr or 0 }))
 end
 
-local map_opts = { noremap = false, silent = true }
-aa.nmap = make_keymap_fn("n", map_opts)
-aa.xmap = make_keymap_fn("x", map_opts)
-aa.imap = make_keymap_fn("i", map_opts)
-aa.vmap = make_keymap_fn("v", map_opts)
-aa.omap = make_keymap_fn("o", map_opts)
-aa.tmap = make_keymap_fn("t", map_opts)
-aa.smap = make_keymap_fn("s", map_opts)
-aa.cmap = make_keymap_fn("c", map_opts)
+aa.imap = function(tbl)
+  keymap.set("i", tbl[1], tbl[2], tbl[3])
+end
 
-local noremap_opts = { noremap = true, silent = true }
-aa.nnoremap = make_keymap_fn("n", noremap_opts)
-aa.xnoremap = make_keymap_fn("x", noremap_opts)
-aa.vnoremap = make_keymap_fn("v", noremap_opts)
-aa.inoremap = make_keymap_fn("i", noremap_opts)
-aa.onoremap = make_keymap_fn("o", noremap_opts)
-aa.tnoremap = make_keymap_fn("t", noremap_opts)
-aa.cnoremap = make_keymap_fn("c", noremap_opts)
+aa.nmap = function(tbl)
+  keymap.set("n", tbl[1], tbl[2], tbl[3])
+end
 
-aa.has_map = function(map, mode)
-  mode = mode or "n"
-  return fn.maparg(map, mode) ~= ""
+aa.vmap = function(tbl)
+  keymap.set("v", tbl[1], tbl[2], tbl[3])
+end
+
+aa.buf_nnoremap = function(opts)
+  if opts[3] == nil then
+    opts[3] = {}
+  end
+  opts[3] = { buffer = 0 }
+
+  aa.nmap(opts)
+end
+aa.buf_inoremap = function(opts)
+  if opts[3] == nil then
+    opts[3] = {}
+  end
+  opts[3] = { buffer = 0 }
+
+  aa.imap(opts)
+end
+
+aa.buf_vnoremap = function(opts)
+  if opts[3] == nil then
+    opts[3] = {}
+  end
+  opts[3] = { buffer = 0 }
+
+  aa.vmap(opts)
+end
+
+aa.save_and_source = function()
+  if vim.bo.filetype == "vim" then
+    vcmd("silent! write")
+    vcmd("source %")
+    aa.log("Saving and sourcing vim file...")
+  elseif vim.bo.filetype == "lua" then
+    vcmd("silent! write")
+    vcmd("luafile %")
+    aa.log("Saving and sourcing lua file...")
+  end
 end
 
 return aa

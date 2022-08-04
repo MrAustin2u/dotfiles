@@ -1,7 +1,7 @@
 require("bufferline").setup({
 	options = {
-		always_show_bufferline = false,
-		separator_style = os.getenv("KITTY_WINDOW_ID") and "slant" or "padded_slant",
+		always_show_bufferline = true,
+		separator_style = os.getenv("KITTY_WINDOW_ID") and "slant" or "thin",
 		diagnostics = "nvim_lsp",
 		custom_filter = function(buf)
 			local ignored = { "nnn", "dap-repl" }
