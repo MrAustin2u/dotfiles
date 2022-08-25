@@ -1,10 +1,12 @@
 local lualine = require("lualine")
-local nord_custom = require("lualine.themes.nord")
+local background = vim.opt.background:get()
+local gruvbox_custom = require("lualine.themes.gruvbox_" .. background)
+--[[ local nord_custom = require("lualine.themes.nord") ]]
 -- local onedark_custom = require("lualine.themes.onedark")
 -- onedark_custom.normal.c.bg = "#282c34"
 
 lualine.setup({
-	options = { theme = nord_custom },
+	options = { theme = gruvbox_custom },
 	sections = {
 		lualine_a = {},
 		lualine_b = { "branch", "diff", "diagnostics" },

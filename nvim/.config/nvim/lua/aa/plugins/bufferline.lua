@@ -2,7 +2,7 @@ require("bufferline").setup({
 	options = {
 		always_show_bufferline = true,
 		sort_by = "relative_directory",
-		separator_style = os.getenv("KITTY_WINDOW_ID") and "padded_slant",
+		separator_style = os.getenv("KITTY_WINDOW_ID") and "slant",
 		diagnostics = "nvim_lsp",
 		custom_filter = function(buf)
 			local ignored = { "nnn", "dap-repl" }

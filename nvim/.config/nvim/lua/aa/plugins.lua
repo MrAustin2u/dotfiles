@@ -117,7 +117,8 @@ require("packer").startup(function(use)
 
 	-- Theme
 	use({
-		"EdenEast/nightfox.nvim",
+		--[[ "EdenEast/nightfox.nvim", ]]
+		"ellisonleao/gruvbox.nvim",
 		config = [[ require "aa.plugins.colorscheme" ]],
 	})
 
