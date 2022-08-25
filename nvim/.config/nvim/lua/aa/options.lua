@@ -4,10 +4,10 @@ local opt, cmd, o, wo, g, fn = vim.opt, vim.cmd, vim.o, vim.wo, vim.g, vim.fn
 g.matchup_surround_enabled = true
 g.matchup_matchparen_deferred = true
 g.matchup_matchparen_offscreen = {
-  method = "popup",
-  fullwidth = true,
-  highlight = "Normal",
-  border = "shadow",
+	method = "popup",
+	fullwidth = true,
+	highlight = "Normal",
+	border = "shadow",
 }
 -- disable the default highlight group
 g.conflict_marker_highlight_group = "Error"
@@ -15,20 +15,20 @@ g.conflict_marker_highlight_group = "Error"
 g.conflict_marker_begin = "^<<<<<<< .*$"
 g.conflict_marker_end = "^>>>>>>> .*$"
 g.markdown_fenced_languages = {
-  "shell=sh",
-  "bash=sh",
-  "zsh=sh",
-  "console=sh",
-  "vim",
-  "lua",
-  "sql",
-  "elixir",
-  "javascript",
-  "typescript",
-  "js=javascript",
-  "ts=typescript",
-  "yaml",
-  "json",
+	"shell=sh",
+	"bash=sh",
+	"zsh=sh",
+	"console=sh",
+	"vim",
+	"lua",
+	"sql",
+	"elixir",
+	"javascript",
+	"typescript",
+	"js=javascript",
+	"ts=typescript",
+	"yaml",
+	"json",
 }
 
 -- opts
@@ -77,7 +77,7 @@ opt.writebackup = false
 opt.backup = false
 opt.writebackup = false
 if fn.isdirectory(o.undodir) == 0 then
-  fn.mkdir(o.undodir, "p")
+	fn.mkdir(o.undodir, "p")
 end
 opt.undofile = true
 opt.swapfile = false
@@ -86,7 +86,7 @@ opt.swapfile = false
 -- with the same name from different directories.
 opt.directory = fn.stdpath("data") .. "/swap//"
 if fn.isdirectory(vim.o.directory) == 0 then
-  fn.mkdir(vim.o.directory, "p")
+	fn.mkdir(vim.o.directory, "p")
 end
 
 cmd([[syntax on]])
