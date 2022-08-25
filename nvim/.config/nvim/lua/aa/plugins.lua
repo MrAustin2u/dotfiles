@@ -42,6 +42,7 @@ require("packer").startup(function(use)
 			require("fidget").setup({})
 		end,
 	})
+	use("RRethy/vim-illuminate")
 
 	-- Completion
 	use({
@@ -118,6 +119,7 @@ require("packer").startup(function(use)
 	-- Theme
 	use({
 		--[[ "EdenEast/nightfox.nvim", ]]
+    --[[ "RRethy/nvim-base16", ]]
 		"ellisonleao/gruvbox.nvim",
 		config = [[ require "aa.plugins.colorscheme" ]],
 	})

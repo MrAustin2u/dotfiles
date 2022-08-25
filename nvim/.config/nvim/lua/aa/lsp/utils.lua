@@ -130,6 +130,8 @@ utils.on_attach = function(client, bufnr)
       command = "LspFormatting",
     })
   end
+
+  require("illuminate").on_attach(client)
 end
 
 utils.capabilities = function()
