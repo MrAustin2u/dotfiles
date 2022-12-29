@@ -5,7 +5,7 @@ g.nvim_tree_highlight_opened_files = 2
 
 require("nvim-tree").setup({
 	view = {
-		width = 45,
+		width = 50,
 		side = "right",
 	},
 	filters = {

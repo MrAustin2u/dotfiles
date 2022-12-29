@@ -135,21 +135,13 @@ utils.on_attach = function(client, bufnr)
 end
 
 utils.capabilities = function()
-  local updated_capabilities = lsp.protocol.make_client_capabilities()
 
-  if nvim_status then
-    updated_capabilities = tbl_deep_extend("keep", updated_capabilities, nvim_status.capabilities)
+  local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-    if updated_capabilities ~= nil then
-      updated_capabilities.textDocument.codeLens = { dynamicRegistration = false }
-    end
+  capabilities.textDocument.completion.completionItem.insertReplaceSupport = false
+  capabilities.textDocument.codeLens = { dynamicRegistration = false }
 
-    updated_capabilities = require("cmp_nvim_lsp").update_capabilities(updated_capabilities)
-
-    updated_capabilities.textDocument.completion.completionItem.snippetSupport = true
-  end
-
-  return updated_capabilities
+  return capabilities
 end
 
 return utils

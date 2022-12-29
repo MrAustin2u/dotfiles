@@ -65,17 +65,21 @@ opt.shortmess = "atToOFc"
 opt.smartcase = true
 opt.smartindent = true
 opt.softtabstop = 2
+opt.splitbelow = true
+opt.splitright = true
 opt.swapfile = false
 opt.tabstop = 2
 opt.updatetime = 300
 opt.timeout = true
 opt.timeoutlen = 500
 opt.ttimeoutlen = 10
+-- Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+-- delays and poor user experience.
+opt.updatetime = 50
 opt.visualbell = true
 opt.wildmenu = true
 opt.wildmode = { "list", "longest", "full" }
 opt.writebackup = false
-opt.backup = false
 opt.writebackup = false
 if fn.isdirectory(o.undodir) == 0 then
 	fn.mkdir(o.undodir, "p")

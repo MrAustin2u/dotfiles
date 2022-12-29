@@ -8,11 +8,21 @@ local vnoremap = aa.vmap
 nnoremap({ ";", ":", { silent = false } })
 nnoremap({ "<leader>q", "<cmd>q!<CR>" })
 
-nnoremap({ "<C-h>", "<C-w>h" })
-nnoremap({ "<C-j>", "<C-w>j" })
-nnoremap({ "<C-k>", "<C-w>k" })
-nnoremap({ "<C-l>", "<C-w>l" })
+-- ==================================
+-- # Splits
+-- ===================================
 
+-- Navigation
+nnoremap({ "<C-h>", "<C-W>h" })
+nnoremap({ "<C-j>", "<C-W>j" })
+nnoremap({ "<C-k>", "<C-W>k" })
+nnoremap({ "<C-l>", "<C-W>l" })
+
+-- Resize
+nnoremap({ "<M-Left>", ":vertical resize +3<CR>", { silent = true } })
+nnoremap({ "<M-Right>", ":vertical resize -3<CR>", { silent = true } })
+nnoremap({ "<M-Up>", ":resize -3<CR>", { silent = true } })
+nnoremap({ "<M-Down>", ":resize +3<CR>", { silent = true } })
 -- ==================================
 -- # Save and source files
 -- ===================================
