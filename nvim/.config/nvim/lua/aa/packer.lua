@@ -1,15 +1,15 @@
-local fn = vim.fn
-local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-if fn.empty(fn.glob(install_path)) > 0 then
-  packer_bootstrap = fn.system({
-    "git",
-    "clone",
-    "--depth",
-    "1",
-    "https://github.com/wbthomason/packer.nvim",
-    install_path,
-  })
+local ensure_packer = function()
+  local fn = vim.fn
+  local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
+  if fn.empty(fn.glob(install_path)) > 0 then
+    fn.system({ "git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", install_path })
+    vim.cmd([[packadd packer.nvim]])
+    return true
+  end
+  return false
 end
+
+local packer_bootstrap = ensure_packer()
 
 require("packer").startup(function(use)
   -- Manage self
@@ -17,24 +17,32 @@ require("packer").startup(function(use)
 
   -- LSP
   use({
-    "williamboman/nvim-lsp-installer",
-    "neovim/nvim-lspconfig",
-    config = [[ require "aa.lsp" ]],
+    "VonHeikemen/lsp-zero.nvim",
+    requires = {
+      -- LSP Support
+      "neovim/nvim-lspconfig",
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+
+      -- Autocompletion
+      "hrsh7th/nvim-cmp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-nvim-lua",
+
+      -- Snippets
+      "L3MON4D3/LuaSnip",
+      "rafamadriz/friendly-snippets",
+    },
   })
 
   use({
-    "folke/trouble.nvim",
-    requires = "kyazdani42/nvim-web-devicons",
-  })
-  use({
     "jose-elias-alvarez/null-ls.nvim",
-    "jose-elias-alvarez/nvim-lsp-ts-utils",
-    "jose-elias-alvarez/typescript.nvim",
     requires = { "nvim-lua/plenary.nvim" },
   })
-  use("ray-x/lsp_signature.nvim")
-  use("nvim-lua/lsp_extensions.nvim")
-  use("nvim-lua/lsp-status.nvim")
+
   use("b0o/SchemaStore.nvim")
   use({
     "j-hui/fidget.nvim",
@@ -45,20 +53,6 @@ require("packer").startup(function(use)
   use("RRethy/vim-illuminate")
   use("simrat39/inlay-hints.nvim")
 
-  -- Completion
-  use({
-    "hrsh7th/nvim-cmp",
-    requires = {
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-cmdline",
-      "L3MON4D3/LuaSnip",
-      "onsails/lspkind-nvim",
-    },
-    config = [[ require "aa.plugins.completion" ]],
-  })
-
   --Navigation
   use({
     "kyazdani42/nvim-tree.lua",
@@ -66,19 +60,17 @@ require("packer").startup(function(use)
       "kyazdani42/nvim-web-devicons", -- optional, for file icon
     },
     tag = "nightly",
-    config = [[ require "aa.plugins.nvim-tree" ]],
   })
+
   use({
     "nvim-telescope/telescope.nvim",
     requires = {
       "nvim-lua/plenary.nvim",
     },
-    config = [[ require "aa.plugins.telescope" ]],
   })
   use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" })
   use({
     "goolord/alpha-nvim",
-    config = [[ require "aa.plugins.alpha" ]],
   })
 
   use({
@@ -99,7 +91,6 @@ require("packer").startup(function(use)
       "p00f/nvim-ts-rainbow",
       "JoosepAlviste/nvim-ts-context-commentstring",
     },
-    config = [[ require "aa.plugins.treesitter" ]],
   })
 
   -- Languages
@@ -109,7 +100,6 @@ require("packer").startup(function(use)
   use({
     "lewis6991/gitsigns.nvim",
     requires = { "nvim-lua/plenary.nvim" },
-    config = [[ require "aa.plugins.gitsigns" ]],
     tag = "release",
   })
 
@@ -119,30 +109,23 @@ require("packer").startup(function(use)
   -- Theme
   use({
     "EdenEast/nightfox.nvim",
-    "RRethy/nvim-base16",
-    "ellisonleao/gruvbox.nvim",
-    config = [[ require "aa.plugins.colorscheme" ]],
   })
 
   use({
     "nvim-lualine/lualine.nvim",
     requires = { "kyazdani42/nvim-web-devicons", opt = true },
-    config = [[ require "aa.plugins.lualine" ]],
   })
 
   -- Pretty colors
-  use({ "norcalli/nvim-colorizer.lua", config = [[ require "aa.plugins.colorizer" ]] })
   use("norcalli/nvim-terminal.lua")
 
   -- Tools
   use({
     "numToStr/Comment.nvim",
-    config = [[ require "aa.plugins.comment" ]],
   })
   use({
     "vim-test/vim-test",
     requires = "preservim/vimux",
-    config = [[ require "aa.plugins.vimtest" ]],
   })
 
   use("aserowy/tmux.nvim")
@@ -157,14 +140,6 @@ require("packer").startup(function(use)
   })
   use({
     "lukas-reineke/indent-blankline.nvim",
-    config = [[ require "aa.plugins.indent-blankline" ]],
-  })
-
-  use({
-    "akinsho/bufferline.nvim",
-    tag = "v2.*",
-    requires = "kyazdani42/nvim-web-devicons",
-    config = [[ require "aa.plugins.bufferline" ]],
   })
 
   use("ojroques/nvim-bufdel")
