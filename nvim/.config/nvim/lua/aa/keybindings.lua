@@ -52,9 +52,6 @@ vim.keymap.set("n", "nr", "<cmd>NvimTreeRefresh<CR>", {})
 -- ===================================
 
 local builtin = require("telescope.builtin")
-vim.keymap.set("n", "<leader>gr", function()
-  builtin.diagnostics({ bufnr = 0 })
-end)
 vim.keymap.set("n", "<leader>gr", builtin.lsp_references, {})
 vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
 vim.keymap.set("n", "<leader>fb", builtin.buffers, {})

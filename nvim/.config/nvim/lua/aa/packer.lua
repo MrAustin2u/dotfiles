@@ -54,6 +54,8 @@ require("packer").startup(function(use)
   use("simrat39/inlay-hints.nvim")
 
   --Navigation
+  use({ "ThePrimeagen/harpoon", requires = { "nvim-lua/plenary.nvim" } })
+
   use({
     "kyazdani42/nvim-tree.lua",
     requires = {
