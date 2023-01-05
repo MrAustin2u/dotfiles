@@ -53,6 +53,7 @@ opt.incsearch = true
 opt.lazyredraw = true
 opt.mousefocus = true
 opt.number = true
+opt.pumblend = 20
 opt.relativenumber = false
 opt.ruler = true
 opt.shell = "zsh"
