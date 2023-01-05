@@ -6,31 +6,26 @@ g.mapleader = " "
 g.matchup_surround_enabled = true
 g.matchup_matchparen_deferred = true
 g.matchup_matchparen_offscreen = {
-  method = "popup",
-  fullwidth = true,
-  highlight = "Normal",
-  border = "shadow",
+	method = "popup",
+	fullwidth = true,
+	highlight = "Normal",
+	border = "shadow",
 }
--- disable the default highlight group
-g.conflict_marker_highlight_group = "Error"
--- Include text after begin and end markers
-g.conflict_marker_begin = "^<<<<<<< .*$"
-g.conflict_marker_end = "^>>>>>>> .*$"
 g.markdown_fenced_languages = {
-  "shell=sh",
-  "bash=sh",
-  "zsh=sh",
-  "console=sh",
-  "vim",
-  "lua",
-  "sql",
-  "elixir",
-  "javascript",
-  "typescript",
-  "js=javascript",
-  "ts=typescript",
-  "yaml",
-  "json",
+	"shell=sh",
+	"bash=sh",
+	"zsh=sh",
+	"console=sh",
+	"vim",
+	"lua",
+	"sql",
+	"elixir",
+	"javascript",
+	"typescript",
+	"js=javascript",
+	"ts=typescript",
+	"yaml",
+	"json",
 }
 
 -- opts
@@ -58,7 +53,7 @@ opt.incsearch = true
 opt.lazyredraw = true
 opt.mousefocus = true
 opt.number = true
-opt.relativenumber = true
+opt.relativenumber = false
 opt.ruler = true
 opt.shell = "zsh"
 opt.showmode = false
@@ -84,8 +79,9 @@ opt.wildmenu = true
 opt.wildmode = { "list", "longest", "full" }
 opt.writebackup = false
 if fn.isdirectory(o.undodir) == 0 then
-  fn.mkdir(o.undodir, "p")
+	fn.mkdir(o.undodir, "p")
 end
+opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 opt.undofile = true
 opt.swapfile = false
 -- The // at the end tells Vim to use the absolute path to the file to create the swap file.
@@ -93,18 +89,18 @@ opt.swapfile = false
 -- with the same name from different directories.
 opt.directory = fn.stdpath("data") .. "/swap//"
 if fn.isdirectory(vim.o.directory) == 0 then
-  fn.mkdir(vim.o.directory, "p")
+	fn.mkdir(vim.o.directory, "p")
 end
 
-autocmd("TextYankPost", {
-  group = vim.api.nvim_create_augroup("HighlightYank", {}),
-  pattern = "*",
-  callback = function()
-    vim.highlight.on_yank({
-      higroup = "IncSearch",
-      timeout = 500,
-    })
-  end,
+vim.api.nvim_create_autocmd("TextYankPost", {
+	group = vim.api.nvim_create_augroup("HighlightYank", {}),
+	pattern = "*",
+	callback = function()
+		vim.highlight.on_yank({
+			higroup = "IncSearch",
+			timeout = 500,
+		})
+	end,
 })
 
 cmd([[syntax on]])
