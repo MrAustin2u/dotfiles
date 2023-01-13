@@ -7,7 +7,7 @@ M.map = function(tbl)
 end
 
 M.buf_nmap = function(bufnr, mapping, cmd, opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", mapping, cmd, opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', mapping, cmd, opts)
 end
 
 M.cmap = function(tbl)
@@ -15,11 +15,11 @@ M.cmap = function(tbl)
 end
 
 M.imap = function(tbl)
-  vim.keymap.set("i", tbl[1], tbl[2], tbl[3])
+  vim.keymap.set('i', tbl[1], tbl[2], tbl[3])
 end
 
 M.nmap = function(tbl)
-  vim.keymap.set("n", tbl[1], tbl[2], tbl[3])
+  vim.keymap.set('n', tbl[1], tbl[2], tbl[3])
 end
 
 M.tmap = function(tbl)
@@ -47,10 +47,9 @@ M.autocmd = function(args)
     callback = function()
       callback()
     end,
-    once = args.once
+    once = args.once,
   })
 end
-
 
 -- Load project specific vimrc
 M.load_local_vimrc = function()
@@ -172,7 +171,6 @@ M.contains = function(tbl, item)
 
   return false
 end
-
 
 --- Convert a list or map of items into a value by iterating all it's fields and transforming
 --- them with a callback

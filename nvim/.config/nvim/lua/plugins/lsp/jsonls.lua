@@ -1,4 +1,4 @@
-local utils = require('core.utils')
+local utils = require 'core.utils'
 
 local catalog = utils.read_json_schemas()
 

@@ -7,8 +7,8 @@ end
 local M = {}
 
 M.setup = function()
-  lspsaga.init_lsp_saga {
-    code_action_lightbulb = {
+  lspsaga.setup {
+    lightbulb = {
       enable = true,
       sign = true,
       enable_in_insert = true,

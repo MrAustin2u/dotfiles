@@ -1,50 +1,49 @@
 local opt, cmd, o, wo, g, fn = vim.opt, vim.cmd, vim.o, vim.wo, vim.g, vim.fn
-local autocmd = vim.api.nvim_create_autocmd
 
 -- globals
-g.mapleader = " "
+g.mapleader = ' '
 g.matchup_surround_enabled = true
 g.matchup_matchparen_deferred = true
 g.matchup_matchparen_offscreen = {
-	method = "popup",
-	fullwidth = true,
-	highlight = "Normal",
-	border = "shadow",
+  method = 'popup',
+  fullwidth = true,
+  highlight = 'Normal',
+  border = 'shadow',
 }
 g.markdown_fenced_languages = {
-	"shell=sh",
-	"bash=sh",
-	"zsh=sh",
-	"console=sh",
-	"vim",
-	"lua",
-	"sql",
-	"elixir",
-	"javascript",
-	"typescript",
-	"js=javascript",
-	"ts=typescript",
-	"yaml",
-	"json",
+  'shell=sh',
+  'bash=sh',
+  'zsh=sh',
+  'console=sh',
+  'vim',
+  'lua',
+  'sql',
+  'elixir',
+  'javascript',
+  'typescript',
+  'js=javascript',
+  'ts=typescript',
+  'yaml',
+  'json',
 }
 
 -- opts
 o.termguicolors = true
-o.background = "dark"
-o.mouse = "nva"
-o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal"
+o.background = 'dark'
+o.mouse = 'nva'
+o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal'
 wo.wrap = false
-opt.shell = "/opt/homebrew/bin/zsh" -- Use zsh as the default shell
+opt.shell = '/opt/homebrew/bin/zsh' -- Use zsh as the default shell
 opt.autoindent = true
 opt.backup = false
 opt.cmdheight = 2
 opt.compatible = false
-opt.completeopt = { "menu", "menuone", "noselect", "noinsert" }
+opt.completeopt = { 'menu', 'menuone', 'noselect', 'noinsert' }
 opt.confirm = true
 opt.cursorline = true
-opt.cursorlineopt = "both" -- optionally -> "screenline,number"
+opt.cursorlineopt = 'both' -- optionally -> "screenline,number"
 opt.emoji = false
-opt.encoding = "utf-8"
+opt.encoding = 'utf-8'
 opt.errorbells = false
 opt.expandtab = true
 opt.hlsearch = false
@@ -56,11 +55,11 @@ opt.number = true
 opt.pumblend = 20
 opt.relativenumber = false
 opt.ruler = true
-opt.shell = "zsh"
+opt.shell = 'zsh'
 opt.showmode = false
 opt.shiftwidth = 2
-opt.signcolumn = "yes"
-opt.shortmess = "atToOFc"
+opt.signcolumn = 'yes'
+opt.shortmess = 'atToOFc'
 opt.smartcase = true
 opt.smartindent = true
 opt.softtabstop = 2
@@ -77,35 +76,35 @@ opt.ttimeoutlen = 10
 opt.updatetime = 50
 opt.visualbell = true
 opt.wildmenu = true
-opt.wildmode = { "list", "longest", "full" }
+opt.wildmode = { 'list', 'longest', 'full' }
 opt.writebackup = false
 if fn.isdirectory(o.undodir) == 0 then
-	fn.mkdir(o.undodir, "p")
+  fn.mkdir(o.undodir, 'p')
 end
-opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+opt.undodir = os.getenv 'HOME' .. '/.vim/undodir'
 opt.undofile = true
 opt.swapfile = false
 -- The // at the end tells Vim to use the absolute path to the file to create the swap file.
 -- This will ensure that swap file name is unique, so there are no collisions between files
 -- with the same name from different directories.
-opt.directory = fn.stdpath("data") .. "/swap//"
+opt.directory = fn.stdpath 'data' .. '/swap//'
 if fn.isdirectory(vim.o.directory) == 0 then
-	fn.mkdir(vim.o.directory, "p")
+  fn.mkdir(vim.o.directory, 'p')
 end
 
-vim.api.nvim_create_autocmd("TextYankPost", {
-	group = vim.api.nvim_create_augroup("HighlightYank", {}),
-	pattern = "*",
-	callback = function()
-		vim.highlight.on_yank({
-			higroup = "IncSearch",
-			timeout = 500,
-		})
-	end,
+vim.api.nvim_create_autocmd('TextYankPost', {
+  group = vim.api.nvim_create_augroup('HighlightYank', {}),
+  pattern = '*',
+  callback = function()
+    vim.highlight.on_yank {
+      higroup = 'IncSearch',
+      timeout = 500,
+    }
+  end,
 })
 
-cmd([[syntax on]])
-cmd([[filetype plugin indent on]])
-cmd([[highlight LineNr ctermbg=NONE guibg=NONE]])
-cmd([[highlight NonText ctermfg=19 guifg=#333333]])
-cmd([[autocmd StdinReadPre * let s:std_in=1]])
+cmd [[syntax on]]
+cmd [[filetype plugin indent on]]
+cmd [[highlight LineNr ctermbg=NONE guibg=NONE]]
+cmd [[highlight NonText ctermfg=19 guifg=#333333]]
+cmd [[autocmd StdinReadPre * let s:std_in=1]]
