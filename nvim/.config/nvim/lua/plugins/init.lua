@@ -67,10 +67,6 @@ return packer.startup(function(use)
         'mhanberg/elixir.nvim',
         requires = { 'neovim/nvim-lspconfig', 'nvim-lua/plenary.nvim' },
       },
-      {
-        'SmiteshP/nvim-navic',
-        requires = 'neovim/nvim-lspconfig',
-      },
     },
     config = function()
       require('plugins.lsp').setup()
@@ -244,6 +240,8 @@ return packer.startup(function(use)
       require('plugins.treesitter').setup()
     end,
   }
+
+  use 'RRethy/vim-illuminate'
 
   -- Elixir support {{{
   use 'elixir-editors/vim-elixir'

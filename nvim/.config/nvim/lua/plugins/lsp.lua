@@ -2,12 +2,10 @@ local utils = require 'core.utils'
 
 local lspconfig_present, lspconfig = pcall(require, 'lspconfig')
 local cmp_lsp_present, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
-local navic_present, navic = pcall(require, 'nvim-navic')
 
 local deps = {
   cmp_lsp_present,
   lspconfig_present,
-  navic_present,
 }
 
 if utils.contains(deps, false) then
@@ -21,9 +19,8 @@ local on_attach = function(client, bufnr)
   if client.name == 'copilot' then
     return
   end
-  -- Enable completion triggered by <c-x><c-o> (not sure this is necessary with
-  -- cmp plugin)
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+  vim.bo.omnifunc = 'v:lua.vim.lsp.omnifunc'
 
   if client.config.name == 'yamlls' and vim.bo.filetype == 'helm' then
     vim.lsp.buf_detach_client(bufnr, client.id)
@@ -33,13 +30,11 @@ local on_attach = function(client, bufnr)
     vim.api.nvim_buf_set_option(bufnr, 'formatexpr', '')
   end
 
-  if client.server_capabilities.documentSymbolProvider then
-    navic.attach(client, bufnr)
-  end
-
   -- Use an on_attach function to only map the following keys
   -- after the language server attaches to the current buffer
   require('core.mappings').lsp_mappings(bufnr)
+
+  require('illuminate').on_attach(client)
 end
 
 M.setup = function()
