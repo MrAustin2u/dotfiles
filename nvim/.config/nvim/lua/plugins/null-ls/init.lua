@@ -29,6 +29,7 @@ M.setup = function()
       ----------------------
       --    Diagnostics   --
       ----------------------
+      b.diagnostics.golangci_lint,
       b.diagnostics.actionlint,
       b.diagnostics.codespell,
 
@@ -76,6 +77,7 @@ M.setup = function()
       b.formatting.prettierd,
       b.formatting.shfmt,
       b.formatting.stylua,
+      b.formatting.golines,
     },
     on_attach = function(client)
       if client.supports_method 'textDocument/formatting' then
