@@ -17,7 +17,31 @@ M.setup = function()
   treesitter.setup {
     -- see full list here:
     -- https://github.com/nvim-treesitter/nvim-treesitter#supported-languages
-    ensure_installed = 'all',
+    ensure_installed = {
+      'bash',
+      'css',
+      'dockerfile',
+      'eex',
+      'elixir',
+      'gitcommit',
+      'gitignore',
+      'git_rebase',
+      'go',
+      'graphql',
+      'html',
+      'javascript',
+      'json5',
+      'jsonc',
+      'lua',
+      'python',
+      'regex',
+      'rust',
+      'scss',
+      'sql',
+      'typescript',
+      'vim',
+      'yaml',
+    },
     autotag = { enable = true },
     highlight = { enable = true },
     context_commentstring = {
