@@ -10,6 +10,10 @@ M.buf_nmap = function(bufnr, mapping, cmd, opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', mapping, cmd, opts)
 end
 
+M.buf_vmap = function(bufnr, mapping, cmd, opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'v', mapping, cmd, opts)
+end
+
 M.cmap = function(tbl)
   vim.keymap.set('c', tbl[1], tbl[2], tbl[3])
 end

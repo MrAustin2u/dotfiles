@@ -28,6 +28,7 @@ local vmap = utils.vmap
 local xmap = utils.xmap
 
 local buf_nmap = utils.buf_nmap
+local buf_vmap = utils.buf_vmap
 
 local silent = { silent = true }
 local default_opts = { noremap = true, silent = true }
@@ -344,6 +345,9 @@ M.lsp_mappings = function(bufnr)
   buf_nmap(bufnr, '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', default_opts)
   -- f = format
   buf_nmap(bufnr, 'f', '<cmd>lua vim.lsp.buf.format()<CR>', default_opts)
+  -- ca = code action
+  buf_nmap(bufnr, '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', default_opts)
+  buf_vmap(bufnr, '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', default_opts)
 end
 
 M.lsp_diagnostic_mappings = function()
@@ -356,10 +360,6 @@ end
 M.lsp_saga_mappings = function()
   -- Lsp finder find the symbol definition implmement reference
   nmap { '<leader>lf', '<cmd>Lspsaga lsp_finder<CR>', silent }
-
-  -- Code action
-  nmap { '<leader>ca', '<cmd>Lspsaga code_action<CR>', silent }
-  vmap { '<leader>ca', '<cmd><C-U>Lspsaga range_code_action<CR>', silent }
 
   -- Rename
   nmap { '<leader>rn', '<cmd>Lspsaga rename<CR>', silent }
