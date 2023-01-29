@@ -8,6 +8,7 @@ end
 local M = {}
 
 M.setup = function()
+  ---@diagnostic disable-next-line: redundant-parameter
   installer.setup {
 
     -- a list of all tools you want to ensure are installed upon
