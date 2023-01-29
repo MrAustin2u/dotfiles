@@ -3,13 +3,5 @@
 .DS_Store
 .luarc.json
 
-AWSVPNClient/
-iterm2/
-karabiner/
-limelight/
-yarn/
-expressvpn/
-configstore/
-
 nvim/.config/nvim/plugin/
 
