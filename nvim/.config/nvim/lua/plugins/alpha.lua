@@ -1,53 +1,63 @@
-local present_alpha, alpha = pcall(require, 'alpha')
-local present_dashboard, dashboard = pcall(require, 'alpha.themes.dashboard')
+return {
+  "goolord/alpha-nvim",
+  event = "VimEnter",
+  opts = function()
+    local dashboard = require("alpha.themes.dashboard")
+    local logo = [[
+ __    __  ________   ______   __     __  ______  __       __ 
+|  \  |  \|        \ /      \ |  \   |  \|      \|  \     /  \
+| $$\ | $$| $$$$$$$$|  $$$$$$\| $$   | $$ \$$$$$$| $$\   /  $$
+| $$$\| $$| $$__    | $$  | $$| $$   | $$  | $$  | $$$\ /  $$$
+| $$$$\ $$| $$  \   | $$  | $$ \$$\ /  $$  | $$  | $$$$\  $$$$
+| $$\$$ $$| $$$$$   | $$  | $$  \$$\  $$   | $$  | $$\$$ $$ $$
+| $$ \$$$$| $$_____ | $$__/ $$   \$$ $$   _| $$_ | $$ \$$$| $$
+| $$  \$$$| $$     \ \$$    $$    \$$$   |   $$ \| $$  \$ | $$
+ \$$   \$$ \$$$$$$$$  \$$$$$$      \$     \$$$$$$ \$$      \$$
+      ]]
 
-if not present_alpha or not present_dashboard then
-  return
-end
+    dashboard.section.header.val = vim.split(logo, "\n")
+    dashboard.section.buttons.val = {
+      dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
+      dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
+      dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
+      dashboard.button("g", " " .. " Find text", ":Telescope live_grep <CR>"),
+      dashboard.button("c", " " .. " Config", ":e $MYVIMRC <CR>"),
+      dashboard.button("s", "勒" .. " Restore Session", [[:lua require("persistence").load() <cr>]]),
+      dashboard.button("l", "鈴" .. " Lazy", ":Lazy<CR>"),
+      dashboard.button("q", " " .. " Quit", ":qa<CR>"),
+    }
+    for _, button in ipairs(dashboard.section.buttons.val) do
+      button.opts.hl = "AlphaButtons"
+      button.opts.hl_shortcut = "AlphaShortcut"
+    end
+    dashboard.section.footer.opts.hl = "Type"
+    dashboard.section.header.opts.hl = "AlphaHeader"
+    dashboard.section.buttons.opts.hl = "AlphaButtons"
+    dashboard.opts.layout[1].val = 8
+    return dashboard
+  end,
+  config = function(_, dashboard)
+    -- close Lazy and re-open when the dashboard is ready
+    if vim.o.filetype == "lazy" then
+      vim.cmd.close()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "AlphaReady",
+        callback = function()
+          require("lazy").show()
+        end,
+      })
+    end
 
-local M = {}
+    require("alpha").setup(dashboard.opts)
 
-math.randomseed(os.time())
-
-local function button(sc, txt, keybind, keybind_opts)
-  local b = dashboard.button(sc, txt, keybind, keybind_opts)
-  b.opts.hl = 'Function'
-  b.opts.hl_shortcut = 'Type'
-  return b
-end
-
-local function pick_color()
-  local clrs = { 'String', 'Identifier', 'Keyword', 'Number' }
-  return clrs[math.random(#clrs)]
-end
-
--- REF: https://patorjk.com/software/taag/#p=display&f=Bloody&t=MR.AUSTIN'S%0ANEOVIM
-dashboard.section.header.val = {
-
-  '             ███▄    █ ▓█████  ▒█████   ██▒   █▓ ██▓ ███▄ ▄███▓                      ',
-  '             ██ ▀█   █ ▓█   ▀ ▒██▒  ██▒▓██░   █▒▓██▒▓██▒▀█▀ ██▒                      ',
-  '            ▓██  ▀█ ██▒▒███   ▒██░  ██▒ ▓██  █▒░▒██▒▓██    ▓██░                      ',
-  '            ▓██▒  ▐▌██▒▒▓█  ▄ ▒██   ██░  ▒██ █░░░██░▒██    ▒██                       ',
-  '            ▒██░   ▓██░░▒████▒░ ████▓▒░   ▒▀█░  ░██░▒██▒   ░██▒                      ',
-  '            ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒░▒░▒░    ░ ▐░  ░▓  ░ ▒░   ░  ░                      ',
-  '            ░ ░░   ░ ▒░ ░ ░  ░  ░ ▒ ▒░    ░ ░░   ▒ ░░  ░      ░                      ',
-  '               ░   ░ ░    ░   ░ ░ ░ ▒       ░░   ▒ ░░      ░                         ',
-  '                     ░    ░  ░    ░ ░        ░   ░         ░                         ',
-  '                                            ░                                        ',
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "LazyVimStarted",
+      callback = function()
+        local stats = require("lazy").stats()
+        local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+        dashboard.section.footer.val = "⚡ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
+        pcall(vim.cmd.AlphaRedraw)
+      end,
+    })
+  end,
 }
-
-dashboard.section.header.opts.hl = pick_color()
-dashboard.section.buttons.val = {
-  button('m', '  Recently opened files', "<cmd>lua require('telescope.builtin').oldfiles()<cr>"),
-  button('f', '  Find file', "<cmd>lua require('telescope.builtin').find_files()<cr>"),
-  button('a', '  Find word', "<cmd>lua require('telescope.builtin').live_grep()<cr>"),
-  button('e', '  New file', '<cmd>ene <BAR> startinsert <CR>'),
-  button('p', '  Update plugins', '<cmd>PackerUpdate<CR>'),
-  button('q', '  Quit', '<cmd>qa<CR>'),
-}
-
-M.setup = function()
-  alpha.setup(dashboard.opts)
-end
-
-return M

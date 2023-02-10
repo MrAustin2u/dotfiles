@@ -1,136 +1,80 @@
-local present, lualine = pcall(require, 'lualine')
-
-if not present then
-  return
-end
-
-local M = {}
-
-M.setup = function()
-  local tokyonight_colors = require('tokyonight.colors').setup { style = 'storm' }
-
-  ---@diagnostic disable:undefined-field
-  local colors = {
-    black = tokyonight_colors.fg,
-    green = tokyonight_colors.green,
-    grey = tokyonight_colors.bg_highlight,
-    light_green = tokyonight_colors.hint,
-    orange = tokyonight_colors.orange,
-    red = tokyonight_colors.red,
-    white = tokyonight_colors.bg_statusline,
-    actual_white = '#f3f3f3',
-  }
-  ---@diagnostic enable:undefined-field
-
-  local empty = require('lualine.component'):extend()
-  function empty:draw(default_highlight)
-    self.status = ''
-    self.applied_separator = ''
-    self:apply_highlights(default_highlight)
-    self:apply_section_separators()
-    return self.status
-  end
-
-  -- Put proper separators and gaps between components in sections
-  local function process_sections(sections)
-    for name, section in pairs(sections) do
-      local left = name:sub(9, 10) < 'x'
-      for pos = 1, name ~= 'lualine_z' and #section or #section - 1 do
-        table.insert(section, pos * 2, { empty, color = { fg = colors.white, bg = colors.white } })
-      end
-      for id, comp in ipairs(section) do
-        if type(comp) ~= 'table' then
-          comp = { comp }
-          section[id] = comp
-        end
-        comp.separator = left and { right = '' } or { left = '' }
+return {
+  "nvim-lualine/lualine.nvim",
+  event = "VeryLazy",
+  opts = function(plugin)
+    local function fg(name)
+      return function()
+        ---@type {foreground?:number}?
+        local hl = vim.api.nvim_get_hl_by_name(name, true)
+        return hl and hl.foreground and { fg = string.format("#%06x", hl.foreground) }
       end
     end
-    return sections
-  end
 
-  local function search_result()
-    if vim.v.hlsearch == 0 then
-      return ''
-    end
-    local last_search = vim.fn.getreg '/'
-    if not last_search or last_search == '' then
-      return ''
-    end
-    local searchcount = vim.fn.searchcount { maxcount = 9999 }
-    return last_search .. '(' .. searchcount.current .. '/' .. searchcount.total .. ')'
-  end
-
-  local function modified()
-    if vim.bo.modified then
-      return '+'
-    elseif vim.bo.modifiable == false or vim.bo.readonly == true then
-      return '-'
-    end
-    return ''
-  end
-
-  lualine.setup {
-    options = {
-      -- theme = theme,
-      component_separators = '',
-      section_separators = { left = '', right = '' },
-    },
-    sections = process_sections {
-      lualine_a = {
-        {
-          'mode',
-          fmt = function(str)
-            return str:sub(1, 1)
+    return {
+      options = {
+        theme = "auto",
+        globalstatus = true,
+        disabled_filetypes = { statusline = { "dashboard", "lazy", "alpha" } },
+      },
+      sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "branch" },
+        lualine_c = {
+          {
+            "diagnostics",
+            symbols = {
+              Error = " ",
+              Warn = " ",
+              Hint = " ",
+              Info = " ",
+            },
+          },
+          { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
+          { "filename", path = 1, symbols = { modified = "  ", readonly = "", unnamed = "" } },
+            -- stylua: ignore
+            {
+              function() return require("nvim-navic").get_location() end,
+              cond = function() return package.loaded["nvim-navic"] and require("nvim-navic").is_available() end,
+            },
+        },
+        lualine_x = {
+                      -- stylua: ignore
+            {
+              function() return require("noice").api.status.command.get() end,
+              cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
+              color = fg("Statement")
+            },
+            -- stylua: ignore
+            {
+              function() return require("noice").api.status.mode.get() end,
+              cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
+              color = fg("Constant") ,
+            },
+          { require("lazy.status").updates, cond = require("lazy.status").has_updates, color = fg("Special") },
+          {
+            "diff",
+            symbols = {
+              added = " ",
+              modified = " ",
+              removed = " ",
+            },
+          },
+        },
+        lualine_y = {
+          { "progress", separator = "", padding = { left = 1, right = 0 } },
+          { "location", padding = { left = 0, right = 1 } },
+        },
+        lualine_z = {
+          function()
+            return " " .. os.date("%R")
           end,
         },
       },
-      lualine_b = {
-        'branch',
-        'diff',
-        {
-          'diagnostics',
-          source = { 'nvim' },
-          sections = { 'error' },
-          diagnostics_color = { error = { bg = colors.red, fg = colors.actual_white } },
-        },
-        {
-          'diagnostics',
-          source = { 'nvim' },
-          sections = { 'warn' },
-          diagnostics_color = { warn = { bg = colors.orange, fg = colors.actual_white } },
-        },
-        { 'filename', file_status = false, path = 1 },
-        { modified, color = { bg = colors.red, fg = colors.actual_white } },
-        {
-          '%w',
-          cond = function()
-            return vim.wo.previewwindow
-          end,
-        },
-        {
-          '%r',
-          cond = function()
-            return vim.bo.readonly
-          end,
-        },
-        {
-          '%q',
-          cond = function()
-            return vim.bo.buftype == 'quickfix'
-          end,
-        },
+      inactive_sections = {
+        lualine_c = { "%f %y %m" },
+        lualine_x = {},
       },
-      lualine_c = {},
-      lualine_x = {},
-      lualine_y = { search_result, 'filetype' },
-      lualine_z = { '%l:%c', '%p%%/%L' },
-    },
-    inactive_sections = {
-      lualine_c = { '%f %y %m' },
-      lualine_x = {},
-    },
-  }
-end
-
-return M
+      extensions = { "neo-tree" },
+    }
+  end,
+}

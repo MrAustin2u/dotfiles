@@ -1,27 +1,34 @@
----@diagnostic disable: redundant-parameter
-local present, gitsigns = pcall(require, "gitsigns")
+return {
+  "lewis6991/gitsigns.nvim",
+  event = { "BufReadPre", "BufNewFile" },
+  opts = {
+    signs = {
+      add = { hl = "GitGutterAdd", text = "+" },
+      change = { hl = "GitGutterChange", text = "~" },
+      delete = { hl = "GitGutterDelete", text = "-" },
+      topdelete = { hl = "GitGutterDelete", text = "-" },
+      changedelete = { hl = "GitGutterChange", text = "-" },
+    },
+    on_attach = function(buffer)
+      local gs = package.loaded.gitsigns
 
-if not present then
-	return
-end
+      local function map(mode, l, r, desc)
+        vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
+      end
 
-local M = {}
+        -- stylua: ignore start
+        map("n", "]h", gs.next_hunk, "Next Hunk")
+        map("n", "[h", gs.prev_hunk, "Prev Hunk")
+        map({ "n", "v" }, "<leader>gs", ":Gitsigns stage_hunk<CR>", "Stage Hunk")
+        map({ "n", "v" }, "<leader>gr", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
+        map("n", "<leader>gu", gs.undo_stage_hunk, "Undo Stage Hunk")
+        map("n", "<leader>gp", gs.preview_hunk, "Preview Hunk")
+        map("n", "<leader>gb", function() gs.blame_line({ full = true }) end, "Blame Line")
+        map("n", "<leader>gd", gs.diffthis, "Diff This")
+        map("n", "<leader>gD", function() gs.diffthis("~") end, "Diff This ~")
+        map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
 
-M.setup = function()
-	gitsigns.setup({
-		signs = {
-			add = { hl = "GitGutterAdd", text = "+" },
-			change = { hl = "GitGutterChange", text = "~" },
-			delete = { hl = "GitGutterDelete", text = "-" },
-			topdelete = { hl = "GitGutterDelete", text = "-" },
-			changedelete = { hl = "GitGutterChange", text = "-" },
-		},
-		on_attach = function(bufnr)
-			require("core.mappings").gitsigns_mappings(gitsigns, bufnr)
-
-			vim.cmd("hi SignColumn guibg=None")
-		end,
-	})
-end
-
-return M
+      vim.cmd("hi SignColumn guibg=None")
+    end,
+  },
+}
