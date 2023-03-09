@@ -1,352 +1,171 @@
 return {
-  -- lspconfig
-  {
-    "neovim/nvim-lspconfig",
-    event = "BufReadPre",
-    keys = { { "<leader>cs", "<cmd>LspRestart<cr>", desc = "Lsp Restart" } },
-    dependencies = {
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = true },
-      { "folke/neodev.nvim", opts = { experimental = { pathStrict = true } } },
-      "mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-      {
-        "mhanberg/elixir.nvim",
-        cond = function()
-          return require("lazyvim.util").has("elixir.language_server")
-        end,
-      },
-      {
-        "hrsh7th/cmp-nvim-lsp",
-        cond = function()
-          return require("lazyvim.util").has("nvim-cmp")
-        end,
-      },
+  "neovim/nvim-lspconfig",
+  dependencies = {
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    "jose-elias-alvarez/nvim-lsp-ts-utils",
+    "folke/lsp-colors.nvim",
+    {
+      "glepnir/lspsaga.nvim",
+      config = function()
+        require("lspsaga").setup({
+          symbol_in_winbar = {
+            enable = false,
+          },
+        })
+      end,
     },
-    ---@class PluginLspOpts
-    opts = function()
-      local lspconfig = require("lspconfig")
-      local elixir = require("elixir.language_server")
-      local root_pattern = lspconfig.util.root_pattern
+  },
+  config = function()
+    require("mason").setup()
+    require("mason-lspconfig").setup({
+      ensure_installed = {
+        "dockerls",
+        "pyright",
+        "elixirls",
+        "gopls",
+        "grammarly",
+        "graphql",
+        "sqlls",
+        "lua_ls",
+        "tsserver",
+        "yamlls",
+        "rust_analyzer",
+        "zls",
+      },
+      automatic_installlation = true,
+    })
 
-      return {
-        -- options for vim.diagnostic.config()
-        diagnostics = {
-          underline = true,
-          update_in_insert = false,
-          virtual_text = { spacing = 4, prefix = "●" },
-          severity_sort = true,
-        },
-        -- Automatically format on save
-        autoformat = true,
-        -- options for vim.lsp.buf.format
-        -- `bufnr` and `filter` is handled by the LazyVim formatter,
-        -- but can be also overriden when specified
-        format = {
-          formatting_options = nil,
-          timeout_ms = nil,
-        },
-        -- LSP Server Settings
-        ---@type lspconfig.options
-        servers = {
-          jsonls = {},
-          lua_ls = {
-            -- mason = false, -- set to false if you don't want this server to be installed with mason
-            settings = {
-              Lua = {
-                runtime = {
-                  -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                  version = "LuaJIT",
-                },
-                diagnostics = {
-                  -- Get the language server to recognize the `vim` global
-                  globals = { "vim" },
-                },
-                workspace = {
-                  checkThirdParty = false,
-                  -- Make the server aware of Neovim runtime files
-                  library = vim.api.nvim_get_runtime_file("", true),
-                },
-                completion = {
-                  callSnippet = "Replace",
-                },
+    local lspconfig = require("lspconfig")
+
+    local buf_map = function(bufnr, mode, lhs, rhs, opts)
+      vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
+        silent = true,
+      })
+    end
+
+    local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
+
+    -- For nvim-cmp
+    local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+    local on_attach = function(client, bufnr)
+      local function buf_set_keymap(...)
+        vim.api.nvim_buf_set_keymap(bufnr, ...)
+      end
+
+      local function buf_set_option(...)
+        vim.api.nvim_buf_set_option(bufnr, ...)
+      end
+
+      buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+
+      local opts = { noremap = true, silent = true }
+
+      buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
+      buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+      buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+      buf_set_keymap("n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+      buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+      buf_set_keymap("n", "<leader>dq", "<cmd>lua vim.diagnostic.set_loclist()<CR>", opts)
+      buf_set_keymap("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+      buf_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
+      buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
+
+      -- lsp-saga
+      buf_set_keymap("n", "<leader>rn", "<cmd>Lspsaga rename<cr>", opts)
+      buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+      --
+      buf_set_keymap("n", "<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
+      if client.supports_method("textDocument/formatting") then
+        vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          group = format_on_save_group,
+          buffer = bufnr,
+          callback = function()
+            vim.lsp.buf.format({ bufnr = bufnr })
+          end,
+        })
+      end
+      vim.api.nvim_create_user_command("Format", function()
+        vim.lsp.buf.format({ async = true })
+      end, {})
+
+      buf_set_keymap("n", "<leader>ca", ":Lspsaga code_action<cr>", opts)
+      buf_set_keymap("x", "<leader>ca", ":<c-u>Lspsaga range_code_action<cr>", opts)
+
+      buf_set_keymap("n", "<leader>cr", "<cmd>lua vim.lsp.codelens.run()<CR>", opts)
+      buf_set_keymap("n", "<leader>cl", "<cmd>lua vim.lsp.codelens.refresh()<CR>", opts)
+      if client.server_capabilities.code_lens then
+        vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+          buffer = bufnr,
+          callback = vim.lsp.codelens.refresh,
+        })
+        vim.lsp.codelens.refresh()
+      end
+    end
+
+    local opts = {
+      capabilities = capabilities,
+      on_attach = on_attach,
+    }
+
+    -- manual lspconfig
+    lspconfig.gleam.setup(opts)
+
+    -- mason-lspconfig
+    require("mason-lspconfig").setup_handlers({
+      function(server_name) -- default handler (optional)
+        lspconfig[server_name].setup({})
+      end,
+          ['elixirls'] = function()
+        opts.settings = {
+          elixirLS = {
+            fetchDeps = false,
+            dialyzerEnabled = true,
+            dialyzerFormat = 'dialyxir_short',
+            suggestSpecs = true,
+            root_dir = vim.fs.dirname(vim.fs.find({ 'mix.exs', '.git' }, { upward = true })[1])
+          }
+        }
+        lspconfig.elixirls.setup(opts)
+      end,
+          ["lua_ls"] = function()
+        opts.settings = {
+          Lua = {
+            diagnostics = {
+              globals = { "vim", "hs" },
+            },
+            workspace = {
+              library = {
+                    [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                    [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+                    ["/Users/nandofarias/.hammerspoon/Spoons/EmmyLua.spoon/annotations"] = true,
               },
             },
           },
-        },
-        -- you can do any additional lsp server setup here
-        -- return true if you don't want this server to be setup with lspconfig
-        ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
-        setup = {
-          -- example to setup with typescript.nvim
-          -- tsserver = function(_, opts)
-          --   require("typescript").setup({ server = opts })
-          --   return true
-          -- end,
-          -- Specify * to use this function as a fallback for any server
-          -- ["*"] = function(server, opts) end,
+        }
 
-          -- Elixir
-          ["elixirls"] = function()
-            lspconfig.elixirls.setup({
-              settings = elixir.settings({}),
-              on_attach = elixir.on_attach,
-            })
-          end,
-
-          -- Tailwindcss
-          ["tailwindcss"] = function()
-            lspconfig.tailwindcss.setup({
-              root_dir = root_pattern(
-                "assets/tailwind.config.js",
-                "tailwind.config.js",
-                "tailwind.config.ts",
-                "postcss.config.js",
-                "postcss.config.ts",
-                "package.json",
-                "node_modules"
-              ),
-              init_options = {
-                userLanguages = {
-                  elixir = "phoenix-heex",
-                  eruby = "erb",
-                  heex = "phoenix-heex",
-                  svelte = "html",
-                },
-              },
-              handlers = {
-                ["tailwindcss/getConfiguration"] = function(_, _, params, _, bufnr, _)
-                  vim.lsp.buf_notify(bufnr, "tailwindcss/getConfigurationResponse", { _id = params._id })
-                end,
-              },
-              settings = {
-                includeLanguages = {
-                  typescript = "javascript",
-                  typescriptreact = "javascript",
-                  ["html-eex"] = "html",
-                  ["phoenix-heex"] = "html",
-                  heex = "html",
-                  eelixir = "html",
-                  elm = "html",
-                  erb = "html",
-                  svelte = "html",
-                },
-                tailwindCSS = {
-                  lint = {
-                    cssConflict = "warning",
-                    invalidApply = "error",
-                    invalidConfigPath = "error",
-                    invalidScreen = "error",
-                    invalidTailwindDirective = "error",
-                    invalidVariant = "error",
-                    recommendedVariantOrder = "warning",
-                  },
-                  experimental = {
-                    classRegex = {
-                      [[class= "([^"]*)]],
-                      [[class: "([^"]*)]],
-                      '~H""".*class="([^"]*)".*"""',
-                    },
-                  },
-                  validate = true,
-                },
-              },
-              filetypes = {
-                "css",
-                "scss",
-                "sass",
-                "html",
-                "heex",
-                "elixir",
-                "eruby",
-                "javascript",
-                "javascriptreact",
-                "typescript",
-                "typescriptreact",
-                "svelte",
-              },
-            })
-          end,
-        },
-      }
-    end,
-    ---@param opts PluginLspOpts
-    config = function(plugin, opts)
-      -- setup autoformat
-      require("lazyvim.plugins.lsp.format").autoformat = opts.autoformat
-      -- setup formatting and keymaps
-      require("lazyvim.util").on_attach(function(client, buffer)
-        require("lazyvim.plugins.lsp.format").on_attach(client, buffer)
-        require("lazyvim.plugins.lsp.keymaps").on_attach(client, buffer)
-      end)
-
-      -- diagnostics
-      for name, icon in pairs(require("lazyvim.config").icons.diagnostics) do
-        name = "DiagnosticSign" .. name
-        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-      end
-      vim.diagnostic.config(opts.diagnostics)
-
-      local servers = opts.servers
-      local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
-
-      local function setup(server)
-        local server_opts = servers[server] or {}
-        server_opts.capabilities = capabilities
-        if opts.setup[server] then
-          if opts.setup[server](server, server_opts) then
-            return
-          end
-        elseif opts.setup["*"] then
-          if opts.setup["*"](server, server_opts) then
-            return
-          end
+        lspconfig.lua_ls.setup(opts)
+      end,
+          ["tsserver"] = function()
+        opts.on_attach = function(client, bufnr)
+          client.server_capabilities.document_formatting = false
+          client.server_capabilities.document_range_formatting = false
+          local ts_utils = require("nvim-lsp-ts-utils")
+          ts_utils.setup({})
+          ts_utils.setup_client(client)
+          buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
+          buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
+          buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
+          on_attach(client, bufnr)
         end
-        require("lspconfig")[server].setup(server_opts)
-      end
 
-      local mlsp = require("mason-lspconfig")
-      local available = mlsp.get_available_servers()
-
-      local ensure_installed = { "elixirls" } ---@type string[]
-      for server, server_opts in pairs(servers) do
-        if server_opts then
-          server_opts = server_opts == true and {} or server_opts
-          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-          if server_opts.mason == false or not vim.tbl_contains(available, server) then
-            setup(server)
-          else
-            ensure_installed[#ensure_installed + 1] = server
-          end
-        end
-      end
-
-      require("mason-lspconfig").setup({ ensure_installed = ensure_installed })
-      require("mason-lspconfig").setup_handlers({ setup })
-    end,
-  },
-
-  -- formatters
-  {
-    "jose-elias-alvarez/null-ls.nvim",
-    event = "BufReadPre",
-    dependencies = { "mason.nvim", "lukas-reineke/lsp-format.nvim" },
-    opts = function()
-      local b = require("null-ls").builtins
-      local lsp_format = require("lsp-format")
-
-      return {
-        sources = {
-          ----------------------
-          --      Hover      --
-          ----------------------
-          b.hover.dictionary,
-          ----------------------
-          --    Formatting   --
-          ----------------------
-          b.formatting.prettierd,
-          b.formatting.stylua,
-          -- Doesn't work for heex files
-          b.formatting.mix.with({
-            extra_filetypes = { "eelixir", "heex" },
-            args = { "format", "-" },
-            extra_args = function(_params)
-              local version_output = vim.fn.system("elixir -v")
-              local minor_version = vim.fn.matchlist(version_output, "Elixir \\d.\\(\\d\\+\\)")[2]
-
-              local extra_args = {}
-
-              -- tells the formatter the filename for the code passed to it via stdin.
-              -- This allows formatting heex files correctly. Only available for
-              -- Elixir >= 1.14
-              if tonumber(minor_version, 10) >= 14 then
-                extra_args = { "--stdin-filename", "$FILENAME" }
-              end
-
-              return extra_args
-            end,
-          }),
-          b.formatting.pg_format,
-          b.formatting.shfmt,
-          b.formatting.golines,
-          ----------------------
-          --    Diagnostics   --
-          ----------------------
-          b.diagnostics.flake8,
-          b.diagnostics.golangci_lint,
-          b.diagnostics.credo.with({
-            -- run credo in strict mode even if strict mode is not enabled in
-            -- .credo.exs
-            extra_args = { "--strict" },
-            -- only register credo source if it is installed in the current project
-            condition = function(_utils)
-              local cmd = { "rg", ":credo", "mix.exs" }
-              local credo_installed = ("" == vim.fn.system(cmd))
-              return not credo_installed
-            end,
-          }),
-          b.diagnostics.yamllint,
-          b.diagnostics.zsh,
-          ----------------------
-          --    Code Action   --
-          ----------------------
-          b.code_actions.eslint_d,
-        },
-        on_attach = function(client)
-          if client.supports_method("textDocument/formatting") then
-            lsp_format.on_attach(client)
-          end
-        end,
-      }
-    end,
-  },
-
-  -- cmdline tools and lsp servers
-  {
-    "williamboman/mason.nvim",
-    cmd = "Mason",
-    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-    opts = {
-      ensure_installed = {
-        -- Null LS
-        "actionlint",
-        "codespell",
-        "eslint_d",
-        "prettierd",
-        "shellcheck",
-        "stylua",
-        "yamllint",
-
-        -- LSPs
-
-        "bash-language-server",
-        "css-lsp",
-        "dockerfile-language-server",
-        "elixir-ls",
-        "elm-language-server",
-        "eslint-lsp",
-        "gopls",
-        "html-lsp",
-        "json-lsp",
-        "lua-language-server",
-        "rust-analyzer",
-        "sqlls",
-        "tailwindcss-language-server",
-        "terraform-ls",
-        "typescript-language-server",
-        "vim-language-server",
-        "yaml-language-server",
-      },
-    },
-    ---@param opts MasonSettings | {ensure_installed: string[]}
-    config = function(plugin, opts)
-      require("mason").setup(opts)
-      local mr = require("mason-registry")
-      for _, tool in ipairs(opts.ensure_installed) do
-        local p = mr.get_package(tool)
-        if not p:is_installed() then
-          p:install()
-        end
-      end
-    end,
-  },
+        lspconfig.tsserver.setup(opts)
+      end,
+          ["grammarly"] = function()
+        opts.init_options = { clientId = "client_BaDkMgx4X19X9UxxYRCXZo" }
+        lspconfig.grammarly.setup(opts)
+      end,
+    })
+  end,
 }

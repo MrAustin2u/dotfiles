@@ -26,10 +26,12 @@ g.markdown_fenced_languages = {
   "yaml",
   "json",
 }
+g.loaded_netrw = 1
+g.loaded_netrwPlugin = 1
 
 o.background = "dark"
 o.laststatus = 2 -- Always display the status line
-o.mouse = "nva"
+o.mouse = "a"
 o.termguicolors = true
 
 opt.autoindent = true
@@ -78,15 +80,15 @@ opt.formatoptions = {
 }
 -- from tj: FIXME: validate these!
 opt.formatoptions = opt.formatoptions
-  - "a" -- Auto formatting is BAD.
-  - "t" -- Don't auto format my code. I got linters for that.
-  + "c" -- In general, I like it when comments respect textwidth
-  + "q" -- Allow formatting comments w/ gq
-  - "o" -- O and o, don't continue comments
-  + "r" -- But do continue when pressing enter.
-  + "n" -- Indent past the formatlistpat, not underneath it.
-  + "j" -- Auto-remove comments if possible.
-  - "2" -- I'm not in gradeschool anymore
+    - "a" -- Auto formatting is BAD.
+    - "t" -- Don't auto format my code. I got linters for that.
+    + "c" -- In general, I like it when comments respect textwidth
+    + "q" -- Allow formatting comments w/ gq
+    - "o" -- O and o, don't continue comments
+    + "r" -- But do continue when pressing enter.
+    + "n" -- Indent past the formatlistpat, not underneath it.
+    + "j" -- Auto-remove comments if possible.
+    - "2" -- I'm not in gradeschool anymore
 -- from folke: FIXME: validate these!
 opt.formatoptions = "jcroqlnt" -- tcqj
 opt.hidden = true
@@ -133,6 +135,7 @@ opt.shortmess = {
 }
 o.shortmess = "filnxtToOFWIcC"
 opt.shortmess:append({ W = true, I = true, c = true })
+opt.showmatch = true
 opt.showmode = false -- Dont show mode since we have a statusline
 opt.sidescrolloff = 8 -- Columns of context
 opt.signcolumn = "yes" -- Always show the signcolumn, otherwise it would shift the text each time
