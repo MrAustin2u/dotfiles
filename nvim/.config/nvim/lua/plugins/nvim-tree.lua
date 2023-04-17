@@ -4,8 +4,12 @@ return {
     'kyazdani42/nvim-web-devicons',
   },
   keys = {
-    { "<leader>nf", "<cmd>NvimTreeFindFile<CR>", desc = "NvimTree - Toggle Find File" },
-    { "<leader>nt", "<cmd>NvimTreeToggle<CR>",   desc = "NvimTree - Toggle" },
+    {
+      "<leader>nf",
+      "<cmd>lua require('nvim-tree.api').tree.toggle({find_file = true})<CR>",
+      desc =
+      "NvimTree - Toggle Find File"
+    }
   },
   config = function()
     vim.cmd([[hi! NvimTreeNormalNC guibg=none ctermbg=none ]])

@@ -6,9 +6,8 @@ return {
     event = "BufReadPost",
     keys = {
       { "<c-space>", desc = "Increment selection" },
-      { "<bs>", desc = "Schrink selection", mode = "x" },
+      { "<bs>",      desc = "Schrink selection",  mode = "x" },
     },
-    ---@type TSConfig
     opts = {
       highlight = { enable = true },
       indent = { enable = true },
@@ -52,7 +51,6 @@ return {
         },
       },
     },
-    ---@param opts TSConfig
     config = function(_, opts)
       vim.cmd([[
       set foldmethod=expr

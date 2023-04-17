@@ -92,16 +92,16 @@ function M.telescope(builtin, opts)
   end
 end
 
--- FIXME: create a togglable terminal
--- Opens a floating terminal (interactive by default)
----@param cmd? string[]|string
----@param opts? LazyCmdOptions|{interactive?:boolean}
-function M.float_term(cmd, opts)
-  opts = vim.tbl_deep_extend("force", {
-    size = { width = 0.9, height = 0.9 },
-  }, opts or {})
-  require("lazy.util").float_term(cmd, opts)
-end
+-- -- FIXME: create a togglable terminal
+-- -- Opens a floating terminal (interactive by default)
+-- ---@param cmd? string[]|string
+-- ---@param opts? LazyCmdOptions|{interactive?:boolean}
+-- function M.float_term(cmd, opts)
+--   opts = vim.tbl_deep_extend("force", {
+--     size = { width = 0.9, height = 0.9 },
+--   }, opts or {})
+--   require("lazy.util").float_term(cmd, opts)
+-- end
 
 ---@param silent boolean?
 ---@param values? {[1]:any, [2]:any}
@@ -175,6 +175,19 @@ function M.lazy_notify()
   end)
   -- or if it took more than 500ms, then something went wrong
   timer:start(500, 0, replay)
+end
+
+---Determine if a value of any type is empty
+---@param item any
+---@return boolean?
+function M.falsy(item)
+  if not item then return true end
+  local item_type = type(item)
+  if item_type == 'boolean' then return not item end
+  if item_type == 'string' then return item == '' end
+  if item_type == 'number' then return item <= 0 end
+  if item_type == 'table' then return vim.tbl_isempty(item) end
+  return item ~= nil
 end
 
 return M

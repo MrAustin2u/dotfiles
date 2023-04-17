@@ -1,10 +1,10 @@
 local Util = require("util")
-
 -- ================================
 -- # Misc
 -- ================================
 -- quit all
 vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
+vim.keymap.set('n', '<space>wq', ':wq <CR>', { silent = true, desc = "Save and Quit" })
 
 -- command
 vim.keymap.set("n", ";", ":")
@@ -59,15 +59,6 @@ vim.keymap.set("n", "<leader>uc", function()
   Util.toggle("conceallevel", false, { 0, conceallevel })
 end, { desc = "Toggle Conceal" })
 
--- lazygit
-vim.keymap.set("n", "<leader>gg", function()
-  Util.float_term({ "lazygit" }, { cwd = Util.get_root() })
-end, { desc = "Lazygit (root dir)" })
-
-vim.keymap.set("n", "<leader>gG", function()
-  Util.float_term({ "lazygit" })
-end, { desc = "Lazygit (cwd)" })
-
 -- floating terminal
 vim.keymap.set("n", "<leader>ft", function()
   Util.float_term()
@@ -81,7 +72,7 @@ vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
 -- copy to end of line
 vim.keymap.set("n", "Y", "y$", { desc = "Copy to end of line" })
 -- copy to system clipboard
-vim.keymap.set("v", "gy", '"+y', { desc = "Copy to system clipboard (visual mode)" })
+vim.keymap.set({ "n", "v" }, "gy", '"+y', { desc = "Copy to system clipboard (normal and visual mode)" })
 -- copy entire file
 vim.keymap.set("n", "<C-g>y", "ggyG", { desc = "Copy entire file" })
 -- copy entire file to system clipboard
@@ -106,9 +97,6 @@ vim.keymap.set("n", "<C-p>", function()
   vim.cmd("let @+ = expand('%')")
 end, { desc = "Copy relative path" })
 
--- Clear search with <esc>
-vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
-
 -- Clear search, diff update and redraw
 -- taken from runtime/lua/_editor.lua
 vim.keymap.set(
@@ -117,8 +105,12 @@ vim.keymap.set(
   "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
   { desc = "Redraw / clear hlsearch / diff update" }
 )
+
+vim.keymap.set({ "n", "x" }, "gw", "*N", { desc = "Search word under cursor" })
 -- buffer
-vim.keymap.set('n', '<space>d', ':Bdelete <CR> <Plug>(cokeline-focus-prev)<CR>', { silent = true })
+vim.keymap.set('n', '<space>bd', ':Bdelete <CR> <Plug>(cokeline-focus-prev)<CR>',
+  { silent = true, desc = "Buffer Delete" })
+vim.keymap.set('n', '<space>ba', ':%bdelete|edit#|bdelete# <CR>', { silent = true, desc = "Buffer Delete All" })
 
 -- windows
 vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window" })
@@ -138,3 +130,6 @@ vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increa
 if vim.fn.has("nvim-0.9.0") == 1 then
   vim.keymap.set("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
 end
+
+-- browse
+vim.keymap.set("n", "<leader>i", "<cmd>Browse<cr>", { desc = "Browse github and internet" })

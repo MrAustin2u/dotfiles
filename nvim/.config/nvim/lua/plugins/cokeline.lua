@@ -1,12 +1,14 @@
 return {
   "noib3/nvim-cokeline",
+  lazy = false,
   dependencies = {
     "kyazdani42/nvim-web-devicons",
   },
+  keys = {
+    { '<S-Tab>', '<Plug>(cokeline-focus-prev)', { silent = true, desc = "Prev Tab" } },
+    { '<Tab>',   '<Plug>(cokeline-focus-next)', { silent = true, desc = "Next Tab" } }
+  },
   config = function()
-    vim.cmd([[au VimEnter * hi TabLineFill gui=none guifg=none guibg=none]])
-    local map = vim.api.nvim_set_keymap
-
     local get_hex = require("cokeline/utils").get_hex
     local green = vim.g.terminal_color_2
     local errors_fg = get_hex("DiagnosticError", "fg")
@@ -68,13 +70,13 @@ return {
         {
           text = function(buffer)
             return (buffer.diagnostics.errors ~= 0 and "  " .. buffer.diagnostics.errors)
-              or (buffer.diagnostics.warnings ~= 0 and " ⚠ " .. buffer.diagnostics.warnings)
-              or ""
+                or (buffer.diagnostics.warnings ~= 0 and " ⚠ " .. buffer.diagnostics.warnings)
+                or ""
           end,
           fg = function(buffer)
             return (buffer.diagnostics.errors ~= 0 and errors_fg)
-              or (buffer.diagnostics.warnings ~= 0 and warnings_fg)
-              or nil
+                or (buffer.diagnostics.warnings ~= 0 and warnings_fg)
+                or nil
           end,
           truncation = { priority = 1 },
         },
@@ -98,11 +100,5 @@ return {
         },
       },
     })
-    map("n", "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true })
-    map("n", "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true })
-
-    for i = 1, 9 do
-      map("n", ("<Leader>%s"):format(i), ("<Plug>(cokeline-focus-%s)"):format(i), { silent = true })
-    end
   end,
 }

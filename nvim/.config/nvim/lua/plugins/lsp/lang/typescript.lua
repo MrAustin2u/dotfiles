@@ -17,14 +17,21 @@ return {
     opts = {
       -- make sure mason installs the server
       servers = {
-        tsserver = {},
+        tsserver = {
+          settings = {
+            completions = {
+              completeFunctionCalls = true,
+            },
+          },
+        },
       },
       setup = {
         tsserver = function(_, opts)
           local on_attach = function(client, buffer)
             if client.name == "tsserver" then
               -- stylua: ignore
-              vim.keymap.set("n", "<leader>co", "<cmd>TypescriptOrganizeImports<CR>", { buffer = buffer, desc = "Organize Imports" })
+              vim.keymap.set("n", "<leader>co", "<cmd>TypescriptOrganizeImports<CR>",
+                { buffer = buffer, desc = "Organize Imports" })
               vim.keymap.set(
                 "n",
                 "<leader>cR",
@@ -47,5 +54,11 @@ return {
         end,
       },
     },
+  },
+  {
+    "jose-elias-alvarez/null-ls.nvim",
+    opts = function(_, opts)
+      table.insert(opts.sources, require("typescript.extensions.null-ls.code-actions"))
+    end,
   },
 }

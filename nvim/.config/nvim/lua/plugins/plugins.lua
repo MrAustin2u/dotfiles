@@ -108,6 +108,17 @@ return {
   { 'sindrets/diffview.nvim',   dependencies = { 'kyazdani42/nvim-web-devicons' } },
   { 'ruifm/gitlinker.nvim',     config = true },
 
+  {
+    'mattn/vim-gist',
+    dependencies = { 'mattn/webapi-vim' },
+    config = function()
+      vim.g.gist_clip_command = 'pbcopy'
+      vim.g.gist_detect_filetype = 1
+      vim.g.gist_open_browser_after_post = 1
+      vim.g.gist_post_private = 1
+    end
+  },
+
   -- Frontend
   'mattn/emmet-vim',
 
@@ -116,7 +127,4 @@ return {
 
   -- Better wildmenu
   { 'gelguy/wilder.nvim',    config = function() require('wilder').setup({ modes = { ':', '/', '?' } }) end },
-
-  -- 'github/copilot.vim',
-  'github/copilot.vim',
 }
