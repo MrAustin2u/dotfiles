@@ -83,12 +83,16 @@ return {
         ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
       },
       sources = {
-        { name = "copilot" },
-        { name = "nvim_lsp" },
-        { name = "nvim_lua" },
-        { name = "vsnip" },
-        { name = "path" },
-        { name = "tmux" },
+        {
+          name = "copilot",
+          max_item_count = 3,
+          group_index = 2,
+        },
+        { name = "nvim_lsp", group_index = 2 },
+        { name = "nvim_lua", group_index = 2 },
+        { name = "vsnip", group_index = 2 },
+        { name = "path", group_index = 2 },
+        { name = "tmux", group_index = 2 },
         {
           name = "buffer",
           option = {
@@ -96,6 +100,7 @@ return {
               return vim.api.nvim_list_bufs()
             end,
           },
+          group_index = 2,
         },
       },
     })

@@ -1,18 +1,21 @@
-local Util = require("lazy.core.util")
+local LazyUtil = require("lazy.core.util")
 
 local M = {}
 
 M.root_patterns = { ".git", "lua" }
 
----@param on_attach fun(client, buffer)
-function M.on_attach(on_attach)
-  vim.api.nvim_create_autocmd("LspAttach", {
-    callback = function(args)
-      local buffer = args.buf
-      local client = vim.lsp.get_client_by_id(args.data.client_id)
-      on_attach(client, buffer)
-    end,
-  })
+-- Checks if a table contains a value
+---@param tbl table
+---@param item any
+---@return boolean
+function M.contains(tbl, item)
+  for x in pairs(tbl) do
+    if x == item then
+      return true
+    end
+  end
+
+  return false
 end
 
 ---@param plugin string
@@ -45,9 +48,12 @@ function M.get_root()
   if path then
     for _, client in pairs(vim.lsp.get_active_clients({ bufnr = 0 })) do
       local workspace = client.config.workspace_folders
-      local paths = workspace and vim.tbl_map(function(ws)
+      local paths = workspace
+          and vim.tbl_map(function(ws)
             return vim.uri_to_fname(ws.uri)
-          end, workspace) or client.config.root_dir and { client.config.root_dir } or {}
+          end, workspace)
+        or client.config.root_dir and { client.config.root_dir }
+        or {}
       for _, p in ipairs(paths) do
         local r = vim.loop.fs_realpath(p)
         if path:find(r, 1, true) then
@@ -92,17 +98,6 @@ function M.telescope(builtin, opts)
   end
 end
 
--- -- FIXME: create a togglable terminal
--- -- Opens a floating terminal (interactive by default)
--- ---@param cmd? string[]|string
--- ---@param opts? LazyCmdOptions|{interactive?:boolean}
--- function M.float_term(cmd, opts)
---   opts = vim.tbl_deep_extend("force", {
---     size = { width = 0.9, height = 0.9 },
---   }, opts or {})
---   require("lazy.util").float_term(cmd, opts)
--- end
-
 ---@param silent boolean?
 ---@param values? {[1]:any, [2]:any}
 function M.toggle(option, silent, values)
@@ -112,14 +107,14 @@ function M.toggle(option, silent, values)
     else
       vim.opt_local[option] = values[1]
     end
-    return Util.info("Set " .. option .. " to " .. vim.opt_local[option]:get(), { title = "Option" })
+    return LazyUtil.info("Set " .. option .. " to " .. vim.opt_local[option]:get(), { title = "Option" })
   end
   vim.opt_local[option] = not vim.opt_local[option]:get()
   if not silent then
     if vim.opt_local[option]:get() then
-      Util.info("Enabled " .. option, { title = "Option" })
+      LazyUtil.info("Enabled " .. option, { title = "Option" })
     else
-      Util.warn("Disabled " .. option, { title = "Option" })
+      LazyUtil.warn("Disabled " .. option, { title = "Option" })
     end
   end
 end
@@ -129,15 +124,50 @@ function M.toggle_diagnostics()
   enabled = not enabled
   if enabled then
     vim.diagnostic.enable()
-    Util.info("Enabled diagnostics", { title = "Diagnostics" })
+    LazyUtil.info("Enabled diagnostics", { title = "Diagnostics" })
   else
     vim.diagnostic.disable()
-    Util.warn("Disabled diagnostics", { title = "Diagnostics" })
+    LazyUtil.warn("Disabled diagnostics", { title = "Diagnostics" })
   end
 end
 
 function M.deprecate(old, new)
-  Util.warn(("`%s` is deprecated. Please use `%s` instead"):format(old, new), { title = "LazyVim" })
+  LazyUtil.warn(("`%s` is deprecated. Please use `%s` instead"):format(old, new), { title = "LazyVim" })
+end
+
+---@param msg string|string[]
+---@param opts? LazyNotifyOpts
+function M.notify(msg, opts)
+  if vim.in_fast_event() then
+    return vim.schedule(function()
+      M.notify(msg, opts)
+    end)
+  end
+
+  opts = opts or {}
+  if type(msg) == "table" then
+    msg = table.concat(
+      vim.tbl_filter(function(line)
+        return line or false
+      end, msg),
+      "\n"
+    )
+  end
+  local lang = opts.lang or "markdown"
+  vim.notify(msg, opts.level or vim.log.levels.INFO, {
+    on_open = function(win)
+      pcall(require, "nvim-treesitter")
+      vim.wo[win].conceallevel = 3
+      vim.wo[win].concealcursor = ""
+      vim.wo[win].spell = false
+      local buf = vim.api.nvim_win_get_buf(win)
+      if not pcall(vim.treesitter.start, buf, lang) then
+        vim.bo[buf].filetype = lang
+        vim.bo[buf].syntax = lang
+      end
+    end,
+    title = opts.title or "lazy.nvim",
+  })
 end
 
 -- delay notifications till vim.notify was replaced or after 500ms
@@ -181,13 +211,62 @@ end
 ---@param item any
 ---@return boolean?
 function M.falsy(item)
-  if not item then return true end
+  if not item then
+    return true
+  end
   local item_type = type(item)
-  if item_type == 'boolean' then return not item end
-  if item_type == 'string' then return item == '' end
-  if item_type == 'number' then return item <= 0 end
-  if item_type == 'table' then return vim.tbl_isempty(item) end
+  if item_type == "boolean" then
+    return not item
+  end
+  if item_type == "string" then
+    return item == ""
+  end
+  if item_type == "number" then
+    return item <= 0
+  end
+  if item_type == "table" then
+    return vim.tbl_isempty(item)
+  end
   return item ~= nil
+end
+
+-- Builds the path for the json schema catalog cache
+---@return Path path
+local json_schemas_catalog_path = function()
+  local Path = require("plenary.path")
+  local base_path = Path:new(vim.fn.stdpath("data"))
+  return base_path:joinpath("json_schema_catalog.json")
+end
+
+-- Fetches the JSON Schemas catalog from the SchemaStore API and stores it in a
+-- local file
+function M.download_json_schemas()
+  local catalog_path = json_schemas_catalog_path()
+
+  -- download the latest json schema catalog
+  local json = vim.fn.system({
+    "curl",
+    "https://json.schemastore.org/api/json/catalog.json",
+    "--silent",
+  })
+
+  -- write file
+  catalog_path:write(json, "w")
+
+  -- notify user
+  vim.notify(string.format("Wrote JSON Schemas catalog to %s", catalog_path))
+end
+
+-- Reads JSON Schemas from cache location
+function M.read_json_schemas()
+  local catalog_path = json_schemas_catalog_path()
+
+  if catalog_path:exists() then
+    local contents = catalog_path:read()
+    return vim.json.decode(contents)
+  else
+    return nil
+  end
 end
 
 return M
