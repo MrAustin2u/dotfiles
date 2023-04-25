@@ -183,6 +183,24 @@ vim.keymap.set("n", "<leader>i", "<cmd>Browse<cr>", { desc = "Browse github and 
 -- Elixir
 vim.keymap.set("n", "<leader>re", "<cmd>ElixirRestart<CR>", { desc = "Restart Elixir LSP" })
 
+M.attempt = function(attempt)
+  nmap({ "<leader>an", attempt.new_select, default_opts })
+  nmap({ "<leader>ar", attempt.run, default_opts })
+  nmap({ "<leader>ad", attempt.delete_buf, default_opts })
+  nmap({ "<leader>ac", attempt.rename_buf, default_opts })
+  nmap({ "<leader>al", "<cmd>Telescope attempt", default_opts })
+end
+
+M.cokeline = function()
+  nmap({ "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true, desc = "Prev Tab" } })
+  nmap({ "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Tab" } })
+end
+
+M.dadbod_mappings = function()
+  nmap({ "<leader>do", ":DBUI<CR><CR>", { silent = true, desc = "Database UI Open" } })
+  nmap({ "<leader>dc", ":DBUIClose<CR>", { silent = true, desc = "Database UI Close" } })
+end
+
 M.lsp_mappings = function(bufnr)
   local buf_nmap = function(mapping, cmd)
     vim.api.nvim_buf_set_keymap(bufnr, "n", mapping, cmd, default_opts)
@@ -213,8 +231,10 @@ M.lsp_mappings = function(bufnr)
   buf_nmap("<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
   -- ca = code action
   buf_vmap("<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
-  -- gr = get references
-  buf_nmap("gr", "<cmd>lua vim.lsp.buf.references()<CR>")
+  -- K = hover doc
+  buf_nmap("K", "<cmd>lua vim.lsp.buf.hover()<CR>")
+  -- bf = buffer format
+  buf_nmap("<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
 end
 
 M.lsp_diagnostic_mappings = function()
@@ -226,8 +246,8 @@ end
 
 M.lsp_saga_mappings = function()
   -- Lsp finder find the symbol definition implmement reference
-  nmap({ "<leader>ca", ":<c-u>Lspsaga range_code_action<cr>", silent })
-  nmap({ "<leader>ca", ":Lspsaga code_action<cr>", silent })
+  nmap({ "<leader>ca", "<cmd><c-u>Lspsaga range_code_action<cr>", silent })
+  nmap({ "<leader>ca", "<cmd>Lspsaga code_action<cr>", silent })
   nmap({ "<leader>lf", "<cmd>Lspsaga lsp_finder<CR>", silent })
 
   -- Rename
@@ -266,7 +286,17 @@ M.lsp_saga_mappings = function()
   nmap({ "<leader>ol", "<cmd>LSoutlineToggle<CR>", silent })
 
   -- Hover Doc
-  nmap({ "K", "<cmd>Lspsaga hover_doc<CR>", silent })
+  -- nmap({ "K", "<cmd>Lspsaga hover_doc<CR>", silent })
+end
+
+M.nvim_tree_mappings = function()
+  nmap({
+    "<leader>nf",
+    "<cmd>lua require('nvim-tree.api').tree.toggle({find_file = true})<CR>",
+    {
+      desc = "NvimTree - Toggle Find File",
+    },
+  })
 end
 
 M.telescope_mappings = function()
@@ -276,6 +306,8 @@ M.telescope_mappings = function()
   nmap({ "<leader>f?", "<cmd>Telescope search_history<cr>", default_opts })
   nmap({ "<leader>ff", "<cmd>Telescope find_files<cr>", { silent = true, noremap = true, desc = "Find Files" } })
   nmap({ "<leader>fg", "<cmd>Telescope git_files<cr>", { silent = true, noremap = true, desc = "Find Git Files" } })
+  nmap({ "<leader>sg", "<cmd>Telescope live_grep<cr>", default_opts })
+  nmap({ "<leader>sw", "<cmd>Telescope grep_string<cr>", default_opts })
   nmap({ "<leader>fh", "<cmd>Telescope help_tags<cr>", default_opts })
   nmap({ "<leader>fk", "<cmd>Telescope keymaps<cr>", default_opts })
   nmap({ "<leader>fo", "<cmd>Telescope oldfiles<cr>", default_opts })
@@ -285,13 +317,14 @@ M.telescope_mappings = function()
   --  Extensions
   nmap({ "<leader>fb", "<cmd>Telescope file_browser<cr>", default_opts })
 
-  nmap({ "<leader>lg", "<cmd>Telescope live_grep<cr>", default_opts })
   nmap({ "<leader>bb", "<cmd>Telescope buffers<cr>", default_opts })
 
   -- better spell suggestions
   nmap({ "z=", "<cmd>Telescope spell_suggest<cr>", default_opts })
 
   -- LSP
+  -- find references
+  nmap({ "fr", "<cmd>Telescope lsp_references<cr>", default_opts })
   -- ds = document symbols
   nmap({ "<leader>ds", "<cmd>Telescope lsp_document_symbols<cr>", default_opts })
 
@@ -302,6 +335,216 @@ M.telescope_mappings = function()
   nmap({ "<leader>gg", "<cmd>Telescope gh gist<cr>", default_opts })
   nmap({ "<leader>gi", "<cmd>Telescope gh issues<cr>", default_opts })
   nmap({ "<leader>gp", "<cmd>Telescope gh pull_request<cr>", default_opts })
+end
+
+M.attempt_mappings = function(attempt)
+  -- new attempt, selecting extension
+  nmap({ "<leader>sn", attempt.new_select, default_opts })
+  -- run current attempt buffer
+  nmap({ "<leader>sr", attempt.run, default_opts })
+  -- delete attempt from current buffer
+  nmap({ "<leader>sd", attempt.delete_buf, default_opts })
+  -- rename attempt from current buffer
+  nmap({ "<leader>sc", attempt.rename_buf, default_opts })
+  -- open one of the existing scratch buffers
+  nmap({ "<leader>sl", attempt.open_select, default_opts })
+end
+
+M.gitsigns_mappings = function(gitsigns, bufnr)
+  local opts = { expr = true, buffer = bufnr }
+
+  local next_hunk = function()
+    if vim.wo.diff then
+      return "]c"
+    end
+    vim.schedule(function()
+      gitsigns.next_hunk()
+    end)
+    return "<Ignore>"
+  end
+
+  local prev_hunk = function()
+    if vim.wo.diff then
+      return "[c"
+    end
+    vim.schedule(function()
+      gitsigns.prev_hunk()
+    end)
+    return "<Ignore>"
+  end
+
+  -- Navigation
+  nmap({ "]h", next_hunk, opts })
+  nmap({ "[h", prev_hunk, opts })
+
+  -- Hunk operations
+  -- Reset Hunk
+  nmap({ "<leader>gr", ":Gitsigns reset_hunk<CR>" })
+  vmap({ "<leader>gr", ":Gitsigns reset_hunk<CR>" })
+  -- Stage Hunk
+  nmap({ "<leader>gs", ":Gitsigns stage_hunk<CR>" })
+  vmap({ "<leader>gs", ":Gitsigns stage_hunk<CR>" })
+  -- Undo Stage Hunk
+  nmap({ "<leader>gu", ":Gitsigns undo_stage_hunk<CR>" })
+  vmap({ "<leader>gu", ":Gitsigns undo_stage_hunk<CR>" })
+
+  -- Text object for git hunks (e.g. vih will select the hunk)
+  map({ { "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>" })
+end
+
+M.noice_mappings = function(noice)
+  nmap({
+    "<S-Enter>",
+    function()
+      noice.redirect(vim.fn.getcmdline())
+    end,
+    mode = "c",
+    desc = "Redirect Cmdline",
+  })
+  nmap({
+    "<leader>snl",
+    function()
+      noice.cmd("last")
+    end,
+    desc = "Noice Last Message",
+  })
+  nmap({
+    "<leader>snh",
+    function()
+      noice.cmd("history")
+    end,
+    desc = "Noice History",
+  })
+  nmap({
+    "<leader>sna",
+    function()
+      noice.cmd("all")
+    end,
+    desc = "Noice All",
+  })
+  nmap({
+    "<c-f>",
+    function()
+      if not noice.lsp.scroll(4) then
+        return "<c-f>"
+      end
+    end,
+    silent = true,
+    expr = true,
+    desc = "Scroll forward",
+    mode = {
+      "i",
+      "n",
+      "s",
+    },
+  })
+  nmap({
+    "<c-b>",
+    function()
+      if not require("noice.lsp").scroll(-4) then
+        return "<c-b>"
+      end
+    end,
+    silent = true,
+    expr = true,
+    desc = "Scroll backward",
+    mode = {
+      "i",
+      "n",
+      "s",
+    },
+  })
+end
+
+M.persistence_mappings = function(p)
+  nmap({
+    "<leader>qs",
+    function()
+      p.load()
+    end,
+    { silent = true, desc = "Restore Session" },
+  })
+  nmap({
+    "<leader>ql",
+    function()
+      p.load({ last = true })
+    end,
+    { silent = true, desc = "Restore Last Session" },
+  })
+  nmap({
+    "<leader>qd",
+    function()
+      p.stop()
+    end,
+    { silent = true, desc = "Don't Save Current Session" },
+  })
+end
+
+M.rest_mappings = function()
+  nmap({ "<leader>rf", "<Plug>RestNvim<CR>", default_opts })
+  nmap({ "<leader>rl", "<Plug>RestNvimLast<CR>", default_opts })
+  nmap({ "<leader>rp", "<Plug>RestNvimPreview<CR>", default_opts })
+end
+
+M.spectre_mappings = function(spectre)
+  nmap({
+    "<leader>sr",
+    function()
+      spectre.open()
+    end,
+    { silent = true, desc = "Replace in files (Spectre)" },
+  })
+end
+
+M.silicon_mappings = function()
+  nmap({ "<leader>ss", "<cmd>Silicon!<cr>", mode = "v", { silent = true, desc = "Screenshot a code snippet" } })
+  nmap({
+    "<leader>sc",
+    ":Silicon<cr>",
+    mode = "v",
+    { silent = true, desc = "Screenshot a code snippet into the clipboard" },
+  })
+end
+
+M.toggleterm_mappings = function(lazygit, node, terminal)
+  vim.keymap.set({ "n", "t" }, "<C-\\>", function()
+    terminal:toggle()
+  end, { desc = "Toggleterm: toggle" })
+  vim.keymap.set({ "n", "t" }, "<leader>gg", function()
+    lazygit:toggle()
+  end, { desc = "Toggleterm: toggle LazyGit" })
+  vim.keymap.set({ "n", "t" }, "<C-n>", function()
+    node:toggle()
+  end, { desc = "Toggleterm: toggle Node" })
+end
+
+M.trouble_mappings = function()
+  nmap({ "<leader>xx", "<cmd>TroubleToggle<cr>", { silent = true, desc = "Trouble Toggle" } })
+  nmap({ "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { silent = true, desc = "Trouble Workspace" } })
+  nmap({ "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { silent = true, desc = "Trouble Document" } })
+  nmap({ "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true, desc = "Trouble Quickfix" } })
+  nmap({ "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { silent = true, desc = "Trouble Loclist" } })
+  nmap({ "<leader>xr", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, desc = "Trouble LSP" } })
+end
+
+M.vim_notify_mappings = function(notify)
+  nmap({
+    "<leader>un",
+    function()
+      notify.dismiss({ silent = true, pending = true })
+    end,
+    {
+      silent = true,
+      desc = "Delete all Notifications",
+    },
+  })
+end
+
+M.vim_test_mappings = function()
+  nmap({ "<leader>tn", ":TestNearest<CR>" })
+  nmap({ "<leader>tf", ":TestFile<CR>" })
+  nmap({ "<leader>ts", ":TestSuite<CR>" })
+  nmap({ "<leader>tl", ":TestLast<CR>" })
 end
 
 return M

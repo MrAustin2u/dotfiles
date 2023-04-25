@@ -30,6 +30,7 @@ M.setup = function()
       "dockerls",
       "grammarly",
       "graphql",
+      "elixirls",
       "lua_ls",
       "rust_analyzer",
       "sqlls",
@@ -44,7 +45,6 @@ M.setup = function()
     function(server_name)
       lspconfig[server_name].setup({})
     end,
-
     ["tailwindcss"] = function()
       lspconfig.tailwindcss.setup({
         root_dir = root_pattern(
@@ -117,19 +117,16 @@ M.setup = function()
         },
       })
     end,
-
     -- JSON
     ["jsonls"] = function()
       local overrides = require("plugins.lsp.jsonls")
       lspconfig.jsonls.setup(overrides)
     end,
-
     -- YAML
     ["yamlls"] = function()
       local overrides = require("plugins.lsp.yamlls").setup()
       lspconfig.yamlls.setup(overrides)
     end,
-
     -- Lua
     ["lua_ls"] = function()
       -- Make runtime files discoverable to the lua server

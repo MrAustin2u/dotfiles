@@ -1,7 +1,14 @@
-return {
-  "windwp/nvim-spectre",
-    -- stylua: ignore
-    keys = {
-      { "<leader>sr", function() require("spectre").open() end, desc = "Replace in files (Spectre)" },
-    },
-}
+local present, spectre = pcall(require, "spectre")
+
+if not present then
+  return
+end
+
+local M = {}
+
+M.setup = function()
+  spectre.setup()
+  require("core.keymaps").spectre_mappings()
+end
+
+return M

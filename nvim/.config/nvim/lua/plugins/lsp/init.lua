@@ -20,6 +20,14 @@ end
 local M = {}
 
 local on_attach = function(client, bufnr)
+  -- dont format if client disabled it
+  if
+    client.config
+    and client.config.capabilities
+    and client.config.capabilities.documentFormattingProvider == false
+  then
+    return
+  end
   -- Enable completion triggered by <c-x><c-o> (not sure this is necessary with
   -- cmp plugin)
   vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
@@ -30,6 +38,32 @@ local on_attach = function(client, bufnr)
 
   if client.server_capabilities.documentSymbolProvider then
     navic.attach(client, bufnr)
+  end
+
+  local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
+
+  if client.supports_method("textDocument/formatting") then
+    vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = format_on_save_group,
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.format({
+          bufnr = bufnr,
+        })
+      end,
+    })
+  end
+  vim.api.nvim_create_user_command("Format", function()
+    vim.lsp.buf.format({ async = true })
+  end, {})
+
+  if client.server_capabilities.code_lens then
+    vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+      buffer = bufnr,
+      callback = vim.lsp.codelens.refresh,
+    })
+    vim.lsp.codelens.refresh()
   end
 
   -- Use an on_attach function to only map the following keys
