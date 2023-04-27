@@ -1,18 +1,16 @@
-local present, regexplainer = pcall(require, "regexplainer")
+return {
+  "bennypowers/nvim-regexplainer",
+  dependencies = {
+    "MunifTanjim/nui.nvim",
+  },
+  config = function()
+    local regexplainer = require("regexplainer")
 
-if not present then
-  return
-end
-
-local M = {}
-
-M.setup = function()
-  require("regexplainer").setup({
-    auto = true,
-    mappings = {
-      toggle = "gR",
-    },
-  })
-end
-
-return M
+    require("regexplainer").setup({
+      auto = true,
+      mappings = {
+        toggle = "gR",
+      },
+    })
+  end,
+}

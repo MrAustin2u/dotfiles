@@ -1,4 +1,4 @@
-local Utils = require("core.utils")
+local Utils = require("utils")
 local M = {}
 
 --[[
@@ -180,8 +180,8 @@ end
 -- browse
 vim.keymap.set("n", "<leader>i", "<cmd>Browse<cr>", { desc = "Browse github and internet" })
 
--- Elixir
-vim.keymap.set("n", "<leader>re", "<cmd>ElixirRestart<CR>", { desc = "Restart Elixir LSP" })
+-- LSP Restart
+vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" })
 
 M.attempt = function(attempt)
   nmap({ "<leader>an", attempt.new_select, default_opts })
@@ -504,18 +504,6 @@ M.silicon_mappings = function()
     mode = "v",
     { silent = true, desc = "Screenshot a code snippet into the clipboard" },
   })
-end
-
-M.toggleterm_mappings = function(lazygit, node, terminal)
-  vim.keymap.set({ "n", "t" }, "<C-\\>", function()
-    terminal:toggle()
-  end, { desc = "Toggleterm: toggle" })
-  vim.keymap.set({ "n", "t" }, "<leader>gg", function()
-    lazygit:toggle()
-  end, { desc = "Toggleterm: toggle LazyGit" })
-  vim.keymap.set({ "n", "t" }, "<C-n>", function()
-    node:toggle()
-  end, { desc = "Toggleterm: toggle Node" })
 end
 
 M.trouble_mappings = function()

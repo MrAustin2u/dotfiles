@@ -1,14 +1,9 @@
-local present, trouble = pcall(require, "trouble")
+return {
+  "folke/trouble.nvim",
+  config = function()
+    local trouble = require("trouble")
 
-if not present then
-  return
-end
-
-local M = {}
-
-M.setup = function()
-  trouble.setup()
-  require("core.keymaps").trouble_mappings()
-end
-
-return M
+    trouble.setup()
+    require("keymaps").trouble_mappings()
+  end,
+}

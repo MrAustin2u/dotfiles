@@ -1,24 +1,17 @@
-local present, gitsigns = pcall(require, "gitsigns")
-
-if not present then
-  return
-end
-
-local default = {
-  on_attach = function(bufnr)
-    require("core.keymaps").gitsigns_mappings(gitsigns, bufnr)
-
-    -- remove background from sign column (so it works better with a transparent
-    -- terminal emulator)
-    vim.cmd("hi SignColumn guibg=None")
+return {
+  "lewis6991/gitsigns.nvim",
+  config = function()
+    require("gitsigns").setup({
+      current_line_blame = true,
+      current_line_blame_opts = {
+        delay = 500,
+        ignore_whitespace = true,
+      },
+      on_attach = function(bufnr)
+        local gitsigns = require("gitsigns")
+        require("keymaps").gitsigns_mappings(gitsigns, bufnr)
+        vim.cmd("hi SignColumn guibg=None")
+      end,
+    })
   end,
 }
-
-local M = {}
-
-M.setup = function()
-  ---@diagnostic disable-next-line: redundant-parameter
-  gitsigns.setup(default)
-end
-
-return M

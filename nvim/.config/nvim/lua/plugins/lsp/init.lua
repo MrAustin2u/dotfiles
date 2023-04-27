@@ -1,121 +1,158 @@
-local utils = require("core.utils")
-
-local lspconfig_present, lspconfig = pcall(require, "lspconfig")
-local cmp_lsp_present, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-local navic_present, navic = pcall(require, "nvim-navic")
-local elixir_present, elixir = pcall(require, "elixir")
-
-local deps = {
-  cmp_lsp_present,
-  lspconfig_present,
-  navic_present,
-  elixir_present,
-}
-
-if utils.contains(deps, false) then
-  vim.notify("Failed to load dependencies in plugins/lsp.lua")
-  return
-end
-
-local M = {}
-
-local on_attach = function(client, bufnr)
-  -- dont format if client disabled it
-  if
-    client.config
-    and client.config.capabilities
-    and client.config.capabilities.documentFormattingProvider == false
-  then
-    return
-  end
-  -- Enable completion triggered by <c-x><c-o> (not sure this is necessary with
-  -- cmp plugin)
-  vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-
-  if client.config.name == "yamlls" and vim.bo.filetype == "helm" then
-    vim.lsp.buf_detach_client(bufnr, client.id)
-  end
-
-  if client.server_capabilities.documentSymbolProvider then
-    navic.attach(client, bufnr)
-  end
-
-  local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
-
-  if client.supports_method("textDocument/formatting") then
-    vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      group = format_on_save_group,
-      buffer = bufnr,
-      callback = function()
-        vim.lsp.buf.format({
-          bufnr = bufnr,
+return {
+  "neovim/nvim-lspconfig",
+  dependencies = {
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    "jose-elias-alvarez/nvim-lsp-ts-utils",
+    "folke/lsp-colors.nvim",
+    {
+      "glepnir/lspsaga.nvim",
+      config = function()
+        require("lspsaga").setup({
+          symbol_in_winbar = {
+            enable = true,
+          },
         })
       end,
+    },
+  },
+  config = function()
+    require("mason").setup()
+    require("mason-lspconfig").setup({
+      ensure_installed = {
+        "dockerls",
+        "elixirls",
+        "grammarly",
+        "graphql",
+        "sqlls",
+        "lua_ls",
+        "tsserver",
+        "yamlls",
+        "rust_analyzer",
+        "zls",
+      },
+      automatic_installlation = true,
     })
-  end
-  vim.api.nvim_create_user_command("Format", function()
-    vim.lsp.buf.format({ async = true })
-  end, {})
 
-  if client.server_capabilities.code_lens then
-    vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-      buffer = bufnr,
-      callback = vim.lsp.codelens.refresh,
-    })
-    vim.lsp.codelens.refresh()
-  end
+    local lspconfig = require("lspconfig")
 
-  -- Use an on_attach function to only map the following keys
-  -- after the language server attaches to the current buffer
-  require("core.keymaps").lsp_mappings(bufnr)
-end
+    local buf_map = function(bufnr, mode, lhs, rhs, opts)
+      vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
+        silent = true,
+      })
+    end
 
-M.setup = function()
-  -- set up global mappings for diagnostics
-  require("core.keymaps").lsp_diagnostic_mappings()
+    local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
 
-  -- Add completion and documentation capabilities for cmp completion
-  ---@param opts table|nil
-  local function create_capabilities(opts)
-    local default_opts = {
-      with_snippet_support = true,
+    -- For nvim-cmp
+    local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+    local on_attach = function(client, bufnr)
+      require("keymaps").lsp_mappings(bufnr)
+      require("keymaps").lsp_diagnostic_mappings()
+
+      local function buf_set_option(...)
+        vim.api.nvim_buf_set_option(bufnr, ...)
+      end
+
+      buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+
+      if client.supports_method("textDocument/formatting") then
+        vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          group = format_on_save_group,
+          buffer = bufnr,
+          callback = function()
+            vim.lsp.buf.format({ bufnr = bufnr })
+          end,
+        })
+      end
+      vim.api.nvim_create_user_command("Format", function()
+        vim.lsp.buf.format({ async = true })
+      end, {})
+
+      if client.server_capabilities.code_lens then
+        vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+          buffer = bufnr,
+          callback = vim.lsp.codelens.refresh,
+        })
+        vim.lsp.codelens.refresh()
+      end
+    end
+
+    local opts = {
+      capabilities = capabilities,
+      on_attach = on_attach,
     }
-    opts = opts or default_opts
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities.textDocument.completion.completionItem.snippetSupport = opts.with_snippet_support
-    if opts.with_snippet_support then
-      capabilities.textDocument.completion.completionItem.resolveSupport = {
-        properties = {
-          "documentation",
-          "detail",
-          "additionalTextEdits",
-        },
-      }
-    end
 
-    return cmp_lsp.default_capabilities(capabilities)
-  end
+    -- mason-lspconfig
+    require("mason-lspconfig").setup_handlers({
+      function(server_name) -- default handler (optional)
+        lspconfig[server_name].setup({})
+      end,
+      ["elixirls"] = function()
+        local child_or_root_path = vim.fs.dirname(vim.fs.find({ "mix.exs", ".git" }, { upward = true })[1])
+        local maybe_umbrella_path =
+            vim.fs.dirname(vim.fs.find({ "mix.exs" }, { upward = true, path = child_or_root_path })[1])
 
-  -- inject our custom on_attach after the built in on_attach from the lspconfig
-  lspconfig.util.on_setup = lspconfig.util.add_hook_after(lspconfig.util.on_setup, function(config)
-    if config.on_attach then
-      config.on_attach = lspconfig.util.add_hook_after(config.on_attach, on_attach)
-    else
-      config.on_attach = on_attach
-    end
+        if maybe_umbrella_path then
+          local Path = require("plenary.path")
+          if not vim.startswith(child_or_root_path, Path:joinpath(maybe_umbrella_path, "apps"):absolute()) then
+            maybe_umbrella_path = nil
+          end
+        end
 
-    config.capabilities = create_capabilities()
-  end)
+        local root_dir = maybe_umbrella_path or child_or_root_path or vim.loop.os_homedir()
+        local path_to_elixirls = vim.fn.expand("~/elixir-ls/release/language_server.sh")
 
-  ---@diagnostic disable-next-line: redundant-parameter
-  require("plugins.mason").setup({
-    on_attach = on_attach,
-  })
+        opts.settings = {
+          cmd = { path_to_elixirls },
+          elixirLS = {
+            fetchDeps = false,
+            dialyzerEnabled = true,
+            dialyzerFormat = "dialyxir_short",
+            suggestSpecs = true,
+            root_dir = root_dir,
+          },
+        }
+        lspconfig.elixirls.setup(opts)
+      end,
+      ["lua_ls"] = function()
+        opts.settings = {
+          Lua = {
+            diagnostics = {
+              globals = { "vim", "hs" },
+            },
+            workspace = {
+              library = {
+                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+                ["/Users/nandofarias/.hammerspoon/Spoons/EmmyLua.spoon/annotations"] = true,
+              },
+            },
+          },
+        }
 
-  elixir.setup({
-    on_attach = on_attach,
-  })
-end
+        lspconfig.lua_ls.setup(opts)
+      end,
+      ["tsserver"] = function()
+        opts.on_attach = function(client, bufnr)
+          client.server_capabilities.document_formatting = false
+          client.server_capabilities.document_range_formatting = false
+          local ts_utils = require("nvim-lsp-ts-utils")
+          ts_utils.setup({})
+          ts_utils.setup_client(client)
+          buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
+          buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
+          buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
+          on_attach(client, bufnr)
+        end
 
-return M
+        lspconfig.tsserver.setup(opts)
+      end,
+      ["grammarly"] = function()
+        opts.init_options = { clientId = "client_BaDkMgx4X19X9UxxYRCXZo" }
+        lspconfig.grammarly.setup(opts)
+      end,
+    })
+  end,
+}

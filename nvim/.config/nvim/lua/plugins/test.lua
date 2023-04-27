@@ -7,6 +7,6 @@ return {
     vim.g["test#strategy"] = "vimux"
     vim.g["test#preserve_screen"] = 0
 
-    require("core.keymaps").vim_test_mappings()
+    require("keymaps").vim_test_mappings()
   end,
 }
