@@ -339,15 +339,15 @@ end
 
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
-  nmap({ "<leader>sn", attempt.new_select, default_opts })
+  nmap({ "<leader>an", attempt.new_select, default_opts })
   -- run current attempt buffer
-  nmap({ "<leader>sr", attempt.run, default_opts })
+  nmap({ "<leader>ar", attempt.run, default_opts })
   -- delete attempt from current buffer
-  nmap({ "<leader>sd", attempt.delete_buf, default_opts })
+  nmap({ "<leader>ad", attempt.delete_buf, default_opts })
   -- rename attempt from current buffer
-  nmap({ "<leader>sc", attempt.rename_buf, default_opts })
+  nmap({ "<leader>ac", attempt.rename_buf, default_opts })
   -- open one of the existing scratch buffers
-  nmap({ "<leader>sl", attempt.open_select, default_opts })
+  nmap({ "<leader>al", attempt.open_select, default_opts })
 end
 
 M.gitsigns_mappings = function(gitsigns, bufnr)
@@ -497,7 +497,7 @@ M.spectre_mappings = function(spectre)
 end
 
 M.silicon_mappings = function()
-  nmap({ "<leader>ss", "<cmd>Silicon!<cr>", mode = "v", { silent = true, desc = "Screenshot a code snippet" } })
+  nmap({ "<leader>SS", "<cmd>Silicon!<cr>", mode = "v", { silent = true, desc = "Screenshot a code snippet" } })
   nmap({
     "<leader>sc",
     ":Silicon<cr>",

@@ -3,6 +3,6 @@ return {
   config = function()
     local spectre = require("spectre")
     spectre.setup()
-    require("keymaps").spectre_mappings()
+    require("keymaps").spectre_mappings(spectre)
   end,
 }

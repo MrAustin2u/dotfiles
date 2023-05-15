@@ -14,5 +14,7 @@ return {
         format = "silicon_[year][month][day]_[hour][minute][second].png",
       },
     })
+
+    require("keymaps").silicon_mappings()
   end,
 }

@@ -38,5 +38,7 @@ const log = ():void => {
         ex = { "w", "!elixir %" },
       },
     })
+
+    require("keymaps").attempt_mappings(attempt)
   end,
 }

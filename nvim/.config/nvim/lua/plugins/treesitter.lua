@@ -1,66 +1,108 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  version = false, -- last release is way too old and doesn't work on Windows
   build = ":TSUpdate",
-  event = "BufReadPost",
-  keys = {
-    { "<c-space>", desc = "Increment selection" },
-    { "<bs>",      desc = "Schrink selection",  mode = "x" },
+  dependencies = {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    "JoosepAlviste/nvim-ts-context-commentstring",
+    "RRethy/nvim-treesitter-endwise",
+    "nvim-treesitter/playground",
+    "nvim-treesitter/nvim-treesitter-context",
   },
   config = function()
     local treesitter = require("nvim-treesitter.configs")
 
+    vim.cmd([[
+    set foldmethod=expr
+    set foldexpr=nvim_treesitter#foldexpr()
+    " disable folds at startup
+    set nofoldenable
+  ]])
     local opts = {
+      ensure_installed = "all",
+      autotag = { enable = true },
       highlight = { enable = true },
-      indent = { enable = true },
-      context_commentstring = { enable = true, enable_autocmd = false },
-      ensure_installed = {
-        "bash",
-        "css",
-        "dockerfile",
-        "eex",
-        "elixir",
-        "erlang",
-        "git_rebase",
-        "gitcommit",
-        "gitignore",
-        "go",
-        "graphql",
-        "heex",
-        "html",
-        "javascript",
-        "json",
-        "json5",
-        "jsonc",
-        "lua",
-        "markdown",
-        "markdown_inline",
-        "python",
-        "regex",
-        "rust",
-        "scss",
-        "sql",
-        "typescript",
-        "vim",
-        "yaml",
-      },
-      incremental_selection = {
+      context_commentstring = {
         enable = true,
-        keymaps = {
-          init_selection = "<C-space>",
-          node_incremental = "<C-space>",
-          scope_incremental = "<nop>",
-          node_decremental = "<bs>",
+        enable_autocmd = false,
+      },
+      textobjects = {
+        select = {
+          enable = true,
+          -- Automatically jump forward to textobj, similar to targets.vim
+          lookahead = true,
+          keymaps = {
+            -- You can use the capture groups defined in textobjects.scm
+            ["af"] = "@function.outer",
+            ["if"] = "@function.inner",
+            ["ac"] = "@class.outer",
+            ["ic"] = "@class.inner",
+            ["ip"] = "@parameter.inner",
+            ["ap"] = "@parameter.outer",
+            ["ib"] = "@block.inner",
+            ["ab"] = "@block.outer",
+            ["ik"] = "@comment.inner",
+            ["ak"] = "@comment.outer",
+          },
+        },
+        swap = {
+          enable = true,
+          swap_next = {
+            ["<leader>pn"] = "@parameter.inner",
+          },
+          swap_previous = {
+            ["<leader>pp"] = "@parameter.inner",
+          },
+        },
+        move = {
+          enable = true,
+          -- whether to set jumps in the jumplist
+          set_jumps = true,
+          goto_next_start = {
+            ["]m"] = "@function.outer",
+            ["]]"] = "@class.outer",
+          },
+          goto_next_end = {
+            ["]M"] = "@function.outer",
+            ["]["] = "@class.outer",
+          },
+          goto_previous_start = {
+            ["[m"] = "@function.outer",
+            ["[["] = "@class.outer",
+          },
+          goto_previous_end = {
+            ["[M"] = "@function.outer",
+            ["[]"] = "@class.outer",
+          },
         },
       },
+      -- :TSPlaygroundToggle
+      playground = {
+        enable = true,
+        disable = {},
+        updatetime = 25,         -- Debounced time for highlighting nodes in the playground from source code
+        persist_queries = false, -- Whether the query persists across vim sessions
+        keybindings = {
+          toggle_query_editor = "gq",
+          toggle_hl_groups = "i",
+          toggle_injected_languages = "t",
+          toggle_anonymous_nodes = "a",
+          toggle_language_display = "I",
+          focus_language = "f",
+          unfocus_language = "F",
+          update = "R",
+          goto_node = "<cr>",
+          show_help = "?",
+        },
+      },
+      query_linter = {
+        enable = true,
+        use_virtual_text = true,
+        lint_events = { "BufWrite", "CursorHold" },
+      },
+      endwise = {
+        enable = true,
+      },
     }
-
-    vim.cmd([[
-      set foldmethod=expr
-      set foldexpr=nvim_treesitter#foldexpr()
-      " disable folds at startup
-      set nofoldenable
-      ]])
 
     treesitter.setup(opts)
   end,
