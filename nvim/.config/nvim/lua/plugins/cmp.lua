@@ -11,18 +11,21 @@ return {
     },
     "andersevenrud/cmp-tmux",
     "hrsh7th/cmp-buffer",
+    "hrsh7th/cmp-cmdline",
     "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-nvim-lsp-signature-help",
     "hrsh7th/cmp-nvim-lua",
     "hrsh7th/cmp-path",
     "hrsh7th/cmp-vsnip",
     "hrsh7th/vim-vsnip",
+    "onsails/lspkind.nvim",
     "petertriho/cmp-git",
-    "hrsh7th/cmp-cmdline",
   },
   config = function()
     vim.g.vsnip_snippet_dir = "~/.config/nvim/snippets"
 
     local cmp = require("cmp")
+    local lspkind = require("lspkind")
 
     cmp.setup({
       window = {
@@ -31,48 +34,18 @@ return {
       },
       formatting = {
         fields = { "kind", "abbr", "menu" },
-        format = function(entry, vim_item)
-          local lspkind_icons = {
-            Text = "",
-            Method = "",
-            Function = "",
-            Constructor = " ",
-            Field = "",
-            Variable = "",
-            Class = "",
-            Interface = "",
-            Module = "硫",
-            Property = "",
-            Unit = " ",
-            Value = "",
-            Enum = " ",
-            Keyword = "ﱃ",
-            Snippet = " ",
-            Color = " ",
-            File = " ",
-            Reference = "Ꮢ",
-            Folder = " ",
-            EnumMember = " ",
-            Constant = " ",
-            Struct = " ",
-            Event = "",
-            Operator = "",
-            TypeParameter = " ",
-            Copilot = "",
-          }
-          local meta_type = vim_item.kind
-          -- load lspkind icons
-          vim_item.kind = lspkind_icons[vim_item.kind] .. ""
-
-          vim_item.menu = ({
-            buffer = " Buffer",
-            nvim_lsp = meta_type,
-            path = " Path",
-            luasnip = " LuaSnip",
-          })[entry.source.name]
-
-          return vim_item
-        end,
+        format = lspkind.cmp_format({
+          symbol_map = { Copilot = "" },
+          before = function(entry, vim_item)
+            vim_item.menu = ({
+              buffer = " Buffer",
+              nvim_lsp = vim_item.kind,
+              path = " Path",
+              luasnip = " LuaSnip",
+            })[entry.source.name]
+            return vim_item
+          end,
+        }),
       },
       snippet = {
         expand = function(args)
@@ -93,6 +66,7 @@ return {
       },
       sources = {
         { name = "copilot" },
+        { name = "nvim_lsp_signature_help" },
         { name = "nvim_lsp" },
         { name = "nvim_lua" },
         { name = "vsnip" },
