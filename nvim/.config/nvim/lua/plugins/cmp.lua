@@ -1,17 +1,16 @@
 return {
   "hrsh7th/nvim-cmp",
+  version = false, -- last release is way too old
   event = "InsertEnter",
   dependencies = {
     {
       "L3MON4D3/LuaSnip",
       dependencies = {
-        -- snippets!
         "rafamadriz/friendly-snippets",
       },
     },
     "andersevenrud/cmp-tmux",
     "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-cmdline",
     "hrsh7th/cmp-nvim-lsp",
     "hrsh7th/cmp-nvim-lsp-signature-help",
     "hrsh7th/cmp-nvim-lua",
@@ -20,73 +19,127 @@ return {
     "hrsh7th/vim-vsnip",
     "onsails/lspkind.nvim",
     "petertriho/cmp-git",
+    "saadparwaiz1/cmp_luasnip",
   },
   config = function()
     vim.g.vsnip_snippet_dir = "~/.config/nvim/snippets"
 
     local cmp = require("cmp")
     local lspkind = require("lspkind")
+    local luasnip = require("luasnip")
 
-    cmp.setup({
+    local has_words_before = function()
+      local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+      return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+    end
+
+    local tmux_source = {
+      name = "tmux",
+      option = { all_panes = true },
+    }
+
+    local all_buffers_completion_source = {
+      name = "buffer",
+      option = {
+        get_bufnrs = function()
+          -- complete from all buffers
+          return vim.api.nvim_list_bufs()
+        end,
+      },
+    }
+
+    local opts = {
       window = {
         completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
       },
-      formatting = {
-        fields = { "kind", "abbr", "menu" },
-        format = lspkind.cmp_format({
-          symbol_map = { Copilot = "" },
-          before = function(entry, vim_item)
-            vim_item.menu = ({
-              buffer = " Buffer",
-              nvim_lsp = vim_item.kind,
-              path = " Path",
-              luasnip = " LuaSnip",
-            })[entry.source.name]
-            return vim_item
-          end,
-        }),
+      completion = {
+        completeopt = "menu,menuone,noinsert",
       },
       snippet = {
         expand = function(args)
           vim.fn["vsnip#anonymous"](args.body)
         end,
+        -- expand = function(args)
+        --   luasnip.lsp_expand(args.body)
+        -- end,
       },
-      mapping = {
-        ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+      mapping = cmp.mapping.preset.insert({
+        ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+        ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+        ["<C-b>"] = cmp.mapping.scroll_docs(-4),
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
         ["<C-Space>"] = cmp.mapping.complete(),
-        ["<C-y>"] = cmp.mapping.close(),
-        ["<C-c>"] = cmp.mapping.abort(),
-        ["<CR>"] = cmp.mapping.confirm({ select = true }),
-        ["<Tab>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
-        ["<S-Tab>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
-        ["<C-n>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
-        ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
-      },
-      sources = {
-        { name = "copilot" },
-        { name = "nvim_lsp_signature_help" },
+        ["<C-e>"] = cmp.mapping.abort(),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+        ["<S-CR>"] = cmp.mapping.confirm({
+          behavior = cmp.ConfirmBehavior.Replace,
+          select = true,
+        }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+        ["<Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item()
+          elseif luasnip.expand_or_jumpable() then
+            luasnip.expand_or_jump()
+          elseif has_words_before() then
+            cmp.complete()
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item()
+          elseif luasnip.jumpable(-1) then
+            luasnip.jump(-1)
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+      }),
+      sources = cmp.config.sources({
         { name = "nvim_lsp" },
-        { name = "nvim_lua" },
-        { name = "vsnip" },
+        { name = "luasnip" },
         { name = "path" },
-        { name = "tmux" },
-        {
-          name = "buffer",
-          option = {
-            get_bufnrs = function()
-              return vim.api.nvim_list_bufs()
-            end,
-          },
+        all_buffers_completion_source,
+        { name = "emoji" },
+        tmux_source,
+      }),
+      preselect = cmp.PreselectMode.None,
+      formatting = {
+        fields = { "kind", "abbr", "menu" },
+        format = lspkind.cmp_format({
+          symbol_map = { Copilot = "" },
+          -- mode = "symbol", -- show only symbol annotations
+          maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+          ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
+          before = function(entry, vim_item)
+            local source = ({
+              buffer = "[BUF]",
+              cmdline = "[CMD]",
+              emoji = "[EMJ]",
+              git = "[GIT]",
+              luasnip = "[SNP]",
+              nvim_lsp = vim_item.kind,
+              nvim_lua = "[LUA]",
+              path = "[PTH]",
+              tmux = "[TMX]",
+            })[entry.source.name]
+
+            local padded_kind = require("utils").right_pad(vim_item.kind, 8, " ")
+            vim_item.menu = string.format("%s %s", padded_kind, source)
+
+            return vim_item
+          end,
+        }),
+      },
+      experimental = {
+        ghost_text = {
+          hl_group = "LspCodeLens",
         },
       },
-    })
+    }
 
-    local opts = { remap = true, expr = true, replace_keycodes = false }
-    -- vim.keymap.set({'i','s'}, '<C-J>',   "vsnip#expandable() ? '<Plug>(vsnip-expand)'         : '<C-J>'",   opts)
-    -- vim.keymap.set({'i','s'}, '<C-L>',   "vsnip#available(1) ? '<Plug>(vsnip-expand-or-jump)' : '<C-L>'",   opts)
-    vim.keymap.set({ "i", "s" }, "<Tab>", "vsnip#jumpable(1)  ? '<Plug>(vsnip-jump-next)'      : '<Tab>'", opts)
-    vim.keymap.set({ "i", "s" }, "<S-Tab>", "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'", opts)
+    cmp.setup(opts)
   end,
 }

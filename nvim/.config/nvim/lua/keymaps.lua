@@ -183,6 +183,22 @@ vim.keymap.set("n", "<leader>i", "<cmd>Browse<cr>", { desc = "Browse github and 
 -- LSP Restart
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" })
 
+-- lazygit
+nmap({
+  "<leader>gg",
+  function()
+    Utils.float_term({ "lazygit" }, { cwd = Utils.get_root(), esc_esc = false })
+  end,
+  Utils.merge_maps(default_opts, { desc = "Lazygit (root dir)" }),
+})
+nmap({
+  "<leader>gG",
+  function()
+    Utils.float_term({ "lazygit" }, { esc_esc = false })
+  end,
+  Utils.merge_maps(default_opts, { desc = "Lazygit (cwd)" }),
+})
+
 M.attempt = function(attempt)
   nmap({ "<leader>an", attempt.new_select, default_opts })
   nmap({ "<leader>ar", attempt.run, default_opts })
@@ -332,22 +348,21 @@ M.telescope_mappings = function()
 
   -- GitHub
   nmap({ "<leader>ga", "<cmd>Telescope gh run<cr>", default_opts })
-  nmap({ "<leader>gg", "<cmd>Telescope gh gist<cr>", default_opts })
   nmap({ "<leader>gi", "<cmd>Telescope gh issues<cr>", default_opts })
   nmap({ "<leader>gp", "<cmd>Telescope gh pull_request<cr>", default_opts })
 end
 
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
-  nmap({ "<leader>an", attempt.new_select, default_opts })
+  nmap({ "<leader>an", attempt.new_select, Utils.merge_maps(default_opts, { desc = "New Attempt" }) })
   -- run current attempt buffer
-  nmap({ "<leader>ar", attempt.run, default_opts })
+  nmap({ "<leader>ar", attempt.run, Utils.merge_maps(default_opts, { desc = "Run Attempt" }) })
   -- delete attempt from current buffer
-  nmap({ "<leader>ad", attempt.delete_buf, default_opts })
+  nmap({ "<leader>ad", attempt.delete_buf, Utils.merge_maps(default_opts, { desc = "Delete Attempt" }) })
   -- rename attempt from current buffer
-  nmap({ "<leader>ac", attempt.rename_buf, default_opts })
+  nmap({ "<leader>ac", attempt.rename_buf, Utils.merge_maps(default_opts, { desc = "Rename Attempt" }) })
   -- open one of the existing scratch buffers
-  nmap({ "<leader>al", attempt.open_select, default_opts })
+  nmap({ "<leader>al", attempt.open_select, Utils.merge_maps(default_opts, { desc = "Select Attempt" }) })
 end
 
 M.gitsigns_mappings = function(gitsigns, bufnr)

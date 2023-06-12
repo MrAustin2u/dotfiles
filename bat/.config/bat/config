@@ -1,0 +1,6 @@
+--theme="tokyonight_moon"
+--style="numbers,changes,header"
+--italic-text=always
+
+# Update the binary cache
+# bat cache --build

@@ -2,7 +2,91 @@ local LazyUtil = require("lazy.core.util")
 
 local M = {}
 
+M.defaults = {
+  -- colorscheme can be a string like `catppuccin` or a function that will load the colorscheme
+  ---@type string|fun()
+  colorscheme = function()
+    require("tokyonight").load()
+  end,
+  -- load the default settings
+  defaults = {
+    autocmds = false, -- lazyvim.config.autocmds
+    keymaps = false, -- lazyvim.config.keymaps
+    -- lazyvim.config.options can't be configured here since that's loaded before lazyvim setup
+    -- if you want to disable loading options, add `package.loaded["lazyvim.config.options"] = true` to the top of your init.lua
+  },
+  -- icons used by other plugins
+  icons = {
+    dap = {
+      Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
+      Breakpoint = " ",
+      BreakpointCondition = " ",
+      BreakpointRejected = { " ", "DiagnosticError" },
+      LogPoint = ".>",
+    },
+    diagnostics = {
+      Error = " ",
+      Warn = " ",
+      Hint = " ",
+      Info = " ",
+    },
+    git = {
+      added = " ",
+      modified = " ",
+      removed = " ",
+    },
+    kinds = {
+      Array = " ",
+      Boolean = " ",
+      Class = " ",
+      Color = " ",
+      Constant = " ",
+      Constructor = " ",
+      Copilot = " ",
+      Enum = " ",
+      EnumMember = " ",
+      Event = " ",
+      Field = " ",
+      File = " ",
+      Folder = " ",
+      Function = " ",
+      Interface = " ",
+      Key = " ",
+      Keyword = " ",
+      Method = " ",
+      Module = " ",
+      Namespace = " ",
+      Null = " ",
+      Number = " ",
+      Object = " ",
+      Operator = " ",
+      Package = " ",
+      Property = " ",
+      Reference = " ",
+      Snippet = " ",
+      String = " ",
+      Struct = " ",
+      Text = " ",
+      TypeParameter = " ",
+      Unit = " ",
+      Value = " ",
+      Variable = " ",
+    },
+  },
+}
+
 M.root_patterns = { ".git", "lua" }
+
+---@param on_attach fun(client, buffer)
+M.on_attach = function(on_attach)
+  vim.api.nvim_create_autocmd("LspAttach", {
+    callback = function(args)
+      local buffer = args.buf
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      on_attach(client, buffer)
+    end,
+  })
+end
 
 -- Checks if a table contains a value
 ---@param tbl table
@@ -267,6 +351,74 @@ function M.read_json_schemas()
   else
     return nil
   end
+end
+
+---@type table<string,LazyFloat>
+local terminals = {}
+
+-- Opens a floating terminal (interactive by default)
+---@param cmd? string[]|string
+---@param opts? LazyCmdOptions|{interactive?:boolean, esc_esc?:false}
+function M.float_term(cmd, opts)
+  opts = vim.tbl_deep_extend("force", {
+    ft = "lazyterm",
+    size = { width = 0.9, height = 0.9 },
+  }, opts or {}, { persistent = true })
+  ---@cast opts LazyCmdOptions|{interactive?:boolean, esc_esc?:false}
+
+  local termkey = vim.inspect({ cmd = cmd or "shell", cwd = opts.cwd, env = opts.env })
+
+  if terminals[termkey] and terminals[termkey]:buf_valid() then
+    terminals[termkey]:toggle()
+  else
+    terminals[termkey] = require("lazy.util").float_term(cmd, opts)
+    local buf = terminals[termkey].buf
+    vim.b[buf].lazyterm_cmd = cmd
+    if opts.esc_esc == false then
+      vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
+    end
+    vim.api.nvim_create_autocmd("BufEnter", {
+      buffer = buf,
+      callback = function()
+        vim.cmd.startinsert()
+      end,
+    })
+  end
+  return terminals[termkey]
+end
+
+-- Pads a string's right hand side
+---@param str string String to pad
+---@param len number How many characters to pad by
+---@param char string Character to use when padding
+function M.right_pad(str, len, char)
+  local res = str .. string.rep(char or " ", len - #str)
+  return res, res ~= str
+end
+
+-- Pads a string's left hand side
+---@param str string String to pad
+---@param len number How many characters to pad by
+---@param char string Character to use when padding
+function M.left_pad(str, len, char)
+  local res = string.rep(char or " ", len - #str) .. str
+  return res, res ~= str
+end
+
+function M.merge_maps(map1, map2)
+  local mergedMap = {}
+
+  -- Copy all key-value pairs from map1 to mergedMap
+  for key, value in pairs(map1) do
+    mergedMap[key] = value
+  end
+
+  -- Copy all key-value pairs from map2 to mergedMap
+  for key, value in pairs(map2) do
+    mergedMap[key] = value
+  end
+
+  return mergedMap
 end
 
 return M

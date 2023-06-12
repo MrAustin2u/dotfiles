@@ -85,6 +85,13 @@ return {
       require("keymaps").rest_mappings()
     end,
   },
+  -- lsp renaming
+  {
+    "smjonas/inc-rename.nvim",
+    config = function()
+      require("inc_rename").setup()
+    end,
+  },
   -- references
   {
     "RRethy/vim-illuminate",
@@ -142,13 +149,13 @@ return {
   { "nvim-lua/plenary.nvim", lazy = true },
 
   -- makes some plugins dot-repeatable like leap
-  { "tpope/vim-repeat",      event = "VeryLazy" },
+  { "tpope/vim-repeat", event = "VeryLazy" },
 
   "tpope/vim-surround",
 
   "tpope/vim-abolish",
 
-  { "szw/vim-maximizer",     keys = { { "<space>m", ":MaximizerToggle <CR>" } } },
+  { "szw/vim-maximizer", keys = { { "<space>m", ":MaximizerToggle <CR>" } } },
   { "windwp/nvim-autopairs", config = true },
 
   { "karb94/neoscroll.nvim", config = true },
@@ -157,7 +164,7 @@ return {
 
   { "tversteeg/registers.nvim", config = true },
 
-  { "chentoast/marks.nvim",     config = true },
+  { "chentoast/marks.nvim", config = true },
 
   "dstein64/vim-startuptime",
 
@@ -169,7 +176,7 @@ return {
 
   { "folke/todo-comments.nvim", config = true },
 
-  { "numToStr/Comment.nvim",    config = true },
+  { "numToStr/Comment.nvim", config = true },
 
   "benizi/vim-automkdir",
 
@@ -211,7 +218,7 @@ return {
   "mattn/emmet-vim",
 
   -- Better quickfix
-  { "kevinhwang91/nvim-bqf",    ft = "qf" },
+  { "kevinhwang91/nvim-bqf", ft = "qf" },
 
   -- Better wildmenu
   {

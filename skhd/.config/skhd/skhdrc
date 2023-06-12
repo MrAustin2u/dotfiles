@@ -1,7 +1,7 @@
 # services
 shift + alt - y : brew services restart yabai
 shift + alt - s : brew services restart skhd
-shift + alt - b : brew services restart spacebar
+shift + alt - b : brew services restart sketchybar
 shift + alt - p : brew services restart postgresql
 
 # open terminal

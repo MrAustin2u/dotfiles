@@ -1,28 +1,137 @@
 return {
-  "neovim/nvim-lspconfig",
-  dependencies = {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
-    "jose-elias-alvarez/nvim-lsp-ts-utils",
-    "folke/lsp-colors.nvim",
-    {
-      "glepnir/lspsaga.nvim",
-      config = function()
-        require("lspsaga").setup({
-          symbol_in_winbar = {
-            enable = true,
-          },
-        })
-      end,
+  {
+    "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      { "folke/neoconf.nvim", cmd = "Neoconf", config = true },
+      { "folke/neodev.nvim", opts = {} },
+      {
+        "williamboman/mason.nvim",
+        build = ":MasonUpdate", -- :MasonUpdate updates registry contents
+      },
+      "jose-elias-alvarez/typescript.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      {
+        "hrsh7th/cmp-nvim-lsp",
+        cond = function()
+          return require("utils").has("nvim-cmp")
+        end,
+      },
     },
-  },
-  config = function()
-    require("mason").setup()
-    require("mason-lspconfig").setup({
-      ensure_installed = {
+    opts = {
+      autoformat = true,
+      capabilities = {},
+      diagnostics = {
+        underline = true,
+        update_in_insert = false,
+        virtual_text = {
+          spacing = 4,
+          source = "if_many",
+          prefix = "●",
+          -- this will set set the prefix to a function that returns the diagnostics icon based on the severity
+          -- this only works on a recent 0.10.0 build. Will be set to "●" when not supported
+          -- prefix = "icons",
+        },
+        severity_sort = true,
+      },
+      servers = {
+        elixirls = {
+          settings = {
+            cmd = { vim.fn.expand("~/elixir-ls/release/language_server.sh") },
+            elixirLS = {
+              fetchDeps = false,
+              dialyzerEnabled = true,
+              dialyzerFormat = "dialyxir_short",
+              suggestSpecs = true,
+            },
+          },
+        },
+        -- jsonls = {},
+        lua_ls = {
+          -- mason = false, -- set to false if you don't want this server to be installed with mason
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+            },
+          },
+        },
+      },
+      setup = {
+        tsserver = function(_, opts)
+          require("typescript").setup({ server = opts })
+          return true
+        end,
+      },
+    },
+    config = function(_, opts)
+      local Utils = require("utils")
+      require("plugins.lsp.format").autoformat = opts.autoformat
+      Utils.on_attach(function(client, buffer)
+        require("plugins.lsp.format").on_attach(client, buffer)
+        require("plugins.lsp.keymaps").on_attach(client, buffer)
+      end)
+
+      -- diagnostics
+      for name, icon in pairs(Utils.defaults.icons.diagnostics) do
+        name = "DiagnosticSign" .. name
+        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+      end
+
+      if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
+        opts.diagnostics.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
+          or function(diagnostic)
+            local icons = require("lazyvim.config").icons.diagnostics
+            for d, icon in pairs(icons) do
+              if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
+                return icon
+              end
+            end
+          end
+      end
+
+      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
+
+      local servers = opts.servers
+      local capabilities = vim.tbl_deep_extend(
+        "force",
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
+        require("cmp_nvim_lsp").default_capabilities(),
+        opts.capabilities or {}
+      )
+
+      local function setup(server)
+        local server_opts = vim.tbl_deep_extend("force", {
+          capabilities = vim.deepcopy(capabilities),
+        }, servers[server] or {})
+
+        if opts.setup[server] then
+          if opts.setup[server](server, server_opts) then
+            return
+          end
+        elseif opts.setup["*"] then
+          if opts.setup["*"](server, server_opts) then
+            return
+          end
+        end
+        require("lspconfig")[server].setup(server_opts)
+      end
+
+      -- get all the servers that are available thourgh mason-lspconfig
+      local have_mason, mlsp = pcall(require, "mason-lspconfig")
+      local all_mslp_servers = {}
+      if have_mason then
+        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+      end
+
+      local ensure_installed = {
         "dockerls",
         "elixirls",
-        "grammarly",
         "graphql",
         "sqlls",
         "lua_ls",
@@ -30,129 +139,53 @@ return {
         "yamlls",
         "rust_analyzer",
         "zls",
-      },
-      automatic_installlation = true,
-    })
-
-    local lspconfig = require("lspconfig")
-
-    local buf_map = function(bufnr, mode, lhs, rhs, opts)
-      vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
-        silent = true,
-      })
-    end
-
-    local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
-
-    -- For nvim-cmp
-    local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
-    local on_attach = function(client, bufnr)
-      require("keymaps").lsp_mappings(bufnr)
-      require("keymaps").lsp_diagnostic_mappings()
-
-      local function buf_set_option(...)
-        vim.api.nvim_buf_set_option(bufnr, ...)
-      end
-
-      buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
-
-      if client.supports_method("textDocument/formatting") then
-        vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
-        vim.api.nvim_create_autocmd("BufWritePre", {
-          group = format_on_save_group,
-          buffer = bufnr,
-          callback = function()
-            vim.lsp.buf.format({ bufnr = bufnr })
-          end,
-        })
-      end
-      vim.api.nvim_create_user_command("Format", function()
-        vim.lsp.buf.format({ async = true })
-      end, {})
-
-      if client.server_capabilities.code_lens then
-        vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-          buffer = bufnr,
-          callback = vim.lsp.codelens.refresh,
-        })
-        vim.lsp.codelens.refresh()
-      end
-    end
-
-    local opts = {
-      capabilities = capabilities,
-      on_attach = on_attach,
-    }
-
-    -- mason-lspconfig
-    require("mason-lspconfig").setup_handlers({
-      function(server_name) -- default handler (optional)
-        lspconfig[server_name].setup({})
-      end,
-      ["elixirls"] = function()
-        local child_or_root_path = vim.fs.dirname(vim.fs.find({ "mix.exs", ".git" }, { upward = true })[1])
-        local maybe_umbrella_path =
-            vim.fs.dirname(vim.fs.find({ "mix.exs" }, { upward = true, path = child_or_root_path })[1])
-
-        if maybe_umbrella_path then
-          local Path = require("plenary.path")
-          if not vim.startswith(child_or_root_path, Path:joinpath(maybe_umbrella_path, "apps"):absolute()) then
-            maybe_umbrella_path = nil
+      }
+      for server, server_opts in pairs(servers) do
+        if server_opts then
+          server_opts = server_opts == true and {} or server_opts
+          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+          if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
+            setup(server)
+          else
+            ensure_installed[#ensure_installed + 1] = server
           end
         end
+      end
 
-        local root_dir = maybe_umbrella_path or child_or_root_path or vim.loop.os_homedir()
-        local path_to_elixirls = vim.fn.expand("~/elixir-ls/release/language_server.sh")
-
-        opts.settings = {
-          cmd = { path_to_elixirls },
-          elixirLS = {
-            fetchDeps = false,
-            dialyzerEnabled = true,
-            dialyzerFormat = "dialyxir_short",
-            suggestSpecs = true,
-            root_dir = root_dir,
-          },
-        }
-        lspconfig.elixirls.setup(opts)
-      end,
-      ["lua_ls"] = function()
-        opts.settings = {
-          Lua = {
-            diagnostics = {
-              globals = { "vim", "hs" },
-            },
-            workspace = {
-              library = {
-                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-                ["/Users/nandofarias/.hammerspoon/Spoons/EmmyLua.spoon/annotations"] = true,
-              },
-            },
-          },
-        }
-
-        lspconfig.lua_ls.setup(opts)
-      end,
-      ["tsserver"] = function()
-        opts.on_attach = function(client, bufnr)
-          client.server_capabilities.document_formatting = false
-          client.server_capabilities.document_range_formatting = false
-          local ts_utils = require("nvim-lsp-ts-utils")
-          ts_utils.setup({})
-          ts_utils.setup_client(client)
-          buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
-          buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
-          buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
-          on_attach(client, bufnr)
+      if have_mason then
+        mlsp.setup({ ensure_installed = ensure_installed })
+        mlsp.setup_handlers({ setup })
+      end
+    end,
+  },
+  -- cmdline tools and lsp servers
+  {
+    "williamboman/mason.nvim",
+    cmd = "Mason",
+    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+    opts = {
+      ensure_installed = {
+        "stylua",
+        "shfmt",
+      },
+    },
+    ---@param opts MasonSettings | {ensure_installed: string[]}
+    config = function(_, opts)
+      require("mason").setup(opts)
+      local mr = require("mason-registry")
+      local function ensure_installed()
+        for _, tool in ipairs(opts.ensure_installed) do
+          local p = mr.get_package(tool)
+          if not p:is_installed() then
+            p:install()
+          end
         end
-
-        lspconfig.tsserver.setup(opts)
-      end,
-      ["grammarly"] = function()
-        opts.init_options = { clientId = "client_BaDkMgx4X19X9UxxYRCXZo" }
-        lspconfig.grammarly.setup(opts)
-      end,
-    })
-  end,
+      end
+      if mr.refresh then
+        mr.refresh(ensure_installed)
+      else
+        ensure_installed()
+      end
+    end,
+  },
 }

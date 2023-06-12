@@ -9,11 +9,12 @@ defmodule IExHelpers do
 end
 
 IEx.configure(
+  inspect: [limit: :infinity, pretty: true],
   colors: [
     syntax_colors: [
       number: :light_yellow,
       atom: :light_cyan,
-      string: :light_black,
+      string: :white,
       boolean: [:light_blue],
       nil: [:magenta, :bright]
     ],
