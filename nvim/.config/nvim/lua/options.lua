@@ -47,6 +47,7 @@ opt.backspace = "indent,eol,start" -- Backspace deletes like most programs in in
 opt.backup = false
 opt.clipboard = "unnamedplus" -- Sync with system clipboard
 opt.cmdheight = 2
+opt.colorcolumn = "120"
 opt.compatible = false
 opt.complete:append("kspell") -- Autocomplete with dictionary words when spell check is on
 opt.completeopt = "menu,menuone,noselect"

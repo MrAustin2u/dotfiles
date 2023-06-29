@@ -1,5 +1,7 @@
 return {
   "nvim-tree/nvim-tree.lua",
+  cmd = "NvimTreeToggle",
+  keys = require("keymaps").nvim_tree_mappings(),
   config = function()
     local nvimtree = require("nvim-tree")
 
@@ -36,7 +38,5 @@ return {
     vim.g.nvim_tree_respect_buf_cwd = 1
     -- https://github.com/nvim-tree/nvim-tree.lua/wiki/Troubleshooting#fish
     vim.g.shell = "/bin/zsh"
-
-    require("keymaps").nvim_tree_mappings()
   end,
 }

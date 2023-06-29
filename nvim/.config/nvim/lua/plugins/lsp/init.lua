@@ -5,9 +5,14 @@ return {
     dependencies = {
       { "folke/neoconf.nvim", cmd = "Neoconf", config = true },
       { "folke/neodev.nvim", opts = {} },
+      "folke/lsp-colors.nvim",
       {
         "williamboman/mason.nvim",
+        event = "VeryLazy",
         build = ":MasonUpdate", -- :MasonUpdate updates registry contents
+        dependencies = {
+          "williamboman/mason-lspconfig.nvim",
+        },
       },
       "jose-elias-alvarez/typescript.nvim",
       "williamboman/mason-lspconfig.nvim",
@@ -16,6 +21,11 @@ return {
         cond = function()
           return require("utils").has("nvim-cmp")
         end,
+      },
+      -- elixir commands from elixirls
+      {
+        "elixir-tools/elixir-tools.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
       },
     },
     opts = {
@@ -35,18 +45,6 @@ return {
         severity_sort = true,
       },
       servers = {
-        elixirls = {
-          settings = {
-            cmd = { vim.fn.expand("~/elixir-ls/release/language_server.sh") },
-            elixirLS = {
-              fetchDeps = false,
-              dialyzerEnabled = true,
-              dialyzerFormat = "dialyxir_short",
-              suggestSpecs = true,
-            },
-          },
-        },
-        -- jsonls = {},
         lua_ls = {
           -- mason = false, -- set to false if you don't want this server to be installed with mason
           settings = {
@@ -70,7 +68,10 @@ return {
     },
     config = function(_, opts)
       local Utils = require("utils")
+      local cmp_lsp = require("cmp_nvim_lsp")
+
       require("plugins.lsp.format").autoformat = opts.autoformat
+
       Utils.on_attach(function(client, buffer)
         require("plugins.lsp.format").on_attach(client, buffer)
         require("plugins.lsp.keymaps").on_attach(client, buffer)
@@ -96,18 +97,31 @@ return {
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
+      local function create_capabilities()
+        local default_opts = {
+          with_snippet_support = true,
+        }
+        opts = opts or default_opts
+        local capabilities = vim.lsp.protocol.make_client_capabilities()
+        capabilities.textDocument.completion.completionItem.snippetSupport = opts.with_snippet_support
+        if opts.with_snippet_support then
+          capabilities.textDocument.completion.completionItem.resolveSupport = {
+            properties = {
+              "documentation",
+              "detail",
+              "additionalTextEdits",
+            },
+          }
+        end
+
+        return cmp_lsp.default_capabilities(capabilities)
+      end
+
       local servers = opts.servers
-      local capabilities = vim.tbl_deep_extend(
-        "force",
-        {},
-        vim.lsp.protocol.make_client_capabilities(),
-        require("cmp_nvim_lsp").default_capabilities(),
-        opts.capabilities or {}
-      )
 
       local function setup(server)
         local server_opts = vim.tbl_deep_extend("force", {
-          capabilities = vim.deepcopy(capabilities),
+          capabilities = vim.deepcopy(create_capabilities()),
         }, servers[server] or {})
 
         if opts.setup[server] then
@@ -124,6 +138,7 @@ return {
 
       -- get all the servers that are available thourgh mason-lspconfig
       local have_mason, mlsp = pcall(require, "mason-lspconfig")
+      local elixir_present, elixir = pcall(require, "elixir")
       local all_mslp_servers = {}
       if have_mason then
         all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
@@ -131,7 +146,6 @@ return {
 
       local ensure_installed = {
         "dockerls",
-        "elixirls",
         "graphql",
         "sqlls",
         "lua_ls",
@@ -155,6 +169,27 @@ return {
       if have_mason then
         mlsp.setup({ ensure_installed = ensure_installed })
         mlsp.setup_handlers({ setup })
+      end
+
+      if elixir_present then
+        elixir.setup({
+          credo = {},
+          elixirls = {
+            enabled = true,
+            ---@diagnostic disable-next-line: unused-local
+            on_attach = function(client, buffer)
+              vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
+              vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
+              vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
+
+              ---@diagnostic disable-next-line: redefined-local
+              Utils.on_attach(function(client, buffer)
+                require("plugins.lsp.format").on_attach(client, buffer)
+                require("plugins.lsp.keymaps").on_attach(client, buffer)
+              end)
+            end,
+          },
+        })
       end
     end,
   },

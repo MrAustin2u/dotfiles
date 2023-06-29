@@ -1,7 +1,7 @@
 return {
   "hrsh7th/nvim-cmp",
   version = false, -- last release is way too old
-  event = "InsertEnter",
+  event = "VeryLazy",
   dependencies = {
     {
       "L3MON4D3/LuaSnip",
@@ -98,6 +98,7 @@ return {
         end, { "i", "s" }),
       }),
       sources = cmp.config.sources({
+        { name = "copilot" },
         { name = "nvim_lsp" },
         { name = "luasnip" },
         { name = "path" },
@@ -117,6 +118,7 @@ return {
             local source = ({
               buffer = "[BUF]",
               cmdline = "[CMD]",
+              Copilot = "[COP]",
               emoji = "[EMJ]",
               git = "[GIT]",
               luasnip = "[SNP]",

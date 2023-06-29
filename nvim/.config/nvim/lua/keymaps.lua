@@ -183,6 +183,10 @@ vim.keymap.set("n", "<leader>i", "<cmd>Browse<cr>", { desc = "Browse github and 
 -- LSP Restart
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" })
 
+-- Elixir
+vim.keymap.set("n", "<leader>mdg", "<cmd>Mix deps.get<CR>", { desc = "Get Elixir project dependencies" })
+vim.keymap.set("n", "<leader>mem", "<cmd>Mix ecto.migrate<CR>", { desc = "Run Elixir migrations" })
+
 -- lazygit
 nmap({
   "<leader>gg",

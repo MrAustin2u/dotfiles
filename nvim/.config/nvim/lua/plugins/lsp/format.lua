@@ -36,6 +36,7 @@ function M.format(opts)
       end
       return client.name ~= "null-ls"
     end,
+    timeout_ms = 2000,
   }, require("utils").opts("nvim-lspconfig").format or {}))
 end
 
