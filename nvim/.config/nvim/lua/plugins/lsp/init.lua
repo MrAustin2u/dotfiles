@@ -1,226 +1,89 @@
-return {
-  {
-    "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = true },
-      { "folke/neodev.nvim", opts = {} },
-      "folke/lsp-colors.nvim",
-      {
-        "williamboman/mason.nvim",
-        event = "VeryLazy",
-        build = ":MasonUpdate", -- :MasonUpdate updates registry contents
-        dependencies = {
-          "williamboman/mason-lspconfig.nvim",
-        },
-      },
-      "jose-elias-alvarez/typescript.nvim",
-      "williamboman/mason-lspconfig.nvim",
-      {
-        "hrsh7th/cmp-nvim-lsp",
-        cond = function()
-          return require("utils").has("nvim-cmp")
-        end,
-      },
-      -- elixir commands from elixirls
-      {
-        "elixir-tools/elixir-tools.nvim",
-        dependencies = { "nvim-lua/plenary.nvim" },
-      },
-    },
-    opts = {
-      autoformat = true,
-      capabilities = {},
-      diagnostics = {
-        underline = true,
-        update_in_insert = false,
-        virtual_text = {
-          spacing = 4,
-          source = "if_many",
-          prefix = "●",
-          -- this will set set the prefix to a function that returns the diagnostics icon based on the severity
-          -- this only works on a recent 0.10.0 build. Will be set to "●" when not supported
-          -- prefix = "icons",
-        },
-        severity_sort = true,
-      },
-      servers = {
-        lua_ls = {
-          -- mason = false, -- set to false if you don't want this server to be installed with mason
-          settings = {
-            Lua = {
-              workspace = {
-                checkThirdParty = false,
-              },
-              completion = {
-                callSnippet = "Replace",
-              },
-            },
-          },
-        },
-      },
-      setup = {
-        tsserver = function(_, opts)
-          require("typescript").setup({ server = opts })
-          return true
-        end,
-      },
-    },
-    config = function(_, opts)
-      local Utils = require("utils")
-      local cmp_lsp = require("cmp_nvim_lsp")
+local utils = require("utils")
 
-      require("plugins.lsp.format").autoformat = opts.autoformat
+local lspconfig_present, lspconfig = pcall(require, "lspconfig")
+local cmp_lsp_present, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+local elixir_present, elixir = pcall(require, "elixir")
 
-      Utils.on_attach(function(client, buffer)
-        require("plugins.lsp.format").on_attach(client, buffer)
-        require("plugins.lsp.keymaps").on_attach(client, buffer)
-      end)
-
-      -- diagnostics
-      for name, icon in pairs(Utils.defaults.icons.diagnostics) do
-        name = "DiagnosticSign" .. name
-        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-      end
-
-      if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
-        opts.diagnostics.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
-          or function(diagnostic)
-            local icons = require("lazyvim.config").icons.diagnostics
-            for d, icon in pairs(icons) do
-              if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
-                return icon
-              end
-            end
-          end
-      end
-
-      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
-
-      local function create_capabilities()
-        local default_opts = {
-          with_snippet_support = true,
-        }
-        opts = opts or default_opts
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities.textDocument.completion.completionItem.snippetSupport = opts.with_snippet_support
-        if opts.with_snippet_support then
-          capabilities.textDocument.completion.completionItem.resolveSupport = {
-            properties = {
-              "documentation",
-              "detail",
-              "additionalTextEdits",
-            },
-          }
-        end
-
-        return cmp_lsp.default_capabilities(capabilities)
-      end
-
-      local servers = opts.servers
-
-      local function setup(server)
-        local server_opts = vim.tbl_deep_extend("force", {
-          capabilities = vim.deepcopy(create_capabilities()),
-        }, servers[server] or {})
-
-        if opts.setup[server] then
-          if opts.setup[server](server, server_opts) then
-            return
-          end
-        elseif opts.setup["*"] then
-          if opts.setup["*"](server, server_opts) then
-            return
-          end
-        end
-        require("lspconfig")[server].setup(server_opts)
-      end
-
-      -- get all the servers that are available thourgh mason-lspconfig
-      local have_mason, mlsp = pcall(require, "mason-lspconfig")
-      local elixir_present, elixir = pcall(require, "elixir")
-      local all_mslp_servers = {}
-      if have_mason then
-        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
-      end
-
-      local ensure_installed = {
-        "dockerls",
-        "graphql",
-        "sqlls",
-        "lua_ls",
-        "tsserver",
-        "yamlls",
-        "rust_analyzer",
-        "zls",
-      }
-      for server, server_opts in pairs(servers) do
-        if server_opts then
-          server_opts = server_opts == true and {} or server_opts
-          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-          if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
-            setup(server)
-          else
-            ensure_installed[#ensure_installed + 1] = server
-          end
-        end
-      end
-
-      if have_mason then
-        mlsp.setup({ ensure_installed = ensure_installed })
-        mlsp.setup_handlers({ setup })
-      end
-
-      if elixir_present then
-        elixir.setup({
-          credo = {},
-          elixirls = {
-            enabled = true,
-            ---@diagnostic disable-next-line: unused-local
-            on_attach = function(client, buffer)
-              vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
-              vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
-              vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
-
-              ---@diagnostic disable-next-line: redefined-local
-              Utils.on_attach(function(client, buffer)
-                require("plugins.lsp.format").on_attach(client, buffer)
-                require("plugins.lsp.keymaps").on_attach(client, buffer)
-              end)
-            end,
-          },
-        })
-      end
-    end,
-  },
-  -- cmdline tools and lsp servers
-  {
-    "williamboman/mason.nvim",
-    cmd = "Mason",
-    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-    opts = {
-      ensure_installed = {
-        "stylua",
-        "shfmt",
-      },
-    },
-    ---@param opts MasonSettings | {ensure_installed: string[]}
-    config = function(_, opts)
-      require("mason").setup(opts)
-      local mr = require("mason-registry")
-      local function ensure_installed()
-        for _, tool in ipairs(opts.ensure_installed) do
-          local p = mr.get_package(tool)
-          if not p:is_installed() then
-            p:install()
-          end
-        end
-      end
-      if mr.refresh then
-        mr.refresh(ensure_installed)
-      else
-        ensure_installed()
-      end
-    end,
-  },
+local deps = {
+  cmp_lsp_present,
+  lspconfig_present,
+  elixir_present,
 }
+
+if utils.contains(deps, false) then
+  vim.notify("Failed to load dependencies in plugins/lsp.lua")
+  return
+end
+
+local M = {}
+
+local on_attach = function(client, bufnr)
+  -- Enable completion triggered by <c-x><c-o> (not sure this is necessary with
+  -- cmp plugin)
+  vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+
+  if client.config.name == "yamlls" and vim.bo.filetype == "helm" then
+    vim.lsp.buf_detach_client(bufnr, client.id)
+  end
+
+  -- Use an on_attach function to only map the following keys
+  -- after the language server attaches to the current buffer
+  require("keymaps").lsp_mappings(bufnr)
+end
+
+M.setup = function()
+  -- set up global mappings for diagnostics
+  require("keymaps").lsp_diagnostic_mappings()
+
+  -- Add completion and documentation capabilities for cmp completion
+  ---@param opts table|nil
+  local function create_capabilities(opts)
+    local default_opts = {
+      with_snippet_support = true,
+    }
+    opts = opts or default_opts
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument.completion.completionItem.snippetSupport = opts.with_snippet_support
+    if opts.with_snippet_support then
+      capabilities.textDocument.completion.completionItem.resolveSupport = {
+        properties = {
+          "documentation",
+          "detail",
+          "additionalTextEdits",
+        },
+      }
+    end
+
+    return cmp_lsp.default_capabilities(capabilities)
+  end
+
+  -- inject our custom on_attach after the built in on_attach from the lspconfig
+  lspconfig.util.on_setup = lspconfig.util.add_hook_after(lspconfig.util.on_setup, function(config)
+    if config.on_attach then
+      config.on_attach = lspconfig.util.add_hook_after(config.on_attach, on_attach)
+    else
+      config.on_attach = on_attach
+    end
+
+    config.capabilities = create_capabilities()
+  end)
+
+  ---@diagnostic disable-next-line: redundant-parameter
+  require("plugins.lsp.mason").setup({
+    on_attach = on_attach,
+  })
+
+  elixir.setup({
+    elixirls = {
+      enabled = true,
+      on_attach = function(client, bufnr)
+        vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
+        vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
+        vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
+        on_attach(client, bufnr)
+      end,
+    },
+  })
+end
+
+return M

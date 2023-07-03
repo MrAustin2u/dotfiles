@@ -1,0 +1,36 @@
+return {
+  start_delay = 3000,
+  -- a list of all tools you want to ensure are installed upon
+  -- start; they should be the names Mason uses for each tool
+  ensure_installed = {
+    -- Null LS
+    'codespell',
+    'eslint_d',
+    'prettierd',
+    'stylua',
+    'yamllint',
+    'bash-language-server',
+    'clangd',
+    'css-lsp',
+    'dockerfile-language-server',
+    'erlang-ls',
+    'eslint-lsp',
+    'gopls',
+    'go-debug-adapter',
+    'goimports',
+    'golangci-lint',
+    'golangci-lint-langserver',
+    'gomodifytags',
+    'html-lsp',
+    'json-lsp',
+    'lua-language-server',
+    'rust-analyzer',
+    'sqlls',
+    'tailwindcss-language-server',
+    'terraform-ls',
+    'typescript-language-server',
+    'vim-language-server',
+    'yaml-language-server',
+    'zls',
+  },
+}

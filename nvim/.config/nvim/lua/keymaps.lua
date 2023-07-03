@@ -203,22 +203,22 @@ nmap({
   Utils.merge_maps(default_opts, { desc = "Lazygit (cwd)" }),
 })
 
-M.attempt = function(attempt)
-  nmap({ "<leader>an", attempt.new_select, default_opts })
-  nmap({ "<leader>ar", attempt.run, default_opts })
-  nmap({ "<leader>ad", attempt.delete_buf, default_opts })
-  nmap({ "<leader>ac", attempt.rename_buf, default_opts })
-  nmap({ "<leader>al", "<cmd>Telescope attempt", default_opts })
+M.attempt_mappings = function(attempt)
+  -- new attempt, selecting extension
+  nmap({ "<leader>an", attempt.new_select, Utils.merge_maps(default_opts, { desc = "New Attempt" }) })
+  -- run current attempt buffer
+  nmap({ "<leader>ar", attempt.run, Utils.merge_maps(default_opts, { desc = "Run Attempt" }) })
+  -- delete attempt from current buffer
+  nmap({ "<leader>ad", attempt.delete_buf, Utils.merge_maps(default_opts, { desc = "Delete Attempt" }) })
+  -- rename attempt from current buffer
+  nmap({ "<leader>ac", attempt.rename_buf, Utils.merge_maps(default_opts, { desc = "Rename Attempt" }) })
+  -- open one of the existing scratch buffers
+  nmap({ "<leader>al", attempt.open_select, Utils.merge_maps(default_opts, { desc = "Select Attempt" }) })
 end
 
-M.cokeline = function()
+M.cokeline_mappings = function()
   nmap({ "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true, desc = "Prev Tab" } })
   nmap({ "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Tab" } })
-end
-
-M.dadbod_mappings = function()
-  nmap({ "<leader>do", ":DBUI<CR><CR>", { silent = true, desc = "Database UI Open" } })
-  nmap({ "<leader>dc", ":DBUIClose<CR>", { silent = true, desc = "Database UI Close" } })
 end
 
 M.lsp_mappings = function(bufnr)
@@ -356,19 +356,6 @@ M.telescope_mappings = function()
   nmap({ "<leader>gp", "<cmd>Telescope gh pull_request<cr>", default_opts })
 end
 
-M.attempt_mappings = function(attempt)
-  -- new attempt, selecting extension
-  nmap({ "<leader>an", attempt.new_select, Utils.merge_maps(default_opts, { desc = "New Attempt" }) })
-  -- run current attempt buffer
-  nmap({ "<leader>ar", attempt.run, Utils.merge_maps(default_opts, { desc = "Run Attempt" }) })
-  -- delete attempt from current buffer
-  nmap({ "<leader>ad", attempt.delete_buf, Utils.merge_maps(default_opts, { desc = "Delete Attempt" }) })
-  -- rename attempt from current buffer
-  nmap({ "<leader>ac", attempt.rename_buf, Utils.merge_maps(default_opts, { desc = "Rename Attempt" }) })
-  -- open one of the existing scratch buffers
-  nmap({ "<leader>al", attempt.open_select, Utils.merge_maps(default_opts, { desc = "Select Attempt" }) })
-end
-
 M.gitsigns_mappings = function(gitsigns, bufnr)
   local opts = { expr = true, buffer = bufnr }
 
@@ -475,36 +462,6 @@ M.noice_mappings = function(noice)
   })
 end
 
-M.persistence_mappings = function(p)
-  nmap({
-    "<leader>qs",
-    function()
-      p.load()
-    end,
-    { silent = true, desc = "Restore Session" },
-  })
-  nmap({
-    "<leader>ql",
-    function()
-      p.load({ last = true })
-    end,
-    { silent = true, desc = "Restore Last Session" },
-  })
-  nmap({
-    "<leader>qd",
-    function()
-      p.stop()
-    end,
-    { silent = true, desc = "Don't Save Current Session" },
-  })
-end
-
-M.rest_mappings = function()
-  nmap({ "<leader>rf", "<Plug>RestNvim<CR>", default_opts })
-  nmap({ "<leader>rl", "<Plug>RestNvimLast<CR>", default_opts })
-  nmap({ "<leader>rp", "<Plug>RestNvimPreview<CR>", default_opts })
-end
-
 M.spectre_mappings = function(spectre)
   nmap({
     "<leader>sr",
@@ -547,11 +504,63 @@ M.vim_notify_mappings = function(notify)
   })
 end
 
-M.vim_test_mappings = function()
-  nmap({ "<leader>tn", ":TestNearest<CR>" })
-  nmap({ "<leader>tf", ":TestFile<CR>" })
-  nmap({ "<leader>ts", ":TestSuite<CR>" })
-  nmap({ "<leader>tl", ":TestLast<CR>" })
+M.neotest_mappings = function(neotest)
+  nmap({
+    "<leader>tt",
+    function()
+      neotest.run.run(vim.fn.expand("%"))
+    end,
+    desc = "Run File",
+  })
+  nmap({
+    "<leader>tT",
+    function()
+      neotest.run.run(vim.loop.cwd())
+    end,
+    desc = "Run All Test Files",
+  })
+  nmap({
+    "<leader>tr",
+    function()
+      neotest.run.run()
+    end,
+    desc = "Run Nearest",
+  })
+  nmap({
+    "<leader>ts",
+    function()
+      neotest.summary.toggle()
+    end,
+    desc = "Toggle Summary",
+  })
+  nmap({
+    "<leader>to",
+    function()
+      neotest.output.open({ enter = true, auto_close = true })
+    end,
+    desc = "Show Output",
+  })
+  nmap({
+    "<leader>tO",
+    function()
+      neotest.output_panel.toggle()
+    end,
+    desc = "Toggle Output Panel",
+  })
+  nmap({
+    "<leader>tS",
+    function()
+      neotest.run.stop()
+    end,
+    desc = "Stop",
+  })
+  nmap({
+    "<leader>td",
+    function()
+      neotest.run.run({ strategy = "dap" })
+    end,
+    desc = "Debug Nearest",
+  })
 end
 
 return M

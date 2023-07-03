@@ -12,8 +12,17 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-require("autocmds")
-require("options")
-require("keymaps")
-require("utils")
-require("lazy").setup("plugins")
+local modules = {
+  "autocmds",
+  "options",
+  "keymaps",
+  "utils",
+  "plugins",
+}
+
+for _, module in ipairs(modules) do
+  local ok, err = pcall(require, module)
+  if not ok then
+    error("Error loading " .. module .. "\n\n" .. err)
+  end
+end
