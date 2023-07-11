@@ -66,17 +66,12 @@ vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
 -- save and source config files
-vim.keymap.set({ "i", "v", "n", "s" }, "<C-x>", function()
-  if vim.bo.filetype == "vim" then
-    vim.cmd("silent! write")
-    vim.cmd("source %")
-    vim.api.nvim_echo({ { "Saving and sourcing vim file..." } }, true, {})
-  elseif vim.bo.filetype == "lua" then
-    vim.cmd("silent! write")
-    vim.cmd("luafile %")
-    vim.api.nvim_echo({ { "Saving and sourcing lua file..." } }, true, {})
-  end
-end, { desc = "Save and source config files" })
+vim.keymap.set(
+  { "n" },
+  "<leader>so",
+  ':w<CR>:source %<CR>:lua vim.notify("File sourced!")<CR>',
+  { desc = "[SO]urce file", silent = true }
+)
 
 -- lazy
 vim.keymap.set("n", "<leader>l", "<cmd>:Lazy<cr>", { desc = "Lazy" })
@@ -109,15 +104,17 @@ end, { desc = "Toggle Conceal" })
 -- # Copy, Paste, Movements, Etc..
 -- ================================
 -- yanks
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
-vim.keymap.set("n", "<leader>Y", [["+Y]])
-
 -- copy to end of line
-vim.keymap.set("n", "Y", "y$", { desc = "Copy to end of line" })
+vim.keymap.set("n", "Y", "y$", { desc = "Yank to EOL" })
+-- copy to to system clipboard (till end of line)
+vim.keymap.set("n", "gY", '"+y$', { desc = "Yank to clipboard EOL" })
+-- copy to system clipboard
+vim.keymap.set("n", "gy", '"+y', { desc = "Yank to clipboard" })
+vim.keymap.set("v", "gy", '"+y', { desc = "Yank to clipboard" })
 -- copy entire file
-vim.keymap.set("n", "<C-g>y", 'gg"+yG', { desc = "Copy entire file" })
+vim.keymap.set("n", "<C-g>y", "ggyG", { desc = "Copy entire file" })
 -- copy entire file to system clipboard
-vim.keymap.set("n", "<C-g>y", 'gg"+YG', { desc = "Copy entire file" })
+vim.keymap.set("n", "<C-g>Y", 'gg"+yG', { desc = "Copy Entire File To System Clipboard" })
 
 -- better up/down
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -177,15 +174,12 @@ if vim.fn.has("nvim-0.9.0") == 1 then
   vim.keymap.set("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
 end
 
--- browse
-vim.keymap.set("n", "<leader>i", "<cmd>Browse<cr>", { desc = "Browse github and internet" })
-
 -- LSP Restart
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" })
 
 -- Elixir
-vim.keymap.set("n", "<leader>mdg", "<cmd>Mix deps.get<CR>", { desc = "Get Elixir project dependencies" })
-vim.keymap.set("n", "<leader>mem", "<cmd>Mix ecto.migrate<CR>", { desc = "Run Elixir migrations" })
+vim.keymap.set("n", "<leader>etp", "<cmd>ElixirToPipe<CR>", { desc = "[Elixir] to pipe" })
+vim.keymap.set("n", "<leader>efp", "<cmd>ElixirFromPipe<CR>", { desc = "[Elixir] from pipe" })
 
 -- lazygit
 nmap({
@@ -255,6 +249,9 @@ M.lsp_mappings = function(bufnr)
   buf_nmap("K", "<cmd>lua vim.lsp.buf.hover()<CR>")
   -- bf = buffer format
   buf_nmap("<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
+  vim.api.nvim_create_user_command("Format", function()
+    vim.lsp.buf.format({ async = true })
+  end, {})
 end
 
 M.lsp_diagnostic_mappings = function()
