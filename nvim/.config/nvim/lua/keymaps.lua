@@ -18,32 +18,24 @@ local M = {}
 │  't'  │  mapmode-t   │  Terminal                                 │  :tmap  │
 ╰────────────────────────────────────────────────────────────────────────────╯
 --]]
-local map = function(tbl)
-  vim.keymap.set(tbl[1], tbl[2], tbl[3], tbl[4])
-end
+--
+local silent = { silent = true }
+local default_opts = { noremap = true, silent = true }
 
-local imap = function(tbl)
-  vim.keymap.set("i", tbl[1], tbl[2], tbl[3])
+local map = function(tbl)
+  local opts = tbl[4] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
+  vim.keymap.set(tbl[1], tbl[2], tbl[3], opts)
 end
 
 local nmap = function(tbl)
-  vim.keymap.set("n", tbl[1], tbl[2], tbl[3])
+  local opts = tbl[3] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
+  vim.keymap.set("n", tbl[1], tbl[2], opts)
 end
 
 local vmap = function(tbl)
-  vim.keymap.set("v", tbl[1], tbl[2], tbl[3])
+  local opts = tbl[3] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
+  vim.keymap.set("v", tbl[1], tbl[2], opts)
 end
-
-local tmap = function(tbl)
-  vim.keymap.set("t", tbl[1], tbl[2], tbl[3])
-end
-
-local cmap = function(tbl)
-  vim.keymap.set("c", tbl[1], tbl[2], tbl[3])
-end
-
-local silent = { silent = true }
-local default_opts = { noremap = true, silent = true }
 
 -- ================================
 -- # Misc
@@ -176,10 +168,6 @@ end
 
 -- LSP Restart
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" })
-
--- Elixir
-vim.keymap.set("n", "<leader>etp", "<cmd>ElixirToPipe<CR>", { desc = "[Elixir] to pipe" })
-vim.keymap.set("n", "<leader>efp", "<cmd>ElixirFromPipe<CR>", { desc = "[Elixir] from pipe" })
 
 -- lazygit
 nmap({
@@ -395,70 +383,6 @@ M.gitsigns_mappings = function(gitsigns, bufnr)
   map({ { "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>" })
 end
 
-M.noice_mappings = function(noice)
-  nmap({
-    "<S-Enter>",
-    function()
-      noice.redirect(vim.fn.getcmdline())
-    end,
-    mode = "c",
-    desc = "Redirect Cmdline",
-  })
-  nmap({
-    "<leader>snl",
-    function()
-      noice.cmd("last")
-    end,
-    desc = "Noice Last Message",
-  })
-  nmap({
-    "<leader>snh",
-    function()
-      noice.cmd("history")
-    end,
-    desc = "Noice History",
-  })
-  nmap({
-    "<leader>sna",
-    function()
-      noice.cmd("all")
-    end,
-    desc = "Noice All",
-  })
-  nmap({
-    "<c-f>",
-    function()
-      if not noice.lsp.scroll(4) then
-        return "<c-f>"
-      end
-    end,
-    silent = true,
-    expr = true,
-    desc = "Scroll forward",
-    mode = {
-      "i",
-      "n",
-      "s",
-    },
-  })
-  nmap({
-    "<c-b>",
-    function()
-      if not require("noice.lsp").scroll(-4) then
-        return "<c-b>"
-      end
-    end,
-    silent = true,
-    expr = true,
-    desc = "Scroll backward",
-    mode = {
-      "i",
-      "n",
-      "s",
-    },
-  })
-end
-
 M.spectre_mappings = function(spectre)
   nmap({
     "<leader>sr",
@@ -470,12 +394,12 @@ M.spectre_mappings = function(spectre)
 end
 
 M.silicon_mappings = function()
-  nmap({ "<leader>SS", "<cmd>Silicon!<cr>", mode = "v", { silent = true, desc = "Screenshot a code snippet" } })
-  nmap({
-    "<leader>sc",
-    ":Silicon<cr>",
-    mode = "v",
-    { silent = true, desc = "Screenshot a code snippet into the clipboard" },
+  vmap({
+    "<leader>ss",
+    function()
+      require("silicon").visualise_api({ to_clip = true })
+    end,
+    { silent = true, desc = "Screenshot a code snippet to clipboard" },
   })
 end
 
@@ -507,56 +431,56 @@ M.neotest_mappings = function(neotest)
     function()
       neotest.run.run(vim.fn.expand("%"))
     end,
-    desc = "Run File",
+    Utils.merge_maps(default_opts, { desc = "Run File" }),
   })
   nmap({
     "<leader>tT",
     function()
       neotest.run.run(vim.loop.cwd())
     end,
-    desc = "Run All Test Files",
+    Utils.merge_maps(default_opts, { desc = "Run All Test Files" }),
   })
   nmap({
     "<leader>tr",
     function()
       neotest.run.run()
     end,
-    desc = "Run Nearest",
+    Utils.merge_maps(default_opts, { desc = "Run Nearest" }),
   })
   nmap({
     "<leader>ts",
     function()
       neotest.summary.toggle()
     end,
-    desc = "Toggle Summary",
+    Utils.merge_maps(default_opts, { desc = "Toggle Summary" }),
   })
   nmap({
     "<leader>to",
     function()
       neotest.output.open({ enter = true, auto_close = true })
     end,
-    desc = "Show Output",
+    { desc = "Show Output" },
   })
   nmap({
     "<leader>tO",
     function()
       neotest.output_panel.toggle()
     end,
-    desc = "Toggle Output Panel",
+    { desc = "Toggle Output Panel" },
   })
   nmap({
     "<leader>tS",
     function()
       neotest.run.stop()
     end,
-    desc = "Stop",
+    { desc = "Stop" },
   })
   nmap({
     "<leader>td",
     function()
       neotest.run.run({ strategy = "dap" })
     end,
-    desc = "Debug Nearest",
+    { desc = "Debug Nearest" },
   })
 end
 

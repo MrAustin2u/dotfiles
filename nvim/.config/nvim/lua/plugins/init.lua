@@ -1,69 +1,23 @@
 require("lazy").setup({
-  -- COMPLETION
-  {
-    "L3MON4D3/LuaSnip",
-    build = (not jit.os:find("Windows"))
-        and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
-      or nil,
-    dependencies = {
-      "rafamadriz/friendly-snippets",
-      config = function()
-        require("luasnip.loaders.from_vscode").lazy_load()
-      end,
-    },
-    opts = {
-      history = true,
-      delete_check_events = "TextChanged",
-    },
-    -- stylua: ignore
-    keys = {
-      {
-        "<Tab>",
-        function()
-          return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
-        end,
-        expr = true,
-        silent = true,
-        mode = "i",
-      },
-      {
-        "<Tab>",
-        function() require("luasnip").jump(1) end,
-        mode = "s",
-        { "<S-Tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
-      },
-    },
-  },
+  -- Completion
   {
     "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
+    version = false,
+    event = "VeryLazy",
     dependencies = {
-      "andersevenrud/cmp-tmux",
+      {
+        "L3MON4D3/LuaSnip",
+        dependencies = {
+          "rafamadriz/friendly-snippets",
+        },
+      },
       "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-cmdline",
       "hrsh7th/cmp-nvim-lsp",
-      -- "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-nvim-lua",
       "hrsh7th/cmp-path",
-      "hrsh7th/cmp-vsnip",
-      "hrsh7th/vim-vsnip",
       "onsails/lspkind.nvim",
       "saadparwaiz1/cmp_luasnip",
-      {
-        "zbirenbaum/copilot-cmp",
-        dependencies = "copilot.lua",
-        opts = {},
-        config = function(_, opts)
-          local copilot_cmp = require("copilot_cmp")
-          copilot_cmp.setup(opts)
-          -- attach cmp source whenever copilot attaches
-          -- fixes lazy-loading issues with the copilot cmp source
-          require("utils").on_attach(function(client)
-            if client.name == "copilot" then
-              copilot_cmp._on_insert_enter({})
-            end
-          end)
-        end,
-      },
     },
     config = function()
       require("plugins.cmp").setup()
@@ -73,10 +27,24 @@ require("lazy").setup({
   {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
-    build = ":Copilot auth",
     event = "InsertEnter",
     config = function()
       require("plugins.copilot").setup()
+    end,
+  },
+  {
+    "zbirenbaum/copilot-cmp",
+    dependencies = { "zbirenbaum/copilot.lua" },
+    config = function(_, opts)
+      local copilot_cmp = require("copilot_cmp")
+      copilot_cmp.setup(opts)
+      -- attach cmp source whenever copilot attaches
+      -- fixes lazy-loading issues with the copilot cmp source
+      require("utils").on_attach(function(client)
+        if client.name == "copilot" then
+          copilot_cmp._on_insert_enter({})
+        end
+      end)
     end,
   },
 
@@ -85,7 +53,7 @@ require("lazy").setup({
   {
     "williamboman/mason.nvim",
     event = "VeryLazy",
-    keys = { { "<leader>cm", "<cmd>MasonUpdate<CR>" } },
+    build = ":MasonUpdate",
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
       "neovim/nvim-lspconfig",
@@ -253,6 +221,20 @@ require("lazy").setup({
     },
     enabled = true,
     event = "VeryLazy",
+    config = function()
+      require("plugins.noice").setup()
+    end,
+  },
+  -- modern vim command line replacement, requires nvim 0.9 or higher
+  {
+    "folke/noice.nvim",
+    enabled = true,
+    event = "VeryLazy",
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
     config = function()
       require("plugins.noice").setup()
     end,
@@ -466,10 +448,8 @@ require("lazy").setup({
     end,
   },
   {
-    "krivahtoo/silicon.nvim",
-    build = "./install.sh build",
-    cmd = "Silicon",
-    keys = require("keymaps").silicon_mappings(),
+    "narutoxy/silicon.lua",
+    dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       require("plugins.silicon").setup()
     end,

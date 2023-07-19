@@ -44,24 +44,24 @@ M.setup = function()
     automatic_installation = true,
   })
 
-  -- add completion and documentation capabilities for cmp completion
-  local capabilities = cmp_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-
   vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
     callback = function(ev)
-      local bufnr = ev.buf
       -- Enable completion triggered by <c-x><c-o>
-      vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
+      vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
 
-      require("keymaps").lsp_mappings(bufnr)
+      vim.api.nvim_create_user_command("Format", function()
+        vim.lsp.buf.format({ async = true })
+      end, {})
+
+      require("keymaps").lsp_mappings(ev.buf)
       require("keymaps").lsp_diagnostic_mappings()
     end,
   })
 
   local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
   local on_attach = function(client, bufnr)
-    if client.supports_method("textDocument/formatting") or client.supports_method("textDocument/rangeFormatting") then
+    if client.supports_method("textDocument/formatting") then
       vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
       vim.api.nvim_create_autocmd("BufWritePre", {
         group = format_on_save_group,
@@ -81,15 +81,52 @@ M.setup = function()
     end
   end
 
+  -- add completion and documentation capabilities for cmp completion
+  local create_capabilities = function(opts)
+    local default_opts = {
+      with_snippet_support = true,
+    }
+    opts = opts or default_opts
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument.completion.completionItem.snippetSupport = opts.with_snippet_support
+    if opts.with_snippet_support then
+      capabilities.textDocument.completion.completionItem.resolveSupport = {
+        properties = {
+          "documentation",
+          "detail",
+          "additionalTextEdits",
+        },
+      }
+    end
+
+    return cmp_lsp.default_capabilities(capabilities)
+  end
+  -- inject our custom on_attach after the built in on_attach from the lspconfig
+  lspconfig.util.on_setup = lspconfig.util.add_hook_after(lspconfig.util.on_setup, function(config)
+    if config.on_attach then
+      config.on_attach = lspconfig.util.add_hook_after(config.on_attach, on_attach)
+    else
+      config.on_attach = on_attach
+    end
+
+    config.capabilities = create_capabilities()
+  end)
+
   local opts = {
-    capabilities = capabilities,
+    capabilities = create_capabilities(),
     on_attach = on_attach,
   }
 
   local elixirls = require("elixir.elixirls")
   elixir.setup({
     elixirls = {
-      on_attach = on_attach,
+      on_attach = function(client, bufnr)
+        vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
+        vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
+        vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
+        vim.keymap.set("n", "<space>mc", ":Mix compile<cr>", { buffer = true, noremap = true })
+        on_attach(client, bufnr)
+      end,
       settings = elixirls.settings({
         dialyzerEnabled = true,
         fetchDeps = false,

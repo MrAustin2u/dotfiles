@@ -1,4 +1,4 @@
-local present, silicon = pcall(require, 'silicon')
+local present, silicon = pcall(require, "silicon")
 
 if not present then
   return
@@ -10,12 +10,9 @@ M.setup = function()
   silicon.setup({
     font = "MonoLisa",
     theme = "tokyonight_moon",
-    background = "#636da6",
-    output = {
-      path = "/Users/aaustin/Pictures/Screenshots",
-      format = "silicon_[year][month][day]_[hour][minute][second].png",
-    },
+    bgColor = "#636da6",
   })
+  require("keymaps").silicon_mappings()
 end
 
 return M
