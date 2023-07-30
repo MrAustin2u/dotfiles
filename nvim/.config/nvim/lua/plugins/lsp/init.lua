@@ -117,22 +117,21 @@ M.setup = function()
     on_attach = on_attach,
   }
 
-  local elixirls = require("elixir.elixirls")
   elixir.setup({
+    credo = {},
     elixirls = {
-      on_attach = function(client, bufnr)
-        vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
-        vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
-        vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
-        vim.keymap.set("n", "<space>mc", ":Mix compile<cr>", { buffer = true, noremap = true })
-        on_attach(client, bufnr)
-      end,
-      settings = elixirls.settings({
+      enable = true,
+      settings = elixir.elixirls.settings({
         dialyzerEnabled = true,
+        enableTestLenses = false,
         fetchDeps = false,
-        enableTestLenses = true,
-        suggestSpecs = false,
       }),
+      on_attach = on_attach,
+    },
+    nextls = {
+      enable = true,
+      cmd = vim.fn.expand("~/next-ls/bin/nextls"),
+      on_attach = on_attach,
     },
   })
 
@@ -242,10 +241,10 @@ M.setup = function()
     end,
 
     -- JSON
-    ["jsonls"] = function()
-      local overrides = require("plugins.lsp.jsonls")
-      lspconfig.jsonls.setup(overrides)
-    end,
+    -- ["jsonls"] = function()
+    --   local overrides = require("plugins.lsp.jsonls")
+    --   lspconfig.jsonls.setup(overrides)
+    -- end,
 
     -- YAML
     ["yamlls"] = function()

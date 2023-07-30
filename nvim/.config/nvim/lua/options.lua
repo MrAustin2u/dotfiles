@@ -57,7 +57,7 @@ opt.confirm = true -- Confirm to save changes before exiting modified buffer
 -- Cursor {{{1
 -----------------------------------------------------------------------------//
 opt.cursorline = true -- Enable highlighting of the current line
-opt.cursorlineopt = "number" -- optionally -> "screenline,number"
+opt.cursorlineopt = "screenline" -- optionally -> "screenline,number"
 -----------------------------------------------------------------------------//
 opt.emoji = false
 opt.encoding = "utf-8"

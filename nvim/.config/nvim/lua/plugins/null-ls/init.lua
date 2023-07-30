@@ -22,11 +22,6 @@ M.setup = function()
       ----------------------
       --    Diagnostics   --
       ----------------------
-      -- b.diagnostics.credo.with({
-      --   condition = function(utils)
-      --     return utils.root_has_file(".credo.exs")
-      --   end,
-      -- }),
       b.diagnostics.eslint_d,
       b.diagnostics.yamllint,
       b.diagnostics.zsh,

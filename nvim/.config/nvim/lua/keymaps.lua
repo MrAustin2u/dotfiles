@@ -139,13 +139,15 @@ vim.keymap.set(
 
 vim.keymap.set({ "n", "x" }, "gw", "*N", { desc = "Search word under cursor" })
 -- buffer
-vim.keymap.set(
-  "n",
-  "<space>bd",
-  ":Bdelete <CR> <Plug>(cokeline-focus-prev)<CR>",
-  { silent = true, desc = "Buffer Delete" }
-)
+-- vim.keymap.set(
+--   "n",
+--   "<space>bd",
+--   ":Bdelete <CR> <Plug>(cokeline-focus-prev)<CR>",
+--   { silent = true, desc = "Buffer Delete" }
+-- )
 vim.keymap.set("n", "<space>ba", ":%bdelete|edit#|bdelete# <CR>", { silent = true, desc = "Buffer Delete All" })
+vim.keymap.set("n", "<Tab>", ":bnext <CR>", { silent = true, desc = "Next Bufffer" })
+vim.keymap.set("n", "<S-Tab>", ":bprev <CR>", { silent = true, desc = "Previous Bufffer" })
 
 -- windows
 vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window" })
@@ -211,6 +213,11 @@ M.lsp_mappings = function(bufnr)
   local buf_vmap = function(mapping, cmd)
     vim.api.nvim_buf_set_keymap(bufnr, "v", mapping, cmd, default_opts)
   end
+
+  -- Elixir
+  buf_nmap("<space>fp", ":ElixirFromPipe<cr>")
+  buf_nmap("<space>tp", ":ElixirToPipe<cr>")
+  buf_vmap("<space>em", ":ElixirExpandMacro<cr>")
 
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   -- gD = go Declaration

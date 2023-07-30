@@ -33,7 +33,7 @@ local opts = {
     js = javascript_template,
     ts = typescript_template,
   },
-  ext_options = { "lua", "js", "ts", "ex", "" },
+  ext_options = { "lua", "js", "ts", "ex", "yml", "" },
   format_opts = { [""] = "[None]", js = "JavaScript", lua = "Lua", ex = "Elixir", ts = "Typescript" },
   run = {
     ex = { "w", "!elixir %" },

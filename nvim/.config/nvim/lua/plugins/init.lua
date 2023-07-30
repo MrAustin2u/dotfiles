@@ -3,21 +3,18 @@ require("lazy").setup({
   {
     "hrsh7th/nvim-cmp",
     version = false,
-    event = "VeryLazy",
+    event = "InsertEnter",
     dependencies = {
-      {
-        "L3MON4D3/LuaSnip",
-        dependencies = {
-          "rafamadriz/friendly-snippets",
-        },
-      },
+      "andersevenrud/cmp-tmux",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-cmdline",
       "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-nvim-lua",
       "hrsh7th/cmp-path",
+      "hrsh7th/cmp-vsnip",
+      "hrsh7th/vim-vsnip",
       "onsails/lspkind.nvim",
-      "saadparwaiz1/cmp_luasnip",
     },
     config = function()
       require("plugins.cmp").setup()
@@ -35,17 +32,7 @@ require("lazy").setup({
   {
     "zbirenbaum/copilot-cmp",
     dependencies = { "zbirenbaum/copilot.lua" },
-    config = function(_, opts)
-      local copilot_cmp = require("copilot_cmp")
-      copilot_cmp.setup(opts)
-      -- attach cmp source whenever copilot attaches
-      -- fixes lazy-loading issues with the copilot cmp source
-      require("utils").on_attach(function(client)
-        if client.name == "copilot" then
-          copilot_cmp._on_insert_enter({})
-        end
-      end)
-    end,
+    config = true,
   },
 
   -- LSP STUFF
@@ -60,16 +47,16 @@ require("lazy").setup({
       "hrsh7th/cmp-nvim-lsp",
       "jose-elias-alvarez/typescript.nvim",
       "glepnir/lspsaga.nvim",
-      { "elixir-tools/elixir-tools.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
+      {
+        "elixir-tools/elixir-tools.nvim",
+        version = "*",
+        event = { "BufReadPre", "BufNewFile" },
+        dependencies = { "nvim-lua/plenary.nvim" },
+      },
     },
     config = function()
       require("plugins.lsp").setup()
     end,
-  },
-  {
-    "mhanberg/output-panel.nvim",
-    event = "VeryLazy",
-    opts = {},
   },
   {
     "jose-elias-alvarez/null-ls.nvim",
@@ -109,16 +96,16 @@ require("lazy").setup({
 
   -- COKELINE
 
-  {
-    "noib3/nvim-cokeline",
-    lazy = false,
-    dependencies = {
-      "kyazdani42/nvim-web-devicons",
-    },
-    config = function()
-      require("plugins.cokeline").setup()
-    end,
-  },
+  -- {
+  --   "noib3/nvim-cokeline",
+  --   lazy = false,
+  --   dependencies = {
+  --     "kyazdani42/nvim-web-devicons",
+  --   },
+  --   config = function()
+  --     require("plugins.cokeline").setup()
+  --   end,
+  -- },
 
   -- LUALINE
   {
@@ -165,7 +152,7 @@ require("lazy").setup({
   -- color schemes
   {
     "folke/tokyonight.nvim",
-    lazy = false, -- make sure we load this during startup
+    lazy = false,    -- make sure we load this during startup
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       require("tokyonight").setup({
@@ -529,22 +516,22 @@ require("lazy").setup({
   { "nvim-lua/plenary.nvim", lazy = true },
 
   -- makes some plugins dot-repeatable like leap
-  { "tpope/vim-repeat", event = "VeryLazy" },
+  { "tpope/vim-repeat",      event = "VeryLazy" },
 
   "tpope/vim-surround",
 
   "tpope/vim-abolish",
 
-  { "szw/vim-maximizer", keys = { { "<space>m", "<cmd>MaximizerToggle<CR>" } } },
-  { "windwp/nvim-autopairs", config = true },
+  { "szw/vim-maximizer",        keys = { { "<space>m", "<cmd>MaximizerToggle<CR>" } } },
+  { "windwp/nvim-autopairs",    config = true },
 
-  { "karb94/neoscroll.nvim", config = true },
+  { "karb94/neoscroll.nvim",    config = true },
 
-  "famiu/bufdelete.nvim",
+  -- "famiu/bufdelete.nvim",
 
   { "tversteeg/registers.nvim", config = true },
 
-  { "chentoast/marks.nvim", config = true },
+  { "chentoast/marks.nvim",     config = true },
 
   { "mcauley-penney/tidy.nvim", config = true },
 
@@ -552,7 +539,7 @@ require("lazy").setup({
 
   { "folke/todo-comments.nvim", config = true },
 
-  { "numToStr/Comment.nvim", config = true },
+  { "numToStr/Comment.nvim",    config = true },
 
   "benizi/vim-automkdir",
 
@@ -594,11 +581,11 @@ require("lazy").setup({
   "jparise/vim-graphql",
 
   -- Better quickfix
-  { "kevinhwang91/nvim-bqf", ft = "qf" },
+  { "kevinhwang91/nvim-bqf",    ft = "qf" },
 
   -- GIT
 
-  { "ruifm/gitlinker.nvim", config = true },
+  { "ruifm/gitlinker.nvim",     config = true },
   {
     "sindrets/diffview.nvim",
     dependencies = { "kyazdani42/nvim-web-devicons" },
