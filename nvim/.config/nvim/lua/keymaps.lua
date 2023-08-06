@@ -138,13 +138,9 @@ vim.keymap.set(
 )
 
 vim.keymap.set({ "n", "x" }, "gw", "*N", { desc = "Search word under cursor" })
+
 -- buffer
--- vim.keymap.set(
---   "n",
---   "<space>bd",
---   ":Bdelete <CR> <Plug>(cokeline-focus-prev)<CR>",
---   { silent = true, desc = "Buffer Delete" }
--- )
+vim.keymap.set("n", "<space>bd", ":Bdelete <CR>", { silent = true, desc = "Buffer Delete" })
 vim.keymap.set("n", "<space>ba", ":%bdelete|edit#|bdelete# <CR>", { silent = true, desc = "Buffer Delete All" })
 vim.keymap.set("n", "<Tab>", ":bnext <CR>", { silent = true, desc = "Next Bufffer" })
 vim.keymap.set("n", "<S-Tab>", ":bprev <CR>", { silent = true, desc = "Previous Bufffer" })
@@ -205,55 +201,95 @@ M.cokeline_mappings = function()
   nmap({ "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Tab" } })
 end
 
-M.lsp_mappings = function(bufnr)
-  local buf_nmap = function(mapping, cmd)
-    vim.api.nvim_buf_set_keymap(bufnr, "n", mapping, cmd, default_opts)
-  end
+M.elixir_mappings = function()
+  nmap({
+    "<space>fp",
+    ":ElixirFromPipe<cr>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
+  })
+  nmap({
+    "<space>tp",
+    ":ElixirToPipe<cr>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
+  })
+  vmap({
+    "<space>em",
+    ":ElixirExpandMacro<cr>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
+  })
+end
 
-  local buf_vmap = function(mapping, cmd)
-    vim.api.nvim_buf_set_keymap(bufnr, "v", mapping, cmd, default_opts)
-  end
-
-  -- Elixir
-  buf_nmap("<space>fp", ":ElixirFromPipe<cr>")
-  buf_nmap("<space>tp", ":ElixirToPipe<cr>")
-  buf_vmap("<space>em", ":ElixirExpandMacro<cr>")
-
+M.lsp_mappings = function()
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   -- gD = go Declaration
-  buf_nmap("gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
+  nmap({
+    "gD",
+    "<cmd>lua vim.lsp.buf.declaration()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [D]eclaration" }),
+  })
   -- gD = go definition
-  buf_nmap("gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
+  nmap({
+    "gd",
+    "<cmd>lua vim.lsp.buf.definition()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [d]efinition" }),
+  })
   -- gi = go implementation
-  buf_nmap("gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
+  nmap({
+    "gi",
+    "<cmd>lua vim.lsp.buf.implementation()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [i]mplementation" }),
+  })
   -- fs = function signature
-  buf_nmap("<leader>fs", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
+  nmap({
+    "<leader>fs",
+    "<cmd>lua vim.lsp.buf.signature_help()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[f]unction [s]ignature" }),
+  })
   -- wa = workspace add
-  buf_nmap("<leader>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>")
-  -- wr = workspace remove
-  buf_nmap("<leader>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>")
-  -- wl = workspace list
-  buf_nmap("<leader>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>")
+  nmap({
+    "<leader>wa",
+    "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[w]orkspace [a]dd" }),
+  })
   -- D = <type> Definition
-  buf_nmap("<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>")
+  nmap({
+    "<leader>D",
+    "<cmd>lua vim.lsp.buf.type_definition()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[D]efinition" }),
+  })
   -- ca = code action
-  buf_nmap("<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
-  -- ca = code action
-  buf_vmap("<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
+  nmap({
+    "<leader>ca",
+    "<cmd>lua vim.lsp.buf.code_action()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[c]ode [a]ctions" }),
+  })
   -- K = hover doc
-  buf_nmap("K", "<cmd>lua vim.lsp.buf.hover()<CR>")
+  nmap({
+    "K",
+    "<cmd>lua vim.lsp.buf.hover()<CR>",
+    Utils.merge_maps(default_opts, { buffer = true, desc = "LSP hover doc" }),
+  })
   -- bf = buffer format
-  buf_nmap("<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
-  vim.api.nvim_create_user_command("Format", function()
-    vim.lsp.buf.format({ async = true })
-  end, {})
+  nmap({ "<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>" })
 end
 
 M.lsp_diagnostic_mappings = function()
-  nmap({ "<leader>do", "<cmd>lua vim.diagnostic.open_float()<CR>", default_opts })
-  nmap({ "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", default_opts })
-  nmap({ "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", default_opts })
-  nmap({ "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", default_opts })
+  local function diagnostic_goto(next, severity)
+    local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+    severity = severity and vim.diagnostic.severity[severity] or nil
+    return function()
+      go({ severity = severity })
+    end
+  end
+
+  nmap({ "]d", diagnostic_goto(true), { desc = "Next Diagnostic" } })
+  nmap({ "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" } })
+  nmap({ "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" } })
+  nmap({ "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" } })
+  nmap({ "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" } })
+  nmap({ "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" } })
+
+  nmap({ "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", { desc = "Set loclist to LSP diagnostics" } })
 end
 
 M.lsp_saga_mappings = function()
@@ -324,6 +360,13 @@ M.telescope_mappings = function()
   nmap({ "<leader>fk", "<cmd>Telescope keymaps<cr>", default_opts })
   nmap({ "<leader>fo", "<cmd>Telescope oldfiles<cr>", default_opts })
   nmap({ "<leader>fO", "<cmd>Telescope vim_options<cr>", default_opts })
+  nmap({
+    "gr",
+    function()
+      require("telescope.builtin").lsp_references()
+    end,
+    default_opts,
+  })
   nmap({ "<leader>fr", "<cmd>Telescope resume<cr>", default_opts })
 
   --  Extensions
