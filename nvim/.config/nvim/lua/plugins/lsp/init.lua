@@ -28,7 +28,6 @@ M.setup = function()
   mason_lspconfig.setup({
     ensure_installed = {
       "cssls",
-      -- "elixirls",
       "gopls",
       "graphql",
       "html",
@@ -54,7 +53,7 @@ M.setup = function()
         vim.lsp.buf.format({ async = true })
       end, {})
 
-      require("keymaps").lsp_mappings(ev.buf)
+      require("keymaps").lsp_mappings()
       require("keymaps").lsp_diagnostic_mappings()
     end,
   })
@@ -126,12 +125,17 @@ M.setup = function()
         enableTestLenses = false,
         fetchDeps = false,
       }),
-      on_attach = on_attach,
+      on_attach = function(client, bufnr)
+        require("keymaps").elixir_mappings()
+        on_attach(client, bufnr)
+      end,
     },
     nextls = {
-      enable = true,
-      cmd = vim.fn.expand("~/next-ls/bin/nextls"),
-      on_attach = on_attach,
+      enable = false,
+      on_attach = function(client, bufnr)
+        require("keymaps").elixir_mappings()
+        on_attach(client, bufnr)
+      end,
     },
   })
 
@@ -139,33 +143,6 @@ M.setup = function()
     function(server_name)
       lspconfig[server_name].setup({})
     end,
-
-    -- ["elixirls"] = function()
-    --   opts.settings = {
-    --     elixirLS = {
-    --       fetchDeps = false,
-    --       dialyzerEnabled = true,
-    --       dialyzerFormat = "dialyxir_short",
-    --       suggestSpecs = true,
-    --     },
-    --   }
-    --   opts.root_dir = function(fname)
-    --     local path = lspconfig.util.path
-    --     local child_or_root_path = lspconfig.util.root_pattern({ "mix.exs", ".git" })(fname)
-    --     local maybe_umbrella_path =
-    --       lspconfig.util.root_pattern({ "mix.exs" })(vim.loop.fs_realpath(path.join({ child_or_root_path, ".." })))
-    --
-    --     local has_ancestral_mix_exs_path =
-    --       vim.startswith(child_or_root_path, path.join({ maybe_umbrella_path, "apps" }))
-    --     if maybe_umbrella_path and not has_ancestral_mix_exs_path then
-    --       maybe_umbrella_path = nil
-    --     end
-    --
-    --     return maybe_umbrella_path or child_or_root_path or vim.loop.os_homedir()
-    --   end
-    --
-    --   lspconfig.elixirls.setup(opts)
-    -- end,
 
     ["tailwindcss"] = function()
       lspconfig.tailwindcss.setup({
@@ -238,18 +215,6 @@ M.setup = function()
           "svelte",
         },
       })
-    end,
-
-    -- JSON
-    -- ["jsonls"] = function()
-    --   local overrides = require("plugins.lsp.jsonls")
-    --   lspconfig.jsonls.setup(overrides)
-    -- end,
-
-    -- YAML
-    ["yamlls"] = function()
-      local overrides = require("plugins.lsp.yamlls").setup()
-      lspconfig.yamlls.setup(overrides)
     end,
 
     -- Lua
