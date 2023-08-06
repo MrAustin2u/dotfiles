@@ -1,4 +1,4 @@
-local present, treesitter = pcall(require, 'nvim-treesitter.configs')
+local present, treesitter = pcall(require, "nvim-treesitter.configs")
 
 if not present then
   return
@@ -88,6 +88,12 @@ M.setup = function()
         update = "R",
         goto_node = "<cr>",
         show_help = "?",
+      },
+    },
+    textsubjects = {
+      enable = true,
+      keymaps = {
+        ["."] = "textsubjects-smart",
       },
     },
     query_linter = {

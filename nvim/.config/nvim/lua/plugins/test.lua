@@ -1,6 +1,8 @@
-local present, neotest = pcall(require, 'neotest')
+local neotest_present, neotest = pcall(require, "neotest")
+local trouble_present, _trouble = pcall(require, "trouble")
+local neotest_jest_present, neotest_jest = pcall(require, "neotest-jest")
 
-if not present then
+if not neotest_present and not neotest_jest_present then
   return
 end
 
@@ -9,12 +11,20 @@ local M = {}
 local opts = {
   adapters = {
     ["neotest-elixir"] = true,
+    neotest_jest({
+      jestCommand = "npm test --",
+      jestConfigFile = "custom.jest.config.ts",
+      env = { CI = true },
+      cwd = function(path)
+        return vim.fn.getcwd()
+      end,
+    }),
   },
   status = { virtual_text = true },
   output = { open_on_run = true },
   quickfix = {
     open = function()
-      if require("lazyvim.util").has("trouble.nvim") then
+      if trouble_present then
         vim.cmd("Trouble quickfix")
       else
         vim.cmd("copen")

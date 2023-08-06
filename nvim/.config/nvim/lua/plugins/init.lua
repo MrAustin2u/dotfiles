@@ -5,15 +5,33 @@ require("lazy").setup({
     version = false,
     event = "InsertEnter",
     dependencies = {
-      "andersevenrud/cmp-tmux",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-cmdline",
+      -- snippet engine, required by cmp
+      {
+        "L3MON4D3/LuaSnip",
+        dependencies = {
+          -- snippets!
+          "rafamadriz/friendly-snippets",
+        },
+      },
+      -- LSP driven completions
       "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-nvim-lsp-signature-help",
-      "hrsh7th/cmp-nvim-lua",
+      -- completion from buffer text
+      "hrsh7th/cmp-buffer",
+      -- file path completion
       "hrsh7th/cmp-path",
-      "hrsh7th/cmp-vsnip",
-      "hrsh7th/vim-vsnip",
+      -- command line completion
+      "hrsh7th/cmp-cmdline",
+      -- neovim lua config api completion
+      "hrsh7th/cmp-nvim-lua",
+      -- emoji completion (triggered by `:`)
+      "hrsh7th/cmp-emoji",
+      -- snippets in completion sources
+      "saadparwaiz1/cmp_luasnip",
+      -- git completions
+      "petertriho/cmp-git",
+      -- tmux pane completion
+      "andersevenrud/cmp-tmux",
+      -- icons for the completion menu
       "onsails/lspkind.nvim",
     },
     config = function()
@@ -60,11 +78,12 @@ require("lazy").setup({
   },
   {
     "jose-elias-alvarez/null-ls.nvim",
-    event = "VeryLazy",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "nvim-lua/plenary.nvim",
       "jose-elias-alvarez/typescript.nvim",
       "lukas-reineke/lsp-format.nvim",
+      "williamboman/mason.nvim",
     },
     config = function()
       require("plugins.null-ls").setup()
@@ -96,24 +115,20 @@ require("lazy").setup({
 
   -- COKELINE
 
-  -- {
-  --   "noib3/nvim-cokeline",
-  --   lazy = false,
-  --   dependencies = {
-  --     "kyazdani42/nvim-web-devicons",
-  --   },
-  --   config = function()
-  --     require("plugins.cokeline").setup()
-  --   end,
-  -- },
+  {
+    "noib3/nvim-cokeline",
+    lazy = false,
+    dependencies = {
+      "kyazdani42/nvim-web-devicons",
+    },
+    config = function()
+      require("plugins.cokeline").setup()
+    end,
+  },
 
   -- LUALINE
   {
     "nvim-lualine/lualine.nvim",
-    -- dependencies = {
-    --   "WhoIsSethDaniel/lualine-lsp-progress",
-    --   opt = true,
-    -- },
     config = function()
       require("plugins.lualine").setup()
     end,
@@ -149,10 +164,78 @@ require("lazy").setup({
       require("plugins.vim-notify").setup()
     end,
   },
+  --  Indent lines (visual indication)
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {
+      char = "│",
+      filetype_exclude = {
+        "",
+        "alpha",
+        "NvimTree",
+        "TelescopePrompt",
+        "checkhealth",
+        "dashboard",
+        "help",
+        "lazy",
+        "lazyterm",
+        "lspinfo",
+        "man",
+        "mason",
+        "notify",
+        "nofile",
+        "qf",
+        "quickfix",
+        "terminal",
+      },
+      show_trailing_blankline_indent = false,
+      show_current_context = false,
+    },
+  },
+  -- Active indent guide and indent text objects. When you're browsing
+  -- code, this highlights the current level of indentation, and animates
+  -- the highlighting.
+  {
+    "echasnovski/mini.indentscope",
+    version = false, -- wait till new 0.7.0 release to put it back on semver
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      -- symbol = "▏",
+      symbol = "│",
+      options = { try_as_border = true },
+    },
+    init = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {
+          "",
+          "alpha",
+          "NvimTree",
+          "TelescopePrompt",
+          "checkhealth",
+          "dashboard",
+          "help",
+          "lazy",
+          "lazyterm",
+          "lspinfo",
+          "man",
+          "mason",
+          "notify",
+          "nofile",
+          "qf",
+          "quickfix",
+          "terminal",
+        },
+        callback = function()
+          vim.b.miniindentscope_disable = true
+        end,
+      })
+    end,
+  },
   -- color schemes
   {
     "folke/tokyonight.nvim",
-    lazy = false,    -- make sure we load this during startup
+    lazy = false, -- make sure we load this during startup
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       require("tokyonight").setup({
@@ -319,9 +402,11 @@ require("lazy").setup({
     "nvim-neotest/neotest",
     dependencies = {
       "jfpedroza/neotest-elixir",
+      "haydenmeade/neotest-jest",
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
       "antoinemadec/FixCursorHold.nvim",
+      "folke/trouble.nvim",
     },
     config = function()
       require("plugins.test").setup()
@@ -377,11 +462,15 @@ require("lazy").setup({
   -- treesitter
   {
     "nvim-treesitter/nvim-treesitter",
+    event = { "BufReadPost", "BufNewFile" },
     build = ":TSUpdate",
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
       "JoosepAlviste/nvim-ts-context-commentstring",
       "RRethy/nvim-treesitter-endwise",
+      "RRethy/nvim-treesitter-textsubjects",
+      "windwp/nvim-ts-autotag",
+      "IndianBoy42/tree-sitter-just",
       "nvim-treesitter/playground",
       "nvim-treesitter/nvim-treesitter-context",
     },
@@ -481,6 +570,7 @@ require("lazy").setup({
       "m-demare/attempt.nvim",
       "nvim-telescope/telescope-github.nvim",
       "folke/tokyonight.nvim",
+      "nvim-treesitter/nvim-treesitter",
     },
     config = function()
       require("plugins.telescope").setup()
@@ -512,26 +602,25 @@ require("lazy").setup({
       vim.g.startuptime_tries = 10
     end,
   },
-  -- library used by other plugins
+
   { "nvim-lua/plenary.nvim", lazy = true },
 
-  -- makes some plugins dot-repeatable like leap
-  { "tpope/vim-repeat",      event = "VeryLazy" },
+  { "tpope/vim-repeat", event = "VeryLazy" },
 
   "tpope/vim-surround",
 
   "tpope/vim-abolish",
 
-  { "szw/vim-maximizer",        keys = { { "<space>m", "<cmd>MaximizerToggle<CR>" } } },
-  { "windwp/nvim-autopairs",    config = true },
+  "famiu/bufdelete.nvim",
 
-  { "karb94/neoscroll.nvim",    config = true },
+  { "szw/vim-maximizer", keys = { { "<space>m", "<cmd>MaximizerToggle<CR>" } } },
+  { "windwp/nvim-autopairs", config = true },
 
-  -- "famiu/bufdelete.nvim",
+  { "karb94/neoscroll.nvim", config = true },
 
   { "tversteeg/registers.nvim", config = true },
 
-  { "chentoast/marks.nvim",     config = true },
+  { "chentoast/marks.nvim", config = true },
 
   { "mcauley-penney/tidy.nvim", config = true },
 
@@ -539,7 +628,7 @@ require("lazy").setup({
 
   { "folke/todo-comments.nvim", config = true },
 
-  { "numToStr/Comment.nvim",    config = true },
+  { "numToStr/Comment.nvim", config = true },
 
   "benizi/vim-automkdir",
 
@@ -581,11 +670,11 @@ require("lazy").setup({
   "jparise/vim-graphql",
 
   -- Better quickfix
-  { "kevinhwang91/nvim-bqf",    ft = "qf" },
+  { "kevinhwang91/nvim-bqf", ft = "qf" },
 
   -- GIT
 
-  { "ruifm/gitlinker.nvim",     config = true },
+  { "ruifm/gitlinker.nvim", config = true },
   {
     "sindrets/diffview.nvim",
     dependencies = { "kyazdani42/nvim-web-devicons" },
