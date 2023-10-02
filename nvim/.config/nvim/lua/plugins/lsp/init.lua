@@ -51,7 +51,7 @@ M.setup = function()
       "isort",
       "prettier",
       "pylint",
-      "stlua"
+      "stylua"
     }
   })
 
