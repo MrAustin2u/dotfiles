@@ -61,6 +61,7 @@ require("lazy").setup({
     build = ":MasonUpdate",
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
+      "WhoIsSethDaniel/mason-tool-installer",
       "neovim/nvim-lspconfig",
       "hrsh7th/cmp-nvim-lsp",
       "jose-elias-alvarez/typescript.nvim",

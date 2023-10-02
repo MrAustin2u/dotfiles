@@ -230,13 +230,13 @@ M.formatting_mappings = function(conform)
       async = false,
       timeout_ms = 500,
     })
-  end)
+  end, { desc = "Trigger formatting (in visual mode)" })
 end
 
 M.lint_mappings = function(lint)
   nmap({ "<leader>l", function()
     lint.try_lint()
-  end, { desc = "Trigger linting" } })
+  end, { desc = "Trigger linting for current file" } })
 end
 
 M.lsp_mappings = function()

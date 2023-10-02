@@ -1,11 +1,12 @@
 local utils = require("utils")
 
 local cmp_lsp_present, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+local elixir_present, elixir = pcall(require, "elixir")
 local lspconfig_present, lspconfig = pcall(require, "lspconfig")
 local mason_lspconfig_present, mason_lspconfig = pcall(require, "mason-lspconfig")
 local mason_present, mason = pcall(require, "mason")
+local mason_tool_installer_present, mason_tool_installer = pcall(require, "mason-tool-installer")
 local ts_utils_present, ts_utils = pcall(require, "nvim-lsp-ts-utils")
-local elixir_present, elixir = pcall(require, "elixir")
 
 local deps = {
   cmp_lsp_present,
@@ -13,6 +14,7 @@ local deps = {
   lspconfig_present,
   mason_lspconfig_present,
   mason_present,
+  mason_tool_installer_present,
   ts_utils_present,
 }
 
@@ -22,14 +24,11 @@ if utils.contains(deps, false) then
 end
 
 local M = {}
--- local root_pattern = lspconfig.util.root_pattern
-
 M.setup = function()
   mason.setup()
   mason_lspconfig.setup({
     ensure_installed = {
       "cssls",
-      -- "elixirls",
       "gopls",
       "graphql",
       "html",
@@ -45,10 +44,20 @@ M.setup = function()
     automatic_installation = true,
   })
 
+  mason_tool_installer.setup({
+    ensure_installed = {
+      "black",
+      "eslint_d",
+      "isort",
+      "prettier",
+      "pylint",
+      "stlua"
+    }
+  })
+
   vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
     callback = function(ev)
-      -- Enable completion triggered by <c-x><c-o>
       vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
 
       vim.api.nvim_create_user_command("Format", function()
@@ -67,7 +76,10 @@ M.setup = function()
     end
 
     if client.supports_method("textDocument/formatting") then
-      vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
+      vim.api.nvim_clear_autocmds({
+        group = format_on_save_group,
+        buffer = bufnr
+      })
       vim.api.nvim_create_autocmd("BufWritePre", {
         group = format_on_save_group,
         buffer = bufnr,
