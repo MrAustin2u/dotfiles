@@ -11,16 +11,18 @@ M.setup = function()
     indent = { char = "│" },
     scope = {
       show_start = false,
-      show_end = false
+      show_end = false,
+      enabled = false,
     },
     exclude = {
-      buftypes = { "NvimTree" },
+      buftypes = { "NvimTree", 'TelescopePrompt' },
       filetypes = {
         "alpha",
         "dashboard",
         "lazy",
         "lazyterm",
         "lspinfo",
+        "man",
         "mason",
         "notify",
         "qf",
