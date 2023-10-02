@@ -1,9 +1,8 @@
-local present, nvimtree = pcall(require, 'nvim-tree')
+local present, nvimtree = pcall(require, "nvim-tree")
 
 if not present then
   return
 end
-
 
 local M = {}
 
@@ -14,9 +13,18 @@ M.setup = function()
     },
     diagnostics = {
       enable = true,
+      show_on_dirs = false,
+      icons = {
+        hint = "",
+        info = "",
+        warning = "",
+        error = "",
+      },
     },
     filters = {
-      exclude = { ".DS_Store" },
+      dotfiles = false,
+      custom = { ".DS_Store", ".git" },
+      exclude = {},
     },
     view = {
       width = 45,
@@ -29,6 +37,27 @@ M.setup = function()
       },
       open_file = {
         quit_on_open = true,
+      },
+    },
+    renderer = {
+      icons = {
+        show = {
+          git = true,
+          folder = true,
+          file = true,
+          folder_arrow = true,
+        },
+        glyphs = {
+          default = "",
+          git = {
+            unstaged = "",
+            staged = "",
+            unmerged = "",
+            renamed = "",
+            untracked = "",
+            deleted = "",
+          },
+        },
       },
     },
   }

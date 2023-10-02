@@ -69,7 +69,9 @@ require("lazy").setup({
         "elixir-tools/elixir-tools.nvim",
         version = "*",
         event = { "BufReadPre", "BufNewFile" },
-        dependencies = { "nvim-lua/plenary.nvim" },
+        dependencies = {
+          "nvim-lua/plenary.nvim",
+        },
       },
     },
     config = function()
@@ -112,17 +114,24 @@ require("lazy").setup({
       require("trouble").setup()
     end,
   },
-
-  -- COKELINE
-
   {
-    "noib3/nvim-cokeline",
-    lazy = false,
-    dependencies = {
-      "kyazdani42/nvim-web-devicons",
-    },
-    config = function()
-      require("plugins.cokeline").setup()
+    "SmiteshP/nvim-navic",
+    lazy = true,
+    init = function()
+      vim.g.navic_silence = true
+      require("utils").on_attach(function(client, buffer)
+        if client.server_capabilities.documentSymbolProvider then
+          require("nvim-navic").attach(client, buffer)
+        end
+      end)
+    end,
+    opts = function()
+      return {
+        separator = " ",
+        highlight = true,
+        depth_limit = 5,
+        icons = require("utils").defaults.icons.kinds,
+      }
     end,
   },
 
@@ -134,6 +143,54 @@ require("lazy").setup({
     end,
   },
 
+  -- BUFFERLINE
+  {
+    "echasnovski/mini.bufremove",
+    -- stylua: ignore
+    keys = {
+      { "<leader>bd", function() require("mini.bufremove").delete(0, false) end, desc = "Delete Buffer" },
+      { "<leader>bD", function() require("mini.bufremove").delete(0, true) end,  desc = "Delete Buffer (Force)" },
+    },
+  },
+  {
+    "akinsho/bufferline.nvim",
+    event = "VeryLazy",
+    keys = {
+      { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", desc = "Toggle pin" },
+      { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete non-pinned buffers" },
+    },
+    opts = {
+      options = {
+        always_show_bufferline = false,
+        color_icons = true,
+        diagnostics = "nvim_lsp",
+        separator_style = "thin",
+        show_buffer_close_icons = false,
+        show_close_icon = false,
+        show_tab_indicators = true,
+        close_command = function(n)
+          require("mini.bufremove").delete(n, false)
+        end,
+        right_mouse_command = function(n)
+          require("mini.bufremove").delete(n, false)
+        end,
+        diagnostics_indicator = function(_, _, diag)
+          local icons = require("utils").defaults.icons
+          local ret = (diag.error and icons.Error .. diag.error .. " " or "")
+            .. (diag.warning and icons.Warn .. diag.warning or "")
+          return vim.trim(ret)
+        end,
+        offsets = {
+          {
+            filetype = "nvimtree",
+            text = "NvimTree",
+            highlight = "Directory",
+            text_align = "left",
+          },
+        },
+      },
+    },
+  },
   -- ATTEMPT
 
   {
@@ -245,7 +302,7 @@ require("lazy").setup({
         hide_inactive_statusline = true,
       })
 
-      vim.cmd([[colorscheme tokyonight-moon]])
+      vim.cmd([[colorscheme tokyonight]])
       vim.cmd([[hi TabLine guibg=NONE guifg=NONE]])
     end,
   },
@@ -396,32 +453,6 @@ require("lazy").setup({
         },
       })
     end,
-  },
-  --test
-  {
-    "nvim-neotest/neotest",
-    dependencies = {
-      "jfpedroza/neotest-elixir",
-      "haydenmeade/neotest-jest",
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "antoinemadec/FixCursorHold.nvim",
-      "folke/trouble.nvim",
-    },
-    config = function()
-      require("plugins.test").setup()
-    end,
-  },
-  {
-    "mfussenegger/nvim-dap",
-    dependencies = {
-      "nvim-neotest/neotest",
-    },
-    optional = true,
-    -- stylua: ignore
-    keys = {
-      { "<leader>td", function() require("neotest").run.run({ strategy = "dap" }) end, desc = "Debug Nearest" },
-    },
   },
 
   -- EDITOR STUFF
@@ -578,17 +609,16 @@ require("lazy").setup({
   },
 
   -- TEST
-
   {
-    "nvim-neotest/neotest",
-    dependencies = {
-      "jfpedroza/neotest-elixir",
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "antoinemadec/FixCursorHold.nvim",
-    },
-    config = function()
-      require("plugins.test").setup()
+    "janko-m/vim-test",
+    keys = require("keymaps").vim_test_mappings,
+    dependencies = { "benmills/vimux" },
+    init = function()
+      vim.g["test#strategy"] = "vimux"
+      -- accommodations for Malomo's unusual folder structure on Dash
+      vim.cmd(
+        [[let test#javascript#jest#file_pattern = '\v(__tests__/.*|(spec|test|__tests__))\.(js|jsx|coffee|ts|tsx)$']]
+      )
     end,
   },
 
@@ -611,7 +641,14 @@ require("lazy").setup({
 
   "tpope/vim-abolish",
 
-  "famiu/bufdelete.nvim",
+  {
+    "echasnovski/mini.bufremove",
+    -- stylua: ignore
+    keys = {
+      { "<leader>bd", function() require("mini.bufremove").delete(0, false) end, desc = "Delete Buffer" },
+      { "<leader>bD", function() require("mini.bufremove").delete(0, true) end,  desc = "Delete Buffer (Force)" },
+    },
+  },
 
   { "szw/vim-maximizer", keys = { { "<space>m", "<cmd>MaximizerToggle<CR>" } } },
   { "windwp/nvim-autopairs", config = true },
@@ -674,6 +711,12 @@ require("lazy").setup({
 
   -- GIT
 
+  {
+    "akinsho/git-conflict.nvim",
+    keys = require("keymaps").git_conflict_mappings,
+    version = "*",
+    config = true,
+  },
   { "ruifm/gitlinker.nvim", config = true },
   {
     "sindrets/diffview.nvim",
@@ -685,6 +728,24 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       require("plugins.gitsigns").setup()
+    end,
+  },
+
+  -- DB
+  {
+    "tpope/vim-dadbod",
+    cmd = "DBUI",
+    dependencies = {
+      "tpope/vim-dotenv",
+      "kristijanhusak/vim-dadbod-ui",
+      "kristijanhusak/vim-dadbod-completion",
+    },
+    keys = {
+      { "<leader>do", ":DBUI<CR><CR>", desc = "Database UI Open" },
+      { "<leader>dc", ":DBUIClose<CR>", desc = "Database UI Close" },
+    },
+    config = function()
+      require("plugins.dadbod").setup()
     end,
   },
 }, {

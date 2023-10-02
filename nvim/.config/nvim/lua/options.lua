@@ -1,4 +1,4 @@
-local cache_dir = os.getenv("HOME") .. "/.cache/nvim/"
+local cache_dir = string.format("%s/.cache/nvim/", vim.env.HOME)
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -39,7 +39,20 @@ vim.opt.ch = 0
 vim.opt.cmdheight = 1
 vim.opt.colorcolumn = "120"
 vim.opt.completeopt = "menu,menuone,noselect"
-vim.opt.directory = cache_dir .. "swag/"
+
+-- Make diffing better
+-- https://vimways.org/2018/the-power-of-diff/
+----------------------------------------------
+-- Always use vertical diffs
+vim.opt.diffopt:append("vertical")
+vim.opt.diffopt:append("filler")
+-- ignore whitespace
+vim.opt.diffopt:append("iwhite")
+vim.opt.diffopt:append("algorithm:patience")
+vim.opt.diffopt:append("indent-heuristic")
+----------------------------------------------
+vim.opt.autowrite = true -- Automatically :write before running commands
+vim.opt.ch = 0 -- Command line height
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
 vim.opt.foldenable = false
@@ -59,17 +72,34 @@ vim.opt.showmatch = true
 vim.opt.shortmess:append({ W = true, I = true, c = true })
 vim.opt.sidescrolloff = 8
 vim.opt.signcolumn = "yes"
+vim.opt.smartindent = false
 vim.opt.softtabstop = 2
-vim.opt.spellfile = cache_dir .. "spell/en.uft-8.add"
 vim.opt.spelllang = "en"
 vim.opt.splitright = true
+vim.opt.splitkeep = "screen"
 vim.opt.tabstop = 2
 vim.opt.termguicolors = true
 vim.opt.timeout = true
 vim.opt.timeoutlen = 300
 vim.opt.ttimeoutlen = 0
-vim.opt.undodir = cache_dir .. "undo/"
 vim.opt.undofile = true
 vim.opt.updatetime = 50
-vim.opt.viewdir = cache_dir .. "view/"
 vim.opt.wrap = true
+----------------------------------------------
+-- Files and directories
+----------------------------------------------
+-- Set spellfile to location that is guaranteed to exist, can be symlinked to
+-- Dropbox or kept in Git
+vim.opt.spellfile = cache_dir .. "spell/en.uft-8.add"
+vim.opt_global.spell = true
+
+-- set where swap file and undo/backup/view files are saved
+vim.opt.backupdir = cache_dir
+vim.opt.directory = cache_dir .. "swag/"
+vim.opt.viewdir = cache_dir .. "view/"
+
+-- persistent undo between file reloads
+if vim.fn.has("persistent_undo") then
+  vim.opt.undofile = true
+  vim.opt.undodir = cache_dir .. "undo/"
+end

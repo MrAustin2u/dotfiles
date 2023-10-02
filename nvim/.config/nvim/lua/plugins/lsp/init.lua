@@ -22,12 +22,14 @@ if utils.contains(deps, false) then
 end
 
 local M = {}
+-- local root_pattern = lspconfig.util.root_pattern
 
 M.setup = function()
   mason.setup()
   mason_lspconfig.setup({
     ensure_installed = {
       "cssls",
+      -- "elixirls",
       "gopls",
       "graphql",
       "html",
@@ -60,6 +62,10 @@ M.setup = function()
 
   local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
   local on_attach = function(client, bufnr)
+    if client.config.name == "yamlls" then
+      vim.lsp.buf_detach_client(bufnr, client.id)
+    end
+
     if client.supports_method("textDocument/formatting") then
       vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
       vim.api.nvim_create_autocmd("BufWritePre", {
@@ -117,21 +123,14 @@ M.setup = function()
   }
 
   elixir.setup({
-    credo = {},
+    nextls = { enable = false },
+    credo = { enable = true },
     elixirls = {
       enable = true,
-      settings = elixir.elixirls.settings({
+      settings = require("elixir.elixirls").settings({
         dialyzerEnabled = true,
         enableTestLenses = false,
-        fetchDeps = false,
       }),
-      on_attach = function(client, bufnr)
-        require("keymaps").elixir_mappings()
-        on_attach(client, bufnr)
-      end,
-    },
-    nextls = {
-      enable = false,
       on_attach = function(client, bufnr)
         require("keymaps").elixir_mappings()
         on_attach(client, bufnr)
@@ -143,6 +142,21 @@ M.setup = function()
     function(server_name)
       lspconfig[server_name].setup({})
     end,
+
+    -- ["elixirls"] = function()
+    --   opts.cmd = { vim.fn.expand("~/.local/share/nvim/lsp_servers/elixir/elixir-ls/release/language_server.sh") }
+    --   opts.root_dir = root_pattern("mix.exs", ".git") or vim.loop.os_homedir()
+    --   opts.settings = {
+    --     elixirLS = {
+    --       fetchDeps = false,
+    --       dialyzerEnabled = true,
+    --       dialyzerFormat = "dialyxir_short",
+    --       suggestSpecs = true,
+    --     },
+    --   }
+    --
+    --   lspconfig.elixirls.setup(opts)
+    -- end,
 
     ["tailwindcss"] = function()
       lspconfig.tailwindcss.setup({
@@ -266,6 +280,12 @@ M.setup = function()
       end
 
       lspconfig.tsserver.setup(opts)
+    end,
+
+    -- YAML
+    ["yamlls"] = function()
+      local overrides = require("plugins.lsp.yamlls").setup()
+      lspconfig.yamlls.setup(overrides)
     end,
   })
 end

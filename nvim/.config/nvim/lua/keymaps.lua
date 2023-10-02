@@ -140,18 +140,25 @@ vim.keymap.set(
 vim.keymap.set({ "n", "x" }, "gw", "*N", { desc = "Search word under cursor" })
 
 -- buffer
-vim.keymap.set("n", "<space>bd", ":Bdelete <CR>", { silent = true, desc = "Buffer Delete" })
+
+-- delete all
 vim.keymap.set("n", "<space>ba", ":%bdelete|edit#|bdelete# <CR>", { silent = true, desc = "Buffer Delete All" })
-vim.keymap.set("n", "<Tab>", ":bnext <CR>", { silent = true, desc = "Next Bufffer" })
-vim.keymap.set("n", "<S-Tab>", ":bprev <CR>", { silent = true, desc = "Previous Bufffer" })
+
+--- cycle through buffers
+vim.keymap.set("n", "<Tab>", ":bnext <CR>", { silent = true, desc = "Next Buffer" })
+vim.keymap.set("n", "<S-Tab>", ":bprev <CR>", { silent = true, desc = "Previous Buffer" })
+
+-- Splits
+vim.keymap.set("n", "<space>vs", ":vs<CR>")
+vim.keymap.set("n", "<space>hs", ":split<CR>")
 
 -- windows
-vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window" })
-vim.keymap.set("n", "<leader>wd", "<C-W>c", { desc = "Delete window" })
-vim.keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split window below" })
-vim.keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split window right" })
-vim.keymap.set("n", "<leader>-", "<C-W>s", { desc = "Split window below" })
-vim.keymap.set("n", "<leader>|", "<C-W>v", { desc = "Split window right" })
+-- vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window" })
+-- vim.keymap.set("n", "<leader>wd", "<C-W>c", { desc = "Delete window" })
+-- vim.keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split window below" })
+-- vim.keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split window right" })
+-- vim.keymap.set("n", "<leader>-", "<C-W>s", { desc = "Split window below" })
+-- vim.keymap.set("n", "<leader>|", "<C-W>v", { desc = "Split window right" })
 
 -- Resize window using <ctrl> arrow keys
 vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
@@ -196,10 +203,10 @@ M.attempt_mappings = function(attempt)
   nmap({ "<leader>al", attempt.open_select, Utils.merge_maps(default_opts, { desc = "Select Attempt" }) })
 end
 
-M.cokeline_mappings = function()
-  nmap({ "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true, desc = "Prev Tab" } })
-  nmap({ "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Tab" } })
-end
+-- M.cokeline_mappings = function()
+--   nmap({ "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true, desc = "Prev Tab" } })
+--   nmap({ "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Tab" } })
+-- end
 
 M.elixir_mappings = function()
   nmap({
@@ -391,6 +398,15 @@ M.telescope_mappings = function()
   nmap({ "<leader>gp", "<cmd>Telescope gh pull_request<cr>", default_opts })
 end
 
+M.git_conflict_mappings = function()
+  vim.keymap.set("n", "co", "<Plug>(git-conflict-ours)")
+  vim.keymap.set("n", "ct", "<Plug>(git-conflict-theirs)")
+  vim.keymap.set("n", "cb", "<Plug>(git-conflict-both)")
+  vim.keymap.set("n", "c0", "<Plug>(git-conflict-none)")
+  vim.keymap.set("n", "]x", "<Plug>(git-conflict-prev-conflict)")
+  vim.keymap.set("n", "[x", "<Plug>(git-conflict-next-conflict)")
+end
+
 M.gitsigns_mappings = function(gitsigns, bufnr)
   local opts = { expr = true, buffer = bufnr }
 
@@ -431,6 +447,10 @@ M.gitsigns_mappings = function(gitsigns, bufnr)
 
   -- Text object for git hunks (e.g. vih will select the hunk)
   map({ { "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>" })
+end
+
+M.oil_mappings = function()
+  nmap({ "-", ":Oil<CR>", { desc = "Oil: Open parent directory" } })
 end
 
 M.spectre_mappings = function(spectre)
@@ -475,63 +495,11 @@ M.vim_notify_mappings = function(notify)
   })
 end
 
-M.neotest_mappings = function(neotest)
-  nmap({
-    "<leader>tt",
-    function()
-      neotest.run.run(vim.fn.expand("%"))
-    end,
-    Utils.merge_maps(default_opts, { desc = "Run File" }),
-  })
-  nmap({
-    "<leader>tT",
-    function()
-      neotest.run.run(vim.loop.cwd())
-    end,
-    Utils.merge_maps(default_opts, { desc = "Run All Test Files" }),
-  })
-  nmap({
-    "<leader>tr",
-    function()
-      neotest.run.run()
-    end,
-    Utils.merge_maps(default_opts, { desc = "Run Nearest" }),
-  })
-  nmap({
-    "<leader>ts",
-    function()
-      neotest.summary.toggle()
-    end,
-    Utils.merge_maps(default_opts, { desc = "Toggle Summary" }),
-  })
-  nmap({
-    "<leader>to",
-    function()
-      neotest.output.open({ enter = true, auto_close = true })
-    end,
-    { desc = "Show Output" },
-  })
-  nmap({
-    "<leader>tO",
-    function()
-      neotest.output_panel.toggle()
-    end,
-    { desc = "Toggle Output Panel" },
-  })
-  nmap({
-    "<leader>tS",
-    function()
-      neotest.run.stop()
-    end,
-    { desc = "Stop" },
-  })
-  nmap({
-    "<leader>td",
-    function()
-      neotest.run.run({ strategy = "dap" })
-    end,
-    { desc = "Debug Nearest" },
-  })
-end
+M.vim_test_mappings = {
+  { "<leader>tn", ":TestNearest<CR>", silent = true, desc = "[T]est [N]earest" },
+  { "<leader>tf", ":TestFile<CR>", silent = true, desc = "[T]est [F]ile" },
+  { "<leader>ts", ":TestSuite<CR>", silent = true, desc = "[T]est [S]uite" },
+  { "<leader>tl", ":TestLast<CR>", silent = true, desc = "[T]est [L]ast" },
+}
 
 return M
