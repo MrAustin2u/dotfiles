@@ -65,9 +65,6 @@ vim.keymap.set(
   { desc = "[SO]urce file", silent = true }
 )
 
--- lazy
-vim.keymap.set("n", "<leader>l", "<cmd>:Lazy<cr>", { desc = "Lazy" })
-
 -- new file
 vim.keymap.set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
 
@@ -224,6 +221,22 @@ M.elixir_mappings = function()
     ":ElixirExpandMacro<cr>",
     Utils.merge_maps(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
   })
+end
+
+M.formatting_mappings = function(conform)
+  vim.keymap.set({ "n", "v" }, "<leader>mp", function()
+    conform.format({
+      lsp_fallback = true,
+      async = false,
+      timeout_ms = 500,
+    })
+  end)
+end
+
+M.lint_mappings = function(lint)
+  nmap({ "<leader>l", function()
+    lint.try_lint()
+  end, { desc = "Trigger linting" } })
 end
 
 M.lsp_mappings = function()
@@ -449,10 +462,6 @@ M.gitsigns_mappings = function(gitsigns, bufnr)
   map({ { "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>" })
 end
 
-M.oil_mappings = function()
-  nmap({ "-", ":Oil<CR>", { desc = "Oil: Open parent directory" } })
-end
-
 M.spectre_mappings = function(spectre)
   nmap({
     "<leader>sr",
@@ -497,9 +506,9 @@ end
 
 M.vim_test_mappings = {
   { "<leader>tn", ":TestNearest<CR>", silent = true, desc = "[T]est [N]earest" },
-  { "<leader>tf", ":TestFile<CR>", silent = true, desc = "[T]est [F]ile" },
-  { "<leader>ts", ":TestSuite<CR>", silent = true, desc = "[T]est [S]uite" },
-  { "<leader>tl", ":TestLast<CR>", silent = true, desc = "[T]est [L]ast" },
+  { "<leader>tf", ":TestFile<CR>",    silent = true, desc = "[T]est [F]ile" },
+  { "<leader>ts", ":TestSuite<CR>",   silent = true, desc = "[T]est [S]uite" },
+  { "<leader>tl", ":TestLast<CR>",    silent = true, desc = "[T]est [L]ast" },
 }
 
 return M

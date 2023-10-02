@@ -78,17 +78,21 @@ require("lazy").setup({
       require("plugins.lsp").setup()
     end,
   },
+
+  -- Formatter
   {
-    "jose-elias-alvarez/null-ls.nvim",
+    "stevearc/conform.nvim",
     event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "jose-elias-alvarez/typescript.nvim",
-      "lukas-reineke/lsp-format.nvim",
-      "williamboman/mason.nvim",
-    },
     config = function()
-      require("plugins.null-ls").setup()
+      require("plugins.formatting").setup()
+    end,
+  },
+  -- Linting
+  {
+    "mfussenegger/nvim-lint",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      require("plugins.linting").setup()
     end,
   },
   -- lsp renaming
@@ -156,7 +160,7 @@ require("lazy").setup({
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
     keys = {
-      { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", desc = "Toggle pin" },
+      { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>",            desc = "Toggle pin" },
       { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete non-pinned buffers" },
     },
     opts = {
@@ -177,7 +181,7 @@ require("lazy").setup({
         diagnostics_indicator = function(_, _, diag)
           local icons = require("utils").defaults.icons
           local ret = (diag.error and icons.Error .. diag.error .. " " or "")
-            .. (diag.warning and icons.Warn .. diag.warning or "")
+              .. (diag.warning and icons.Warn .. diag.warning or "")
           return vim.trim(ret)
         end,
         offsets = {
@@ -221,79 +225,22 @@ require("lazy").setup({
       require("plugins.vim-notify").setup()
     end,
   },
+
   --  Indent lines (visual indication)
   {
     "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
     event = { "BufReadPost", "BufNewFile" },
-    opts = {
-      char = "│",
-      filetype_exclude = {
-        "",
-        "alpha",
-        "NvimTree",
-        "TelescopePrompt",
-        "checkhealth",
-        "dashboard",
-        "help",
-        "lazy",
-        "lazyterm",
-        "lspinfo",
-        "man",
-        "mason",
-        "notify",
-        "nofile",
-        "qf",
-        "quickfix",
-        "terminal",
-      },
-      show_trailing_blankline_indent = false,
-      show_current_context = false,
-    },
+    config = function()
+      require("plugins.indent_blankline").setup()
+    end
   },
-  -- Active indent guide and indent text objects. When you're browsing
-  -- code, this highlights the current level of indentation, and animates
-  -- the highlighting.
-  {
-    "echasnovski/mini.indentscope",
-    version = false, -- wait till new 0.7.0 release to put it back on semver
-    event = { "BufReadPre", "BufNewFile" },
-    opts = {
-      -- symbol = "▏",
-      symbol = "│",
-      options = { try_as_border = true },
-    },
-    init = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = {
-          "",
-          "alpha",
-          "NvimTree",
-          "TelescopePrompt",
-          "checkhealth",
-          "dashboard",
-          "help",
-          "lazy",
-          "lazyterm",
-          "lspinfo",
-          "man",
-          "mason",
-          "notify",
-          "nofile",
-          "qf",
-          "quickfix",
-          "terminal",
-        },
-        callback = function()
-          vim.b.miniindentscope_disable = true
-        end,
-      })
-    end,
-  },
-  -- color schemes
+
+  -- COLOR SCHEMES
   {
     "folke/tokyonight.nvim",
-    lazy = false, -- make sure we load this during startup
-    priority = 1000, -- make sure to load this before all the other start plugins
+    lazy = false,
+    priority = 1000,
     config = function()
       require("tokyonight").setup({
         style = "moon",
@@ -635,7 +582,7 @@ require("lazy").setup({
 
   { "nvim-lua/plenary.nvim", lazy = true },
 
-  { "tpope/vim-repeat", event = "VeryLazy" },
+  { "tpope/vim-repeat",      event = "VeryLazy" },
 
   "tpope/vim-surround",
 
@@ -650,14 +597,14 @@ require("lazy").setup({
     },
   },
 
-  { "szw/vim-maximizer", keys = { { "<space>m", "<cmd>MaximizerToggle<CR>" } } },
-  { "windwp/nvim-autopairs", config = true },
+  { "szw/vim-maximizer",        keys = { { "<space>m", "<cmd>MaximizerToggle<CR>" } } },
+  { "windwp/nvim-autopairs",    config = true },
 
-  { "karb94/neoscroll.nvim", config = true },
+  { "karb94/neoscroll.nvim",    config = true },
 
   { "tversteeg/registers.nvim", config = true },
 
-  { "chentoast/marks.nvim", config = true },
+  { "chentoast/marks.nvim",     config = true },
 
   { "mcauley-penney/tidy.nvim", config = true },
 
@@ -665,7 +612,7 @@ require("lazy").setup({
 
   { "folke/todo-comments.nvim", config = true },
 
-  { "numToStr/Comment.nvim", config = true },
+  { "numToStr/Comment.nvim",    config = true },
 
   "benizi/vim-automkdir",
 
@@ -707,7 +654,7 @@ require("lazy").setup({
   "jparise/vim-graphql",
 
   -- Better quickfix
-  { "kevinhwang91/nvim-bqf", ft = "qf" },
+  { "kevinhwang91/nvim-bqf",    ft = "qf" },
 
   -- GIT
 
@@ -741,7 +688,7 @@ require("lazy").setup({
       "kristijanhusak/vim-dadbod-completion",
     },
     keys = {
-      { "<leader>do", ":DBUI<CR><CR>", desc = "Database UI Open" },
+      { "<leader>do", ":DBUI<CR><CR>",  desc = "Database UI Open" },
       { "<leader>dc", ":DBUIClose<CR>", desc = "Database UI Close" },
     },
     config = function()
