@@ -8,13 +8,14 @@ local M = {}
 
 M.setup = function()
   lint.linters_by_ft = {
+    ["*"] = { "codespell" },
     javascript = { "eslint_d" },
     javascriptreact = { "eslint_d" },
     lua = { "yamllint" },
+    python = { "pylint" },
     typescript = { "eslint_d" },
     typescriptreact = { "eslint_d" },
     yaml = { "yamllint" },
-    python = { "pylint" }
   }
 
   local lint_augroup = vim.api.nvim_create_augroup("lint", {

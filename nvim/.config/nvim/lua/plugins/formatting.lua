@@ -9,6 +9,7 @@ local M = {}
 M.setup = function()
   conform.setup({
     formatter_by_ft = {
+      ["*"] = { "codespell" },
       css = { "prettier" },
       graphql = { "prettier" },
       html = { "prettier" },
@@ -16,10 +17,10 @@ M.setup = function()
       javascriptreact = { "prettier" },
       lua = { "stylua" },
       markdown = { "prettier" },
+      python = { "isort", "black" },
       typescript = { "prettier" },
       typescriptreact = { "prettier" },
       yaml = { "prettier" },
-      python = { "isort", "black" },
     },
     format_on_save = {
       async = false,

@@ -47,6 +47,7 @@ M.setup = function()
   mason_tool_installer.setup({
     ensure_installed = {
       "black",
+      "codespell",
       "eslint_d",
       "isort",
       "prettier",
