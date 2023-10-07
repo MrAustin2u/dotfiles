@@ -36,41 +36,33 @@ M.defaults = {
       removed = " ",
     },
     kinds = {
-      Array = " ",
-      Boolean = " ",
-      Class = " ",
-      Color = " ",
-      Constant = " ",
-      Constructor = " ",
-      Copilot = " ",
-      Enum = " ",
-      EnumMember = " ",
-      Event = " ",
-      Field = " ",
-      File = " ",
-      Folder = " ",
-      Function = " ",
-      Interface = " ",
-      Key = " ",
-      Keyword = " ",
-      Method = " ",
-      Module = " ",
-      Namespace = " ",
-      Null = " ",
-      Number = " ",
-      Object = " ",
-      Operator = " ",
-      Package = " ",
-      Property = " ",
-      Reference = " ",
-      Snippet = " ",
-      String = " ",
-      Struct = " ",
-      Text = " ",
-      TypeParameter = " ",
-      Unit = " ",
-      Value = " ",
-      Variable = " ",
+      symbol_map = {
+        Text = "󰉿",
+        Method = "󰆧",
+        Function = "󰊕",
+        Constructor = "",
+        Field = "󰜢",
+        Variable = "󰀫",
+        Class = "󰠱",
+        Interface = "",
+        Module = "",
+        Property = "󰜢",
+        Unit = "󰑭",
+        Value = "󰎠",
+        Enum = "",
+        Keyword = "󰌋",
+        Snippet = "",
+        Color = "󰏘",
+        File = "󰈙",
+        Reference = "󰈇",
+        Folder = "󰉋",
+        EnumMember = "",
+        Constant = "󰏿",
+        Struct = "󰙅",
+        Event = "",
+        Operator = "󰆕",
+        TypeParameter = "",
+      },
     },
   },
 }
@@ -178,6 +170,20 @@ function M.telescope(builtin, opts)
         builtin = "find_files"
       end
     end
+    if opts.cwd and opts.cwd ~= vim.loop.cwd() then
+      opts.attach_mappings = function(_, map)
+        map("i", "<a-c>", function()
+          local action_state = require("telescope.actions.state")
+          local line = action_state.get_current_line()
+          M.telescope(
+            params.builtin,
+            vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line })
+          )()
+        end)
+        return true
+      end
+    end
+
     require("telescope.builtin")[builtin](opts)
   end
 end
@@ -312,45 +318,6 @@ function M.falsy(item)
     return vim.tbl_isempty(item)
   end
   return item ~= nil
-end
-
--- Builds the path for the json schema catalog cache
----@return Path path
-local json_schemas_catalog_path = function()
-  local Path = require("plenary.path")
-  local base_path = Path:new(vim.fn.stdpath("data"))
-  return base_path:joinpath("json_schema_catalog.json")
-end
-
--- Fetches the JSON Schemas catalog from the SchemaStore API and stores it in a
--- local file
-function M.download_json_schemas()
-  local catalog_path = json_schemas_catalog_path()
-
-  -- download the latest json schema catalog
-  local json = vim.fn.system({
-    "curl",
-    "https://json.schemastore.org/api/json/catalog.json",
-    "--silent",
-  })
-
-  -- write file
-  catalog_path:write(json, "w")
-
-  -- notify user
-  vim.notify(string.format("Wrote JSON Schemas catalog to %s", catalog_path))
-end
-
--- Reads JSON Schemas from cache location
-function M.read_json_schemas()
-  local catalog_path = json_schemas_catalog_path()
-
-  if catalog_path:exists() then
-    local contents = catalog_path:read()
-    return vim.json.decode(contents)
-  else
-    return nil
-  end
 end
 
 ---@type table<string,LazyFloat>
@@ -492,6 +459,35 @@ function M.augroup(name, commands)
   end
 
   return id
+end
+
+function M.fg(name)
+  ---@type {foreground?:number}?
+  local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name }) or
+      vim.api.nvim_get_hl_id_by_name(name, true)
+  local fg = hl and hl.fg or hl.foreground
+  return fg and { fg = string.format("#%06x", fg) }
+end
+
+---@param from string
+---@param to string
+function M.on_rename(from, to)
+  local clients = vim.lsp.get_active_clients()
+  for _, client in ipairs(clients) do
+    if client:supports_method("workspace/willRenameFiles") then
+      local resp = client.request_sync("workspace/willRenameFiles", {
+        files = {
+          {
+            oldUri = vim.uri_from_fname(from),
+            newUri = vim.uri_from_fname(to),
+          },
+        },
+      }, 1000)
+      if resp and resp.result ~= nil then
+        vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding)
+      end
+    end
+  end
 end
 
 return M

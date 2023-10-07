@@ -1,3 +1,6 @@
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
@@ -12,17 +15,34 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-local modules = {
-  "autocmds",
-  "options",
-  "keymaps",
-  "utils",
-  "plugins",
-}
+require("utils")
+require("config.autocmds")
+require("config.keymaps")
+require("config.options")
 
-for _, module in ipairs(modules) do
-  local ok, err = pcall(require, module)
-  if not ok then
-    error("Error loading " .. module .. "\n\n" .. err)
-  end
-end
+require("lazy").setup({
+  spec = {
+    -- add LazyVim and import its plugins
+    -- { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    -- import/override with your plugins
+    { import = "plugins" },
+  },
+  defaults = {
+    lazy = false,
+    version = false, -- always use the latest git commit
+  },
+  install = { colorscheme = { "tokyonight" } },
+  checker = { enabled = false }, -- automatically check for plugin updates
+  performance = {
+    rtp = {
+      -- disable some rtp plugins
+      disabled_plugins = {
+        "gzip",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+      },
+    },
+  },
+})
