@@ -10,19 +10,44 @@ return {
       "glepnir/lspsaga.nvim",
       "hrsh7th/cmp-nvim-lsp",
       "williamboman/mason-lspconfig.nvim",
-      "mason.nvim",
       {
-        "elixir-tools/elixir-tools.nvim",
-        version = "*",
-        event = { "BufReadPre", "BufNewFile" },
-        dependencies = {
-          "nvim-lua/plenary.nvim",
+
+        "williamboman/mason.nvim",
+        cmd = "Mason",
+        keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+        build = ":MasonUpdate",
+        opts = {
+          ensure_installed = {
+            "black",
+            "codespell",
+            "eslint_d",
+            "isort",
+            "prettier",
+            "pylint",
+            "stylua",
+          },
         },
+        config = function(_, opts)
+          require("mason").setup(opts)
+          local mr = require("mason-registry")
+          local function ensure_installed()
+            for _, tool in ipairs(opts.ensure_installed) do
+              local p = mr.get_package(tool)
+              if not p:is_installed() then
+                p:install()
+              end
+            end
+          end
+          if mr.refresh then
+            mr.refresh(ensure_installed)
+          else
+            ensure_installed()
+          end
+        end,
       },
     },
     config = function()
       local cmp_lsp = require("cmp_nvim_lsp")
-      local elixir = require("elixir")
       local lspconfig = require("lspconfig")
       local mason_lspconfig = require("mason-lspconfig")
 
@@ -30,6 +55,7 @@ return {
         ensure_installed = {
           "cssls",
           "gopls",
+          "elixirls",
           "graphql",
           "html",
           "jsonls",
@@ -43,6 +69,11 @@ return {
         },
         automatic_installation = true,
       })
+
+      local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
+
+      -- For nvim-cmp
+      local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -58,12 +89,7 @@ return {
         end,
       })
 
-      local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
       local on_attach = function(client, bufnr)
-        if client.config.name == "yamlls" then
-          vim.lsp.buf_detach_client(bufnr, client.id)
-        end
-
         if client.supports_method("textDocument/formatting") then
           vim.api.nvim_clear_autocmds({
             group = format_on_save_group,
@@ -87,56 +113,43 @@ return {
         end
       end
 
-      -- add completion and documentation capabilities for cmp completion
-      local create_capabilities = function(opts)
-        local default_opts = {
-          with_snippet_support = true,
-        }
-        opts = opts or default_opts
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities.textDocument.completion.completionItem.snippetSupport = opts.with_snippet_support
-        if opts.with_snippet_support then
-          capabilities.textDocument.completion.completionItem.resolveSupport = {
-            properties = {
-              "documentation",
-              "detail",
-              "additionalTextEdits",
-            },
-          }
-        end
-
-        return cmp_lsp.default_capabilities(capabilities)
-      end
-      -- inject our custom on_attach after the built in on_attach from the lspconfig
-      lspconfig.util.on_setup = lspconfig.util.add_hook_after(lspconfig.util.on_setup, function(config)
-        if config.on_attach then
-          config.on_attach = lspconfig.util.add_hook_after(config.on_attach, on_attach)
-        else
-          config.on_attach = on_attach
-        end
-
-        config.capabilities = create_capabilities()
-      end)
-
-      elixir.setup({
-        nextls = { enable = false },
-        credo = { enable = true },
-        elixirls = {
-          enable = true,
-          settings = require("elixir.elixirls").settings({
-            dialyzerEnabled = true,
-            enableTestLenses = false,
-          }),
-          on_attach = function(client, bufnr)
-            require("config.keymaps").elixir_mappings()
-            on_attach(client, bufnr)
-          end,
-        },
-      })
+      local opts = {
+        capabilities = capabilities,
+        on_attach = on_attach,
+      }
 
       mason_lspconfig.setup_handlers({
         function(server_name)
           lspconfig[server_name].setup({})
+        end,
+
+        ['elixirls'] = function()
+          opts.settings = {
+            elixirLS = {
+              fetchDeps = false,
+              dialyzerEnabled = true,
+              dialyzerFormat = 'dialyxir_short',
+              suggestSpecs = true
+            }
+          }
+          opts.root_dir = function(fname)
+            local path = lspconfig.util.path
+            local child_or_root_path = lspconfig.util.root_pattern({ "mix.exs", ".git" })(fname)
+            local maybe_umbrella_path = lspconfig.util.root_pattern({ "mix.exs" })(
+              vim.loop.fs_realpath(path.join({ child_or_root_path, ".." }))
+            )
+
+            local has_ancestral_mix_exs_path = vim.startswith(child_or_root_path,
+              path.join({ maybe_umbrella_path, "apps" }))
+            if maybe_umbrella_path and not has_ancestral_mix_exs_path then
+              maybe_umbrella_path = nil
+            end
+
+            return maybe_umbrella_path or child_or_root_path or vim.loop.os_homedir()
+          end
+
+
+          lspconfig.elixirls.setup(opts)
         end,
 
         ["tailwindcss"] = function()
@@ -248,41 +261,6 @@ return {
           })
         end,
       })
-    end,
-  },
-  {
-
-    "williamboman/mason.nvim",
-    cmd = "Mason",
-    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-    build = ":MasonUpdate",
-    opts = {
-      ensure_installed = {
-        "black",
-        "codespell",
-        "eslint_d",
-        "isort",
-        "prettier",
-        "pylint",
-        "stylua",
-      },
-    },
-    config = function(_, opts)
-      require("mason").setup(opts)
-      local mr = require("mason-registry")
-      local function ensure_installed()
-        for _, tool in ipairs(opts.ensure_installed) do
-          local p = mr.get_package(tool)
-          if not p:is_installed() then
-            p:install()
-          end
-        end
-      end
-      if mr.refresh then
-        mr.refresh(ensure_installed)
-      else
-        ensure_installed()
-      end
     end,
   },
   -- Formatter

@@ -279,6 +279,14 @@ M.lsp_mappings = function()
     "<cmd>lua vim.lsp.buf.definition()<CR>",
     Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [d]efinition" }),
   })
+
+  -- gr = go to references
+  nmap({
+    "gr",
+    Utils.telescope("lsp_references"),
+    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [r]eferences" }),
+  })
+
   -- gi = go implementation
   nmap({
     "gi",

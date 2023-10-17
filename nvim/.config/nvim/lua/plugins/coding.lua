@@ -1,69 +1,76 @@
 return {
-  -- Snippets
-  {
-    "L3MON4D3/LuaSnip",
-    build = (not jit.os:find("Windows"))
-        and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
-        or nil,
-    dependencies = {
-      "rafamadriz/friendly-snippets",
-      config = function()
-        require("luasnip.loaders.from_vscode").lazy_load()
-      end,
-    },
-    opts = {
-      history = true,
-      delete_check_events = "TextChanged",
-    },
-    keys = function()
-      return {}
-    end,
-  },
   -- Completion
   {
     "hrsh7th/nvim-cmp",
     version = false, -- last release is way too old
     event = "InsertEnter",
     dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
+      -- Completion
       "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",
       "hrsh7th/cmp-emoji",
-      "saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-nvim-lsp-signature-help",
+      "hrsh7th/cmp-nvim-lua",
+      "hrsh7th/cmp-path",
+      "hrsh7th/nvim-cmp",
+      "lukas-reineke/cmp-under-comparator",
       "onsails/lspkind.nvim",
+      "saadparwaiz1/cmp_luasnip",
+      -- Snippets
+      {
+        "L3MON4D3/LuaSnip",
+        build = (not jit.os:find("Windows"))
+            and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
+            or nil,
+        dependencies = {
+          "rafamadriz/friendly-snippets",
+          config = function()
+            require("luasnip.loaders.from_vscode").lazy_load()
+          end,
+        },
+        opts = {
+          history = true,
+          delete_check_events = "TextChanged",
+        },
+      },
     },
-    opts = function()
-      vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+    config = function()
+      vim.o.runtimepath = vim.o.runtimepath .. "~/dotfiles/nvim/.config/nvim/snippets"
       local cmp = require("cmp")
-      local luasnip = require("luasnip")
       local defaults = require("cmp.config.default")()
+      local lsp_kind = require("lspkind")
+      local luasnip = require("luasnip")
 
-      local has_words_before = function()
-        unpack = unpack or table.unpack
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-      end
+      require("luasnip.loaders.from_vscode").lazy_load()
 
-      return {
+      cmp.setup({
+        window = {
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
+        },
         completion = {
           completeopt = "menu,menuone,noinsert",
         },
         snippet = {
           expand = function(args)
-            require("luasnip").lsp_expand(args.body)
+            luasnip.lsp_expand(args.body)
           end,
         },
         mapping = {
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<C-c>'] = cmp.mapping.abort(),
           ['<C-d>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
-          ['<C-Space>'] = cmp.mapping.complete(),
           ['<C-y>'] = cmp.mapping.close(),
-          ['<C-c>'] = cmp.mapping.abort(),
-          ['<CR>'] = cmp.mapping.confirm({ select = false }),
-          ['<Tab>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
-          ['<S-Tab>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
+          ['<CR>'] = cmp.mapping.confirm({
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = false
+          }),
           ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
           ['<C-p>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
+          ['<S-Tab>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
+          ['<Tab>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
         },
         sources = cmp.config.sources({
           {
@@ -77,31 +84,58 @@ return {
           { name = "copilot" },
           { name = "luasnip" },
           { name = "nvim_lsp" },
+          { name = "nvim_lsp_signature_help" },
+          { name = "nvim_lua" },
           { name = "path" },
         }),
         formatting = {
           fields = { "kind", "abbr", "menu" },
-          format = require("lspkind").cmp_format({
-            symbol_map = { Copilot = "", Codeium = "" },
+          format = lsp_kind.cmp_format({
+            symbol_map = { Copilot = "" },
             before = function(entry, vim_item)
               vim_item.menu = ({
-                buffer = " Buffer",
+                buffer = ' Buffer',
                 nvim_lsp = vim_item.kind,
-                path = " Path",
-                luasnip = " LuaSnip",
+                path = ' Path',
+                luasnip = ' LuaSnip',
               })[entry.source.name]
 
               return vim_item
             end,
-          }),
-        },
-        experimental = {
-          ghost_text = {
-            hl_group = "CmpGhostText",
-          },
+          })
         },
         sorting = defaults.sorting,
-      }
+      })
+
+      cmp.setup.cmdline(":", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = "path" },
+          {
+            name = "cmdline",
+            option = {
+              ignore_cmds = { "Man", "!" },
+            },
+          },
+        }),
+        sorting = {
+          comparators = {
+            cmp.config.compare.offset,
+            cmp.config.compare.exact,
+            cmp.config.compare.score,
+            cmp.config.compare.recently_used,
+            require("cmp-under-comparator").under,
+            cmp.config.compare.kind,
+          },
+        },
+      })
+
+      cmp.setup.cmdline("/", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = "buffer" },
+        },
+      })
     end,
   },
   -- copilot
