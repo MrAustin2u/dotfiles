@@ -17,6 +17,7 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
       "nvim-tree/nvim-web-devicons",
+      "nvim-treesitter/nvim-treesitter",
     },
     config = function()
       local octo = require("octo")

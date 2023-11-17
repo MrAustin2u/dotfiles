@@ -1,108 +1,220 @@
+local Utils = require("utils")
+local LSPUtils = require("utils.lsp")
+local FormatUtils = require("utils.format")
+
 return {
   {
+    "mhanberg/output-panel.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("output_panel").setup()
+    end
+  },
+  -- neodev
+  {
     "folke/neodev.nvim",
-    opts = {},
+    opts = {
+      debug = true,
+      experimental = {
+        pathStrict = true,
+      },
+      library = {
+        runtime = "~/projects/neovim/runtime/",
+      },
+    },
   },
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "glepnir/lspsaga.nvim",
-      "hrsh7th/cmp-nvim-lsp",
+      "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       {
-
-        "williamboman/mason.nvim",
-        cmd = "Mason",
-        keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-        build = ":MasonUpdate",
-        opts = {
-          ensure_installed = {
-            "black",
-            "codespell",
-            "eslint_d",
-            "isort",
-            "prettier",
-            "pylint",
-            "stylua",
+        "elixir-tools/elixir-tools.nvim",
+        version = "*",
+        dev = false,
+        event = { "BufReadPre", "BufNewFile" },
+        dependencies = { "nvim-lua/plenary.nvim" }
+      }
+    },
+    opts = {
+      diagnostics = {
+        underline = true,
+        update_in_insert = false,
+        virtual_text = {
+          spacing = 4,
+          source = "if_many",
+          prefix = "●",
+          -- this will set set the prefix to a function that returns the diagnostics icon based on the severity
+          -- this only works on a recent 0.10.0 build. Will be set to "●" when not supported
+          -- prefix = "icons",
+        },
+        severity_sort = true,
+      },
+      inlay_hints = { enabled = false },
+      capabilities = {},
+      servers = {
+        lua_ls = {
+          single_file_support = true,
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+              },
+              runtime = {
+                -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+                version = "LuaJIT",
+              },
+              completion = {
+                workspaceWord = true,
+                callSnippet = "Both",
+              },
+              misc = {
+                parameters = {
+                  -- "--log-level=trace",
+                },
+              },
+              hint = {
+                enable = true,
+                setType = false,
+                paramType = true,
+                paramName = "Disable",
+                semicolon = "Disable",
+                arrayIndex = "Disable",
+              },
+              doc = {
+                privateName = { "^_" },
+              },
+              type = {
+                castNumberToInteger = true,
+              },
+              diagnostics = {
+                globals = { "vim" },
+                disable = { "incomplete-signature-doc", "trailing-space" },
+                -- enable = false,
+                groupSeverity = {
+                  strong = "Warning",
+                  strict = "Warning",
+                },
+                groupFileStatus = {
+                  ["ambiguity"] = "Opened",
+                  ["await"] = "Opened",
+                  ["codestyle"] = "None",
+                  ["duplicate"] = "Opened",
+                  ["global"] = "Opened",
+                  ["luadoc"] = "Opened",
+                  ["redefined"] = "Opened",
+                  ["strict"] = "Opened",
+                  ["strong"] = "Opened",
+                  ["type-check"] = "Opened",
+                  ["unbalanced"] = "Opened",
+                  ["unused"] = "Opened",
+                },
+                unusedLocalExclude = { "_*" },
+              },
+              telemetry = {
+                enable = false,
+              },
+              format = {
+                enable = true,
+                defaultConfig = {
+                  indent_style = "space",
+                  indent_size = "2",
+                  continuation_indent_size = "2",
+                },
+              },
+            },
           },
         },
-        config = function(_, opts)
-          require("mason").setup(opts)
-          local mr = require("mason-registry")
-          local function ensure_installed()
-            for _, tool in ipairs(opts.ensure_installed) do
-              local p = mr.get_package(tool)
-              if not p:is_installed() then
-                p:install()
-              end
-            end
-          end
-          if mr.refresh then
-            mr.refresh(ensure_installed)
-          else
-            ensure_installed()
-          end
-        end,
-      },
-    },
-    config = function()
-      local cmp_lsp = require("cmp_nvim_lsp")
-      local lspconfig = require("lspconfig")
-      local mason_lspconfig = require("mason-lspconfig")
-
-      mason_lspconfig.setup({
-        ensure_installed = {
-          "cssls",
-          "gopls",
-          "elixirls",
-          "graphql",
-          "html",
-          "jsonls",
-          "lua_ls",
-          "pyright",
-          "rust_analyzer",
-          "tailwindcss",
-          "tsserver",
-          "yamlls",
-          "zls",
-        },
-        automatic_installation = true,
-      })
-
-      local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
-
-      -- For nvim-cmp
-      local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
-
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-        callback = function(ev)
-          vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
-
-          vim.api.nvim_create_user_command("Format", function()
-            vim.lsp.buf.format({ async = true })
-          end, {})
-
-          require("config.keymaps").lsp_mappings()
-          require("config.keymaps").lsp_diagnostic_mappings()
-        end,
-      })
-
-      local on_attach = function(client, bufnr)
-        if client.supports_method("textDocument/formatting") then
-          vim.api.nvim_clear_autocmds({
-            group = format_on_save_group,
-            buffer = bufnr,
-          })
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            group = format_on_save_group,
-            buffer = bufnr,
-            callback = function()
-              vim.lsp.buf.format({ bufnr = bufnr })
+        tailwindcss = {
+          init_options = {
+            userLanguages = {
+              elixir = "phoenix-heex",
+              eruby = "erb",
+              heex = "phoenix-heex",
+              svelte = "html",
+            },
+          },
+          handlers = {
+            ["tailwindcss/getConfiguration"] = function(_, _, params, _, bufnr, _)
+              vim.lsp.buf_notify(bufnr, "tailwindcss/getConfigurationResponse", { _id = params._id })
             end,
-          })
-        end
+          },
+          settings = {
+            includeLanguages = {
+              typescript = "javascript",
+              typescriptreact = "javascript",
+              ["html-eex"] = "html",
+              ["phoenix-heex"] = "html",
+              heex = "html",
+              eelixir = "html",
+              elm = "html",
+              erb = "html",
+              svelte = "html",
+            },
+            tailwindCSS = {
+              experimental = {
+                classRegex = {
+                  [[class= "([^"]*)]],
+                  [[class: "([^"]*)]],
+                  '~H""".*class="([^"]*)".*"""',
+                },
+              },
+            },
+          },
+          filetypes = {
+            "css",
+            "scss",
+            "sass",
+            "html",
+            "heex",
+            "elixir",
+            "eruby",
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact",
+            "svelte",
+          },
+        },
+        tsserver = {
+          single_file_support = false,
+          settings = {
+            typescript = {
+              inlayHints = {
+                includeInlayParameterNameHints = "literal",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = false,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+            javascript = {
+              inlayHints = {
+                includeInlayParameterNameHints = "all",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+          },
+        }
+      },
+      setup = {}
+    },
+    config = function(_, opts)
+      -- setup autoformat
+      FormatUtils.register(LSPUtils.formatter())
+
+      -- setup keymaps
+      LSPUtils.on_attach(function(client, bufnr)
+        require("config.keymaps").lsp_mappings()
+        require("config.keymaps").lsp_diagnostic_mappings()
 
         if client.server_capabilities.code_lens then
           vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
@@ -111,220 +223,166 @@ return {
           })
           vim.lsp.codelens.refresh()
         end
+      end)
+
+      local register_capability = vim.lsp.handlers["client/registerCapability"]
+
+      vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
+        local ret = register_capability(err, res, ctx)
+        require("config.keymaps").lsp_mappings()
+        require("config.keymaps").lsp_diagnostic_mappings()
+        return ret
       end
 
-      local opts = {
-        capabilities = capabilities,
-        on_attach = on_attach,
-      }
+      -- diagnostics
+      for name, icon in pairs(Utils.icons.diagnostics) do
+        name = "DiagnosticSign" .. name
+        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+      end
 
-      mason_lspconfig.setup_handlers({
-        function(server_name)
-          lspconfig[server_name].setup({})
-        end,
+      local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
 
-        ['elixirls'] = function()
-          opts.settings = {
-            elixirLS = {
-              fetchDeps = false,
-              dialyzerEnabled = true,
-              dialyzerFormat = 'dialyxir_short',
-              suggestSpecs = true
-            }
-          }
-          opts.root_dir = function(fname)
-            local path = lspconfig.util.path
-            local child_or_root_path = lspconfig.util.root_pattern({ "mix.exs", ".git" })(fname)
-            local maybe_umbrella_path = lspconfig.util.root_pattern({ "mix.exs" })(
-              vim.loop.fs_realpath(path.join({ child_or_root_path, ".." }))
-            )
-
-            local has_ancestral_mix_exs_path = vim.startswith(child_or_root_path,
-              path.join({ maybe_umbrella_path, "apps" }))
-            if maybe_umbrella_path and not has_ancestral_mix_exs_path then
-              maybe_umbrella_path = nil
-            end
-
-            return maybe_umbrella_path or child_or_root_path or vim.loop.os_homedir()
+      if opts.inlay_hints.enabled and inlay_hint then
+        LSPUtils.on_attach(function(client, buffer)
+          if client.supports_method("textDocument/inlayHint") then
+            inlay_hint(buffer, true)
           end
+        end)
+      end
 
+      if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
+        opts.diagnostics.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
+            or function(diagnostic)
+              local icons = Utils.icons.diagnostics
+              for d, icon in pairs(icons) do
+                if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
+                  return icon
+                end
+              end
+            end
+      end
 
-          lspconfig.elixirls.setup(opts)
-        end,
+      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-        ["tailwindcss"] = function()
-          lspconfig.tailwindcss.setup({
-            root_dir = lspconfig.util.root_pattern(
-              "assets/tailwind.config.js",
-              "tailwind.config.js",
-              "tailwind.config.ts",
-              "postcss.config.js",
-              "postcss.config.ts",
-              "package.json",
-              "node_modules"
-            ),
-            init_options = {
-              userLanguages = {
-                elixir = "phoenix-heex",
-                eruby = "erb",
-                heex = "phoenix-heex",
-                svelte = "html",
-              },
-            },
-            handlers = {
-              ["tailwindcss/getConfiguration"] = function(_, _, params, _, bufnr, _)
-                vim.lsp.buf_notify(bufnr, "tailwindcss/getConfigurationResponse", { _id = params._id })
-              end,
-            },
-            settings = {
-              includeLanguages = {
-                typescript = "javascript",
-                typescriptreact = "javascript",
-                ["html-eex"] = "html",
-                ["phoenix-heex"] = "html",
-                heex = "html",
-                eelixir = "html",
-                elm = "html",
-                erb = "html",
-                svelte = "html",
-              },
-              tailwindCSS = {
-                lint = {
-                  cssConflict = "warning",
-                  invalidApply = "error",
-                  invalidConfigPath = "error",
-                  invalidScreen = "error",
-                  invalidTailwindDirective = "error",
-                  invalidVariant = "error",
-                  recommendedVariantOrder = "warning",
-                },
-                experimental = {
-                  classRegex = {
-                    [[class= "([^"]*)]],
-                    [[class: "([^"]*)]],
-                    '~H""".*class="([^"]*)".*"""',
-                  },
-                },
-                validate = true,
-              },
-            },
-            filetypes = {
-              "css",
-              "scss",
-              "sass",
-              "html",
-              "heex",
-              "elixir",
-              "eruby",
-              "javascript",
-              "javascriptreact",
-              "typescript",
-              "typescriptreact",
-              "svelte",
-            },
-          })
-        end,
+      local servers = opts.servers
+      local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+      local capabilities = vim.tbl_deep_extend(
+        "force",
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
+        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+        opts.capabilities or {}
+      )
 
-        -- Lua
-        ["lua_ls"] = function()
-          -- Make runtime files discoverable to the lua server
-          local runtime_path = vim.split(package.path, ";")
-          table.insert(runtime_path, "lua/?.lua")
-          table.insert(runtime_path, "lua/?/init.lua")
+      local function setup(server)
+        local server_opts = vim.tbl_deep_extend("force", {
+          capabilities = vim.deepcopy(capabilities),
+        }, servers[server] or {})
 
-          lspconfig.lua_ls.setup({
-            settings = {
-              Lua = {
-                runtime = {
-                  -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                  version = "LuaJIT",
-                  -- Setup your lua path
-                  path = runtime_path,
-                },
-                diagnostics = {
-                  -- Get the language server to recognize the `vim` global
-                  globals = { "vim" },
-                  unusedLocalExclude = { "_*" },
-                },
-                workspace = {
-                  -- Make the server aware of Neovim runtime files
-                  library = vim.api.nvim_get_runtime_file("", true),
-                  -- Stop prompting about 'luassert'. See https://github.com/neovim/nvim-lspconfig/issues/1700
-                  checkThirdParty = false,
-                },
-                -- Do not send telemetry data containing a randomized but unique identifier
-                telemetry = {
-                  enable = false,
-                },
-              },
-            },
-          })
-        end,
-      })
-    end,
-  },
-  -- Formatter
-  {
-    "stevearc/conform.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      local conform = require("conform")
+        if opts.setup[server] then
+          if opts.setup[server](server, server_opts) then
+            return
+          end
+        elseif opts.setup["*"] then
+          if opts.setup["*"](server, server_opts) then
+            return
+          end
+        end
+        require("lspconfig")[server].setup(server_opts)
+      end
 
-      conform.setup({
-        formatter_by_ft = {
-          ["*"] = { "codespell" },
-          css = { "prettier" },
-          graphql = { "prettier" },
-          html = { "prettier" },
-          javascript = { "prettier" },
-          javascriptreact = { "prettier" },
-          lua = { "stylua" },
-          markdown = { "prettier" },
-          python = { "isort", "black" },
-          typescript = { "prettier" },
-          typescriptreact = { "prettier" },
-          yaml = { "prettier" },
-        },
-        format_on_save = {
-          async = false,
-          lsp_fallback = true,
-          timeout_ms = 500,
-        },
-      })
+      local elixir = require("elixir")
+      local elixirls = require("elixir.elixirls")
 
-      require("config.keymaps").formatting_mappings()
-    end,
-  },
-  -- Linting
-  {
-    "mfussenegger/nvim-lint",
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      local lint = require("lint")
-
-      lint.linters_by_ft = {
-        ["*"] = { "codespell" },
-        elixir = { "credo" },
-        javascript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        python = { "pylint" },
-        typescript = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-        yaml = { "yamllint" },
+      elixir.setup {
+        elixirls = {
+          on_attach = function(client, bufnr)
+            LSPUtils.on_attach(function(client, bufnr)
+              require("config.keymaps").elixir_mappings()
+            end)
+          end,
+          settings = elixirls.settings {
+            dialyzerEnabled = true,
+            fetchDeps = false,
+            enableTestLenses = true,
+            suggestSpecs = false
+          }
+        }
       }
 
-      local lint_augroup = vim.api.nvim_create_augroup("lint", {
-        clear = true,
-      })
+      -- get all the servers that are available through mason-lspconfig
+      local have_mason, mlsp = pcall(require, "mason-lspconfig")
+      local all_mslp_servers = {}
+      if have_mason then
+        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+      end
 
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
-        group = lint_augroup,
-        callback = function()
-          lint.try_lint()
-        end,
-      })
+      local ensure_installed = {
+        "angularls",
+        "cssls",
+        "gopls",
+        "graphql",
+        "html",
+        "jsonls",
+        "lua_ls",
+        "pyright",
+        "rust_analyzer",
+        "tailwindcss",
+        "tsserver",
+        "yamlls",
+        "zls",
+      }
 
-      require("config.keymaps").lint_mappings(lint)
+      for server, server_opts in pairs(servers) do
+        if server_opts then
+          server_opts = server_opts == true and {} or server_opts
+          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+          if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
+            setup(server)
+          else
+            ensure_installed[#ensure_installed + 1] = server
+          end
+        end
+      end
+
+      if have_mason then
+        mlsp.setup({ ensure_installed = ensure_installed, handlers = { setup } })
+      end
+    end,
+  },
+  {
+    "williamboman/mason.nvim",
+    cmd = "Mason",
+    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+    build = ":MasonUpdate",
+    opts = {
+      ensure_installed = {
+        "black",
+        "codespell",
+        "dprint",
+        "eslint_d",
+        "isort",
+        "prettier",
+        "pylint",
+        "stylua",
+      },
+    },
+    config = function(_, opts)
+      require("mason").setup(opts)
+      local mr = require("mason-registry")
+      local function ensure_installed()
+        for _, tool in ipairs(opts.ensure_installed) do
+          local p = mr.get_package(tool)
+          if not p:is_installed() then
+            p:install()
+          end
+        end
+      end
+      if mr.refresh then
+        mr.refresh(ensure_installed)
+      else
+        ensure_installed()
+      end
     end,
   },
 }

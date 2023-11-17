@@ -2,89 +2,61 @@ local LazyUtil = require("lazy.core.util")
 
 local M = {}
 
-M.defaults = {
-  -- colorscheme can be a string like `catppuccin` or a function that will load the colorscheme
-  ---@type string|fun()
-  colorscheme = function()
-    require("tokyonight").load()
-  end,
-  -- load the default settings
-  defaults = {
-    autocmds = false, -- lazyvim.config.autocmds
-    keymaps = false,  -- lazyvim.config.keymaps
-    -- lazyvim.config.options can't be configured here since that's loaded before lazyvim setup
-    -- if you want to disable loading options, add `package.loaded["lazyvim.config.options"] = true` to the top of your init.lua
+-- icons used by other plugins
+M.icons = {
+  dap = {
+    Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
+    Breakpoint = " ",
+    BreakpointCondition = " ",
+    BreakpointRejected = { " ", "DiagnosticError" },
+    LogPoint = ".>",
   },
-  -- icons used by other plugins
-  icons = {
-    dap = {
-      Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
-      Breakpoint = " ",
-      BreakpointCondition = " ",
-      BreakpointRejected = { " ", "DiagnosticError" },
-      LogPoint = ".>",
-    },
-    diagnostics = {
-      Error = " ",
-      Warn = " ",
-      Hint = " ",
-      Info = " ",
-    },
-    git = {
-      added = " ",
-      modified = " ",
-      removed = " ",
-    },
-    kinds = {
-      symbol_map = {
-        Text = "󰉿",
-        Method = "󰆧",
-        Function = "󰊕",
-        Constructor = "",
-        Field = "󰜢",
-        Variable = "󰀫",
-        Class = "󰠱",
-        Interface = "",
-        Module = "",
-        Property = "󰜢",
-        Unit = "󰑭",
-        Value = "󰎠",
-        Enum = "",
-        Keyword = "󰌋",
-        Snippet = "",
-        Color = "󰏘",
-        File = "󰈙",
-        Reference = "󰈇",
-        Folder = "󰉋",
-        EnumMember = "",
-        Constant = "󰏿",
-        Struct = "󰙅",
-        Event = "",
-        Operator = "󰆕",
-        TypeParameter = "",
-      },
+  diagnostics = {
+    Error = " ",
+    Warn = " ",
+    Hint = " ",
+    Info = " ",
+  },
+  git = {
+    added = " ",
+    modified = " ",
+    removed = " ",
+  },
+  kinds = {
+    symbol_map = {
+      Text = "󰉿",
+      Method = "󰆧",
+      Function = "󰊕",
+      Constructor = "",
+      Field = "󰜢",
+      Variable = "󰀫",
+      Class = "󰠱",
+      Interface = "",
+      Module = "",
+      Property = "󰜢",
+      Unit = "󰑭",
+      Value = "󰎠",
+      Enum = "",
+      Keyword = "󰌋",
+      Snippet = "",
+      Color = "󰏘",
+      File = "󰈙",
+      Reference = "󰈇",
+      Folder = "󰉋",
+      EnumMember = "",
+      Constant = "󰏿",
+      Struct = "󰙅",
+      Event = "",
+      Operator = "󰆕",
+      TypeParameter = "",
     },
   },
 }
 
 M.root_patterns = { ".git", "lua" }
 
----@param on_attach fun(client, buffer)
-M.on_attach = function(on_attach)
-  vim.api.nvim_create_autocmd("LspAttach", {
-    callback = function(args)
-      local buffer = args.buf
-      local client = vim.lsp.get_client_by_id(args.data.client_id)
-      on_attach(client, buffer)
-    end,
-  })
-end
-
 -- Checks if a table contains a value
----@param tbl table
----@param item any
----@return boolean
-function M.contains(tbl, item)
+M.contains = function(tbl, item)
   for x in pairs(tbl) do
     if x == item then
       return true
@@ -94,18 +66,28 @@ function M.contains(tbl, item)
   return false
 end
 
----@param plugin string
-function M.has(plugin)
+M.has = function(plugin)
   return require("lazy.core.config").plugins[plugin] ~= nil
 end
 
----@param name string
-function M.opts(name)
+M.on_very_lazy = function(fn)
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "VeryLazy",
+    callback = function()
+      fn()
+    end,
+  })
+end
+
+M.opts = function(name)
   local plugin = require("lazy.core.config").plugins[name]
+
   if not plugin then
     return {}
   end
+
   local Plugin = require("lazy.core.plugin")
+
   return Plugin.values(plugin, "opts", false)
 end
 
@@ -114,13 +96,13 @@ end
 -- * lsp root_dir
 -- * root pattern of filename of the current buffer
 -- * root pattern of cwd
----@return string
-function M.get_root()
-  ---@type string?
+M.get_root = function()
   local path = vim.api.nvim_buf_get_name(0)
+
   path = path ~= "" and vim.loop.fs_realpath(path) or nil
-  ---@type string[]
+
   local roots = {}
+
   if path then
     for _, client in pairs(vim.lsp.get_active_clients({ bufnr = 0 })) do
       local workspace = client.config.workspace_folders
@@ -138,25 +120,26 @@ function M.get_root()
       end
     end
   end
+
   table.sort(roots, function(a, b)
     return #a > #b
   end)
-  ---@type string?
+
   local root = roots[1]
+
   if not root then
     path = path and vim.fs.dirname(path) or vim.loop.cwd()
-    ---@type string?
     root = vim.fs.find(M.root_patterns, { path = path, upward = true })[1]
     root = root and vim.fs.dirname(root) or vim.loop.cwd()
   end
-  ---@cast root string
+
   return root
 end
 
 -- this will return a function that calls telescope.
 -- cwd will default to lazyvim.util.get_root
 -- for `files`, git_files or find_files will be chosen depending on .git
-function M.telescope(builtin, opts)
+M.telescope = function(builtin, opts)
   local params = { builtin = builtin, opts = opts }
   return function()
     builtin = params.builtin
@@ -188,9 +171,7 @@ function M.telescope(builtin, opts)
   end
 end
 
----@param silent boolean?
----@param values? {[1]:any, [2]:any}
-function M.toggle(option, silent, values)
+M.toggle = function(option, silent, values)
   if values then
     if vim.opt_local[option]:get() == values[1] then
       vim.opt_local[option] = values[2]
@@ -210,7 +191,7 @@ function M.toggle(option, silent, values)
 end
 
 local enabled = true
-function M.toggle_diagnostics()
+M.toggle_diagnostics = function()
   enabled = not enabled
   if enabled then
     vim.diagnostic.enable()
@@ -221,13 +202,11 @@ function M.toggle_diagnostics()
   end
 end
 
-function M.deprecate(old, new)
+M.deprecate = function(old, new)
   LazyUtil.warn(("`%s` is deprecated. Please use `%s` instead"):format(old, new), { title = "LazyVim" })
 end
 
----@param msg string|string[]
----@param opts? LazyNotifyOpts
-function M.notify(msg, opts)
+M.notify = function(msg, opts)
   if vim.in_fast_event() then
     return vim.schedule(function()
       M.notify(msg, opts)
@@ -261,7 +240,7 @@ function M.notify(msg, opts)
 end
 
 -- delay notifications till vim.notify was replaced or after 500ms
-function M.lazy_notify()
+M.lazy_notify = function()
   local notifs = {}
   local function temp(...)
     table.insert(notifs, vim.F.pack_len(...))
@@ -298,9 +277,7 @@ function M.lazy_notify()
 end
 
 ---Determine if a value of any type is empty
----@param item any
----@return boolean?
-function M.falsy(item)
+M.falsy = function(item)
   if not item then
     return true
   end
@@ -320,13 +297,10 @@ function M.falsy(item)
   return item ~= nil
 end
 
----@type table<string,LazyFloat>
 local terminals = {}
 
 -- Opens a floating terminal (interactive by default)
----@param cmd? string[]|string
----@param opts? LazyCmdOptions|{interactive?:boolean, esc_esc?:false}
-function M.float_term(cmd, opts)
+M.float_term = function(cmd, opts)
   opts = vim.tbl_deep_extend("force", {
     ft = "lazyterm",
     size = { width = 0.9, height = 0.9 },
@@ -354,25 +328,7 @@ function M.float_term(cmd, opts)
   return terminals[termkey]
 end
 
--- Pads a string's right hand side
----@param str string String to pad
----@param len number How many characters to pad by
----@param char string Character to use when padding
-function M.right_pad(str, len, char)
-  local res = str .. string.rep(char or " ", len - #str)
-  return res, res ~= str
-end
-
--- Pads a string's left hand side
----@param str string String to pad
----@param len number How many characters to pad by
----@param char string Character to use when padding
-function M.left_pad(str, len, char)
-  local res = string.rep(char or " ", len - #str) .. str
-  return res, res ~= str
-end
-
-function M.merge_maps(map1, map2)
+M.merge_maps = function(map1, map2)
   local mergedMap = {}
 
   -- Copy all key-value pairs from map1 to mergedMap
@@ -390,12 +346,7 @@ end
 
 --- Convert a list or map of items into a value by iterating all it's fields and transforming
 --- them with a callback
----@generic T : table
----@param callback fun(T, T, key: string | number): T
----@param list T[]
----@param accum T
----@return T
-function M.fold(callback, list, accum)
+M.fold = function(callback, list, accum)
   for k, v in pairs(list) do
     accum = callback(accum, v, k)
     assert(accum ~= nil, 'The accumulator must be returned on each iteration')
@@ -404,8 +355,6 @@ function M.fold(callback, list, accum)
 end
 
 --- Validate the keys passed to as.augroup are valid
----@param name string
----@param cmd Autocommand
 local function validate_autocmd(name, cmd)
   local keys = { 'event', 'buffer', 'pattern', 'desc', 'command', 'group', 'once', 'nested' }
   local incorrect = M.fold(function(accum, _, key)
@@ -424,21 +373,9 @@ local function validate_autocmd(name, cmd)
   end)
 end
 
----@class Autocommand
----@field desc string
----@field event  string[] list of autocommand events
----@field pattern string[] list of autocommand patterns
----@field command string | function
----@field nested  boolean
----@field once    boolean
----@field buffer  number
-
 ---Create an autocommand
 ---returns the group ID so that it can be cleared or manipulated.
----@param name string
----@param commands Autocommand[]
----@return number
-function M.augroup(name, commands)
+M.augroup = function(name, commands)
   assert(name ~= 'User', 'The name of an augroup CANNOT be User')
 
   local id = vim.api.nvim_create_augroup(name, { clear = true })
@@ -461,16 +398,13 @@ function M.augroup(name, commands)
   return id
 end
 
-function M.fg(name)
-  ---@type {foreground?:number}?
+M.fg = function(name)
   local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name }) or
       vim.api.nvim_get_hl_id_by_name(name, true)
   local fg = hl and hl.fg or hl.foreground
   return fg and { fg = string.format("#%06x", fg) }
 end
 
----@param from string
----@param to string
 function M.on_rename(from, to)
   local clients = vim.lsp.get_active_clients()
   for _, client in ipairs(clients) do
@@ -487,6 +421,23 @@ function M.on_rename(from, to)
         vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding)
       end
     end
+  end
+end
+
+M.on_load = function(name, fn)
+  local Config = require("lazy.core.config")
+  if Config.plugins[name] and Config.plugins[name]._.loaded then
+    fn(name)
+  else
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "LazyLoad",
+      callback = function(event)
+        if event.data == name then
+          fn(name)
+          return true
+        end
+      end,
+    })
   end
 end
 

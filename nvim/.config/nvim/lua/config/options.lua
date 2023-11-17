@@ -52,7 +52,7 @@ vim.opt.diffopt:append("algorithm:patience")
 vim.opt.diffopt:append("indent-heuristic")
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0 -- Command line height
+vim.opt.ch = 0           -- Command line height
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
 vim.opt.foldenable = false
@@ -63,6 +63,7 @@ vim.opt.laststatus = 3
 vim.opt.matchtime = 1
 vim.opt.mouse = "a"
 vim.opt.number = true
+vim.opt.relativenumber = false
 vim.opt.pumblend = 20
 vim.opt.pumheight = 10
 vim.opt.scrolloff = 8
@@ -88,15 +89,10 @@ vim.opt.wrap = true
 ----------------------------------------------
 -- Files and directories
 ----------------------------------------------
--- Set spellfile to location that is guaranteed to exist, can be symlinked to
--- Dropbox or kept in Git
+vim.opt.swapfile = false
+vim.opt.backup = false
 vim.opt.spellfile = cache_dir .. "spell/en.uft-8.add"
 vim.opt_global.spell = true
-
--- set where swap file and undo/backup/view files are saved
-vim.opt.backupdir = cache_dir
-vim.opt.directory = cache_dir .. "swag/"
-vim.opt.viewdir = cache_dir .. "view/"
 
 -- persistent undo between file reloads
 if vim.fn.has("persistent_undo") then

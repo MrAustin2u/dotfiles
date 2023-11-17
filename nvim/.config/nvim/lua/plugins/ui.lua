@@ -1,7 +1,14 @@
 local Utils = require("utils")
+local LSPUtils = require("utils.lsp")
+
 return {
-  -- icons
+  -- Icons
+
   { "nvim-tree/nvim-web-devicons", lazy = true },
+
+  -- UI components
+
+  { "MunifTanjim/nui.nvim",        lazy = true },
   {
     "echasnovski/mini.animate",
     event = "VeryLazy",
@@ -42,7 +49,7 @@ return {
     lazy = true,
     init = function()
       vim.g.navic_silence = true
-      require("utils").on_attach(function(client, buffer)
+      LSPUtils.on_attach(function(client, buffer)
         if client.server_capabilities.documentSymbolProvider then
           require("nvim-navic").attach(client, buffer)
         end
@@ -53,7 +60,7 @@ return {
         separator = " ",
         highlight = true,
         depth_limit = 5,
-        icons = require("utils").defaults.icons.kinds,
+        icons = Utils.icons.kinds,
       }
     end,
   },
@@ -69,8 +76,8 @@ return {
           ["cmp.entry.get_documentation"] = true,
         },
         hover = {
-          enabled = false
-        }
+          enabled = false,
+        },
       },
       routes = {
         {
@@ -165,15 +172,16 @@ return {
     },
     init = function()
       -- when noice is not enabled, install notify on VeryLazy
-      local Util = require("utils")
-      if not Util.has("noice.nvim") then
-        Util.on_very_lazy(function()
+      if not Utils.has("noice.nvim") then
+        Utils.on_very_lazy(function()
           vim.notify = require("notify")
         end)
       end
     end,
   },
+
   -- DASHBOARD
+
   {
     "goolord/alpha-nvim",
     event = "VimEnter",
@@ -194,15 +202,15 @@ return {
       local dashboard = require("alpha.themes.dashboard")
 
       local logo = [[
-                                             
-      ████ ██████           █████      ██
-     ███████████             █████ 
-     █████████ ███████████████████ ███   ███████████
-    █████████  ███    █████████████ █████ ██████████████
-   █████████ ██████████ █████████ █████ █████ ████ █████
- ███████████ ███    ███ █████████ █████ █████ ████ █████
-██████  █████████████████████ ████ █████ █████ ████ ██████
-]]
+                                               
+        ████ ██████           █████      ██
+       ███████████             █████ 
+       █████████ ███████████████████ ███   ███████████
+      █████████  ███    █████████████ █████ ██████████████
+     █████████ ██████████ █████████ █████ █████ ████ █████
+   ███████████ ███    ███ █████████ █████ █████ ████ █████
+  ██████  █████████████████████ ████ █████ █████ ████ ██████
+  ]]
 
       dashboard.section.header.val = vim.split(logo, "\n")
       dashboard.section.buttons.val = {
@@ -236,7 +244,9 @@ return {
       })
     end,
   },
+
   -- LUALINE
+
   {
     "nvim-lualine/lualine.nvim",
     dependencies = {
@@ -267,10 +277,10 @@ return {
             {
               "diagnostics",
               symbols = {
-                error = Utils.defaults.icons.diagnostics.Error,
-                warn = Utils.defaults.icons.diagnostics.Warn,
-                info = Utils.defaults.icons.diagnostics.Info,
-                hint = Utils.defaults.icons.diagnostics.Hint,
+                error = Utils.icons.diagnostics.Error,
+                warn = Utils.icons.diagnostics.Warn,
+                info = Utils.icons.diagnostics.Info,
+                hint = Utils.icons.diagnostics.Hint,
               },
             },
             { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
@@ -293,7 +303,7 @@ return {
             end,
           },
         },
-        extensions = { "nvim-tree" }
+        extensions = { "nvim-tree" },
       })
     end,
   },
@@ -403,7 +413,7 @@ return {
       local ibl = require("ibl")
 
       ibl.setup({
-        indent = { char = "│" },
+        indent = { char = "│", tab_char = "│" },
         scope = {
           show_start = false,
           show_end = false,
@@ -419,6 +429,7 @@ return {
             "lspinfo",
             "man",
             "mason",
+            "neo-tree",
             "notify",
             "qf",
           },
@@ -426,11 +437,38 @@ return {
       })
     end,
   },
-
+  {
+    "echasnovski/mini.indentscope",
+    version = false, -- wait till new 0.7.0 release to put it back on semver
+    opts = {
+      -- symbol = "▏",
+      symbol = "│",
+      options = { try_as_border = true },
+    },
+    init = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {
+          "help",
+          "alpha",
+          "dashboard",
+          "neo-tree",
+          "Trouble",
+          "lazy",
+          "mason",
+          "notify",
+          "toggleterm",
+          "lazyterm",
+        },
+        callback = function()
+          vim.b.miniindentscope_disable = true
+        end,
+      })
+    end,
+  },
   -- Bufferline
   {
     "akinsho/bufferline.nvim",
-    dependencies = 'nvim-tree/nvim-web-devicons',
+    dependencies = "nvim-tree/nvim-web-devicons",
     event = "VeryLazy",
     keys = {
       { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>",            desc = "Toggle pin" },
@@ -438,39 +476,31 @@ return {
     },
     opts = {
       options = {
-        buffer_close_icon = '',
+        buffer_close_icon = "",
         -- stylua: ignore
         close_command = function(n) require("mini.bufremove").delete(n, false) end,
         always_show_bufferline = false,
         diagnostics = "nvim_lsp",
         diagnostics_indicator = function(_, _, diag)
-          local icons = require("utils").defaults.icons.diagnostics
+          local icons = Utils.icons.diagnostics
           local ret = (diag.error and icons.Error .. diag.error .. " " or "")
               .. (diag.warning and icons.Warn .. diag.warning or "")
           return vim.trim(ret)
         end,
         offsets = {
           {
-            filetype = "NvimTree",
-            text = "NvimTree",
+            filetype = "neo-tree",
+            text = "Neo-tree",
             highlight = "Directory",
             text_align = "left",
           },
         },
         -- stylua: ignore
         right_mouse_command = function(n) require("mini.bufremove").delete(n, false) end
+        ,
       },
     },
   },
-
-  -- Comments
-
-  { "folke/todo-comments.nvim",    config = true },
-  { "numToStr/Comment.nvim",       config = true },
-
-  -- UI components
-
-  { "MunifTanjim/nui.nvim",        lazy = true },
 
   -- Better VIM ui components
 
@@ -489,5 +519,5 @@ return {
         return vim.ui.input(...)
       end
     end,
-  }
+  },
 }

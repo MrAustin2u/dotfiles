@@ -1,18 +1,16 @@
 return {
 
-  { "nvim-lua/plenary.nvim", lazy = true },
-
-  { "tpope/vim-repeat",      event = "VeryLazy" },
+  { "tpope/vim-repeat", event = "VeryLazy" },
 
   "tpope/vim-surround",
 
-  { "windwp/nvim-autopairs",    config = true },
+  { "windwp/nvim-autopairs", config = true },
 
-  { "karb94/neoscroll.nvim",    config = true },
+  { "karb94/neoscroll.nvim", config = true },
 
   { "tversteeg/registers.nvim", config = true },
 
-  { "chentoast/marks.nvim",     config = true },
+  { "chentoast/marks.nvim", config = true },
 
   { "mcauley-penney/tidy.nvim", config = true },
 

@@ -19,12 +19,16 @@ local M = {}
 ╰────────────────────────────────────────────────────────────────────────────╯
 --]]
 --
-local silent = { silent = true }
 local default_opts = { noremap = true, silent = true }
 
 local map = function(tbl)
   local opts = tbl[4] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
   vim.keymap.set(tbl[1], tbl[2], tbl[3], opts)
+end
+
+local imap = function(tbl)
+  local opts = tbl[4] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
+  vim.keymap.set("i", tbl[1], tbl[2], opts)
 end
 
 local nmap = function(tbl)
@@ -130,23 +134,12 @@ vim.keymap.set("n", "<C-p>", function()
   vim.cmd("let @+ = expand('%')")
 end, { desc = "Copy relative path" })
 
--- Clear search, diff update and redraw
--- taken from runtime/lua/_editor.lua
-vim.keymap.set(
-  "n",
-  "<leader>ur",
-  "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
-  { desc = "Redraw / clear hlsearch / diff update" }
-)
-
+-- Search
 vim.keymap.set({ "n", "x" }, "gw", "*N", { desc = "Search word under cursor" })
+vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
 
--- buffer
-
--- delete all
+-- Buffers
 vim.keymap.set("n", "<space>ba", ":%bdelete|edit#|bdelete# <CR>", { silent = true, desc = "Buffer Delete All" })
-
---- cycle through buffers
 vim.keymap.set("n", "<Tab>", ":bnext <CR>", { silent = true, desc = "Next Buffer" })
 vim.keymap.set("n", "<S-Tab>", ":bprev <CR>", { silent = true, desc = "Previous Buffer" })
 
@@ -174,9 +167,12 @@ if vim.fn.has("nvim-0.9.0") == 1 then
 end
 
 -- LSP Restart
-vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" })
+nmap({ "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } })
 
--- lazygit
+-- Lazy
+nmap({ "<leader>l", "<cmd>Lazy<CR>", { desc = "Lazy" } })
+
+-- Lazygit
 nmap({
   "<leader>gg",
   function()
@@ -346,10 +342,6 @@ M.lsp_diagnostic_mappings = function()
   nmap({ "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", { desc = "Set loclist to LSP diagnostics" } })
 end
 
-M.nvimtree_mappings = function()
-  nmap({ "<leader>fe", "<cmd>NvimTreeFindFileToggle<CR>", { desc = "Toggle file explorer (find file)", silent = true } })
-end
-
 M.telescope_mappings = function()
   nmap({ "<leader>,", "<cmd>Telescope buffers show_all_buffers=true<cr>", { desc = "Switch Buffer" } })
   nmap({ "<leader>/", Utils.telescope("live_grep"), { desc = "Grep (root dir)" } })
@@ -374,6 +366,10 @@ M.telescope_mappings = function()
   nmap({ "<leader>sG", Utils.telescope("live_grep", { cwd = false }), { desc = "Grep (cwd)" } })
   nmap({ "<leader>sh", "<cmd>Telescope help_tags<cr>", { desc = "Help Pages" } })
   nmap({ "<leader>sk", "<cmd>Telescope keymaps<cr>", { desc = "Key Maps" } })
+  nmap({ "<leader>sw", Utils.telescope("grep_string", { word_match = "-w" }), { desc = "Word (root dir)" } })
+  nmap({ "<leader>sW", Utils.telescope("grep_string", { cwd = false, word_match = "-w" }), { desc = "Word (cwd)" } })
+  vmap({ "<leader>sw", Utils.telescope("grep_string"), { desc = "Selection (root dir)" } })
+  vmap({ "<leader>sW", Utils.telescope("grep_string", { cwd = false }), { desc = "Selection (cwd)" } })
 end
 
 M.git_conflict_mappings = function()

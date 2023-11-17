@@ -3,74 +3,44 @@ local Utils = require("utils")
 return {
   -- file explorer
   {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-      "MunifTanjim/nui.nvim",
-    },
+    'kyazdani42/nvim-tree.lua',
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
-      {
-        "<leader>fe",
-        function()
-          require("neo-tree.command").execute({ toggle = true, dir = Utils.get_root(), position = "right" })
-        end,
-        desc = "Explorer NeoTree (root dir)",
-      },
-      {
-        "<leader>fE",
-        function()
-          require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd(), position = "right" })
-        end,
-        desc = "Explorer NeoTree (cwd)",
-      },
-      { "<leader>e", "<leader>fe", desc = "Explorer NeoTree (root dir)", remap = true },
-      { "<leader>E", "<leader>fE", desc = "Explorer NeoTree (cwd)",      remap = true },
+      { '<leader>e', ':NvimTreeFindFileToggle<CR>', desc = "Toggle [E]xplorer (Find File)" },
     },
-    open_files_do_not_replace_types = { "terminal", "Trouble", "qf", "Outline" },
-    filesystem = {
-      bind_to_cwd = false,
-      follow_current_file = { enabled = true },
-      use_libuv_file_watcher = true,
-    },
-    window = {
-      mappings = {
-        ["<space>"] = "none",
+    opts = {
+      diagnostics = {
+        enable = true,
+      },
+      filters = {
+        custom = { '.DS_Store', 'fugitive:', '.git' },
+        exclude = { '.dev*' }
+      },
+      view = {
+        width = 45,
+        side = 'right'
+      },
+      actions = {
+        change_dir = {
+          enable = false,
+          global = false,
+        },
+        open_file = {
+          quit_on_open = true,
+        }
       },
     },
-    default_component_configs = {
-      indent = {
-        with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
-        expander_collapsed = "",
-        expander_expanded = "",
-        expander_highlight = "NeoTreeExpander",
-      },
-    },
-    config = function(_, opts)
-      local function on_move(data)
-        Utils.on_rename(data.source, data.destination)
-      end
+    setup = function()
+      vim.cmd [[hi! NvimTreeNormalNC guibg=none ctermbg=none ]]
+      vim.cmd [[hi! NvimTreeNormal guibg=none ctermbg=none ]]
+      vim.cmd [[hi! NvimTreeWinSeparator guibg=none ctermbg=none ]]
 
-      local events = require("neo-tree.events")
-      opts.event_handlers = opts.event_handlers or {}
-      vim.list_extend(opts.event_handlers, {
-        { event = events.FILE_MOVED,   handler = on_move },
-        { event = events.FILE_RENAMED, handler = on_move },
-      })
-      require("neo-tree").setup(opts)
-      vim.api.nvim_create_autocmd("TermClose", {
-        pattern = "*lazygit",
-        callback = function()
-          if package.loaded["neo-tree.sources.git_status"] then
-            require("neo-tree.sources.git_status").refresh()
-          end
-        end,
-      })
+      vim.g.nvim_tree_respect_buf_cwd = 1
     end
   },
 
   -- Fuzzy Finder
+
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
@@ -117,7 +87,46 @@ return {
           },
         },
       }
-    end
+    end,
+  },
+
+  -- Comments
+
+  {
+    "JoosepAlviste/nvim-ts-context-commentstring",
+    lazy = true,
+    opts = {
+      enable_autocmd = false,
+    },
+  },
+  {
+    "echasnovski/mini.comment",
+    event = "VeryLazy",
+    opts = {
+      options = {
+        custom_commentstring = function()
+          return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
+        end,
+      },
+    },
+  },
+
+  -- Finds and lists all of the TODO, HACK, BUG, etc comment
+  -- in your project and loads them into a browsable list.
+
+  {
+    "folke/todo-comments.nvim",
+    cmd = { "TodoTrouble", "TodoTelescope" },
+    config = true,
+    -- stylua: ignore
+    keys = {
+      { "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
+      { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
+      { "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
+      { "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",      desc = "Todo/Fix/Fixme (Trouble)" },
+      { "<leader>st", "<cmd>TodoTelescope<cr>",                            desc = "Todo" },
+      { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>",    desc = "Todo/Fix/Fixme" },
+    },
   },
 
   -- Highlight
@@ -186,6 +195,7 @@ return {
         changedelete = { text = "▎" },
         untracked = { text = "▎" },
       },
+      current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
       on_attach = function(buffer)
         local gs = package.loaded.gitsigns
 
@@ -202,7 +212,7 @@ return {
         map("n", "<leader>ghu", gs.undo_stage_hunk, "Undo Stage Hunk")
         map("n", "<leader>ghR", gs.reset_buffer, "Reset Buffer")
         map("n", "<leader>ghp", gs.preview_hunk, "Preview Hunk")
-        map("n", "<leader>ghb", function() gs.blame_line({ full = true }) end, "Blame Line")
+        map("n", "<leader>glb", function() gs.blame_line({ full = true }) end, "Blame Line")
         map("n", "<leader>ghd", gs.diffthis, "Diff This")
         map("n", "<leader>ghD", function() gs.diffthis("~") end, "Diff This ~")
         map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
@@ -248,5 +258,5 @@ return {
         desc = "Next trouble/quickfix item",
       },
     },
-  }
+  },
 }
