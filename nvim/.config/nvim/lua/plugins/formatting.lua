@@ -1,6 +1,7 @@
 return {
   {
     "stevearc/conform.nvim",
+    dependencies = { "mason.nvim" },
     event = { "BufReadPre", "BufNewFile" },
     config = function()
       local conform = require("conform")
@@ -11,13 +12,13 @@ return {
           css = { "prettier" },
           graphql = { "prettier" },
           html = { "prettier" },
-          javascript = { "drpint" },
-          javascriptreact = { "drpint" },
+          javascript = { "prettier", "drpint" },
+          javascriptreact = { "prettier", "dprint" },
           lua = { "stylua" },
           markdown = { "prettier" },
           python = { "isort", "black" },
-          typescript = { "dprint" },
-          typescriptreact = { "dprint" },
+          typescript = { "prettier", "dprint" },
+          typescriptreact = { "prettier", "drpint" },
           yaml = { "prettier" },
         },
         format_on_save = {

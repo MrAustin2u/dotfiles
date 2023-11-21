@@ -9,10 +9,11 @@ return {
       'nvim-treesitter/playground',
       'RRethy/nvim-treesitter-textsubjects',
       'windwp/nvim-ts-autotag',
-      'JoosepAlviste/nvim-ts-context-commentstring',
       "RRethy/nvim-treesitter-endwise"
     },
     config = function()
+      vim.g.skip_ts_context_commentstring_module = true
+
       require("nvim-treesitter.configs").setup({
         ensure_installed = 'all',
         endwise = {
@@ -29,9 +30,6 @@ return {
         },
         autotag = {
           enable = true,
-        },
-        context_commentstring = {
-          enable = true
         },
         textobjects = {
           select = {

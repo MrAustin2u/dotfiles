@@ -295,6 +295,8 @@ return {
       local elixirls = require("elixir.elixirls")
 
       elixir.setup {
+        nextls = { enable = false },
+        credo = { enable = true },
         elixirls = {
           on_attach = function(client, bufnr)
             LSPUtils.on_attach(function(client, bufnr)

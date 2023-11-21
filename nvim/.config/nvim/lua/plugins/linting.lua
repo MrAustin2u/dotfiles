@@ -8,11 +8,11 @@ return {
       lint.linters_by_ft = {
         ["*"] = { "codespell" },
         elixir = { "credo" },
-        -- javascript = { "eslint_d" },
-        -- javascriptreact = { "eslint_d" },
+        javascript = { "eslint_d" },
+        javascriptreact = { "eslint_d" },
         python = { "pylint" },
-        -- typescript = { "eslint_d" },
-        -- typescriptreact = { "eslint_d" },
+        typescript = { "eslint_d" },
+        typescriptreact = { "eslint_d" },
         yaml = { "yamllint" },
       }
 
