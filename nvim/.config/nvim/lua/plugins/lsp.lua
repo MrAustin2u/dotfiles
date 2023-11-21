@@ -303,6 +303,7 @@ return {
               require("config.keymaps").elixir_mappings()
             end)
           end,
+          tag = "v0.16.0",
           settings = elixirls.settings {
             dialyzerEnabled = true,
             fetchDeps = false,
