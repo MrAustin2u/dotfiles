@@ -7,13 +7,15 @@ return {
     config = function()
       require("tokyonight").setup({
         on_highlights = function(hl, c)
-          hl.LineNr = {
-            fg = c.fg_dark,
-          }
+          -- hl.LineNr = {
+          --   fg = c.fg_dark,
+          -- }
           hl.CursorLineNr = {
             fg = c.orange,
             bold = true,
           }
+          hl.LineNrAbove = { fg = c.fg_gutter }
+          hl.LineNrBelow = { fg = c.fg_gutter }
           local prompt = "#2d3149"
           hl.TelescopeNormal = { bg = c.bg_dark, fg = c.fg_dark }
           hl.TelescopeBorder = { bg = c.bg_dark, fg = c.bg_dark }
