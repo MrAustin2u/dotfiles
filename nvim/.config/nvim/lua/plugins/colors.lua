@@ -70,6 +70,7 @@ return {
           },
         },
         neotest = true,
+        neotree = true,
         noice = true,
         notify = true,
         nvimtree = true,

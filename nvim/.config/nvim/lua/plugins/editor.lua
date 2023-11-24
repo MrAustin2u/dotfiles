@@ -2,41 +2,121 @@ local Utils = require("utils")
 
 return {
   -- file explorer
+  -- {
+  --   'kyazdani42/nvim-tree.lua',
+  --   dependencies = { "nvim-tree/nvim-web-devicons" },
+  --   keys = {
+  --     { '<leader>e', ':NvimTreeFindFileToggle<CR>', desc = "Toggle [E]xplorer (Find File)" },
+  --   },
+  --   opts = {
+  --     diagnostics = {
+  --       enable = true,
+  --     },
+  --     filters = {
+  --       custom = { '.DS_Store', 'fugitive:', '.git' },
+  --       exclude = { '.dev*' }
+  --     },
+  --     view = {
+  --       width = 45,
+  --       side = 'right'
+  --     },
+  --     actions = {
+  --       change_dir = {
+  --         enable = false,
+  --         global = false,
+  --       },
+  --       open_file = {
+  --         quit_on_open = true,
+  --       }
+  --     },
+  --   },
+  --   setup = function()
+  --     vim.cmd [[hi! NvimTreeNormalNC guibg=none ctermbg=none ]]
+  --     vim.cmd [[hi! NvimTreeNormal guibg=none ctermbg=none ]]
+  --     vim.cmd [[hi! NvimTreeWinSeparator guibg=none ctermbg=none ]]
+  --
+  --     vim.g.nvim_tree_respect_buf_cwd = 1
+  --   end
+  -- },
   {
-    'kyazdani42/nvim-tree.lua',
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    cmd = "Neotree",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
     keys = {
-      { '<leader>e', ':NvimTreeFindFileToggle<CR>', desc = "Toggle [E]xplorer (Find File)" },
+      {
+        "<leader>fe",
+        function()
+          require("neo-tree.command").execute({ toggle = true, dir = Utils.get_root() })
+        end,
+        desc = "Explorer NeoTree (root dir)",
+      },
+      {
+        "<leader>fE",
+        function()
+          require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd() })
+        end,
+        desc = "Explorer NeoTree (cwd)",
+      },
+      { "<leader>e", "<leader>fe", desc = "Explorer NeoTree (root dir)", remap = true },
+      { "<leader>E", "<leader>fE", desc = "Explorer NeoTree (cwd)",      remap = true },
     },
+    deactivate = function()
+      vim.cmd([[Neotree close]])
+    end,
+    init = function()
+      if vim.fn.argc(-1) == 1 then
+        local stat = vim.loop.fs_stat(vim.fn.argv(0))
+        if stat and stat.type == "directory" then
+          require("neo-tree")
+        end
+      end
+    end,
     opts = {
-      diagnostics = {
-        enable = true,
-      },
-      filters = {
-        custom = { '.DS_Store', 'fugitive:', '.git' },
-        exclude = { '.dev*' }
-      },
-      view = {
-        width = 45,
-        side = 'right'
-      },
-      actions = {
-        change_dir = {
-          enable = false,
-          global = false,
+      sources = { "filesystem" },
+      open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
+      filesystem = {
+        bind_to_cwd = false,
+        follow_current_file = { enabled = true },
+        use_libuv_file_watcher = true,
+        filtered_items = {
+          hide_by_pattern = { ".git" },
+          never_show = { ".DS_Store" },
         },
-        open_file = {
-          quit_on_open = true,
-        }
+      },
+      window = {
+        position = "right",
+        width = 45,
+        mappings = {
+          ["<space>"] = "none",
+        },
+      },
+      default_component_configs = {
+        indent = {
+          with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
+          expander_collapsed = "",
+          expander_expanded = "",
+          expander_highlight = "NeoTreeExpander",
+        },
       },
     },
-    setup = function()
-      vim.cmd [[hi! NvimTreeNormalNC guibg=none ctermbg=none ]]
-      vim.cmd [[hi! NvimTreeNormal guibg=none ctermbg=none ]]
-      vim.cmd [[hi! NvimTreeWinSeparator guibg=none ctermbg=none ]]
+    config = function(_, opts)
+      local function on_move(data)
+        Utils.lsp.on_rename(data.source, data.destination)
+      end
 
-      vim.g.nvim_tree_respect_buf_cwd = 1
-    end
+      local events = require("neo-tree.events")
+      opts.event_handlers = opts.event_handlers or {}
+      vim.list_extend(opts.event_handlers, {
+        { event = events.FILE_MOVED,   handler = on_move },
+        { event = events.FILE_RENAMED, handler = on_move },
+      })
+      require("neo-tree").setup(opts)
+    end,
   },
 
   -- Fuzzy Finder

@@ -249,25 +249,11 @@ return {
 
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = {
-      "WhoIsSethDaniel/lualine-lsp-progress",
-    },
     config = function()
-      local tokyonight = require("lualine.themes.tokyonight")
-      tokyonight.normal.c.bg = "none"
-
       require("lualine").setup({
         options = {
-          theme = tokyonight,
-          disabled_filetypes = {
-            "NvimTree",
-            "TelescopePrompt",
-            "TelescopeResults",
-            "alpha",
-            "dashboard",
-          },
-          component_separators = "|",
-          section_separators = { left = "", right = "" },
+          theme = "auto",
+          disabled_filetypes = { statusline = { "dashboard", "alpha", "starter" } },
           globalstatus = true,
         },
         sections = {
@@ -303,7 +289,7 @@ return {
             end,
           },
         },
-        extensions = { "nvim-tree" },
+        extensions = { "neo-tree", "lazy" },
       })
     end,
   },
