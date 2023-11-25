@@ -68,8 +68,8 @@ return {
   {
     "folke/noice.nvim",
     event = "VeryLazy",
-    opts = {
-      lsp = {
+    opts = function(_, opts)
+      opts.lsp = {
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
@@ -78,8 +78,9 @@ return {
         hover = {
           enabled = false,
         },
-      },
-      routes = {
+      }
+
+      opts.routes = {
         {
           filter = {
             event = "msg_show",
@@ -91,63 +92,23 @@ return {
           },
           view = "mini",
         },
-      },
-      presets = {
+      }
+
+      table.insert(opts.routes, {
+        filter = {
+          event = "notify",
+          find = "No information available",
+        },
+        opts = { skip = true },
+      })
+
+      opts.presets = {
         bottom_search = true,
         command_palette = true,
         long_message_to_split = true,
         inc_rename = true,
-      },
-    },
-    -- stylua: ignore
-    keys = {
-      {
-        "<S-Enter>",
-        function() require("noice").redirect(vim.fn.getcmdline()) end,
-        mode = "c",
-        desc =
-        "Redirect Cmdline"
-      },
-      {
-        "<leader>snl",
-        function() require("noice").cmd("last") end,
-        desc =
-        "Noice Last Message"
-      },
-      {
-        "<leader>snh",
-        function() require("noice").cmd("history") end,
-        desc =
-        "Noice History"
-      },
-      { "<leader>sna", function() require("noice").cmd("all") end, desc = "Noice All" },
-      {
-        "<leader>snd",
-        function() require("noice").cmd("dismiss") end,
-        desc =
-        "Dismiss All"
-      },
-      {
-        "<c-f>",
-        function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end,
-        silent = true,
-        expr = true,
-        desc =
-        "Scroll forward",
-        mode = {
-          "i", "n", "s" }
-      },
-      {
-        "<c-b>",
-        function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end,
-        silent = true,
-        expr = true,
-        desc =
-        "Scroll backward",
-        mode = {
-          "i", "n", "s" }
-      },
-    },
+      }
+    end,
   },
   -- A better vim.notify
   {
@@ -312,40 +273,6 @@ return {
           Hint = { color = colors.hint },
           Misc = { color = colors.purple },
         },
-      })
-    end,
-  },
-  -- style windows with different colorschemes
-  {
-    "folke/styler.nvim",
-    event = "VeryLazy",
-    opts = {
-      themes = {
-        -- markdown = { colorscheme = "catppuccin" },
-        help = { colorscheme = "catppuccin", background = "dark" },
-      },
-    },
-  },
-  -- WINBAR
-  {
-    "b0o/incline.nvim",
-    event = "BufReadPre",
-    enabled = false,
-    config = function()
-      local colors = require("tokyonight.colors").setup()
-      require("incline").setup({
-        highlight = {
-          groups = {
-            InclineNormal = { guibg = "#FC56B1", guifg = colors.black },
-            InclineNormalNC = { guifg = "#FC56B1", guibg = colors.black },
-          },
-        },
-        window = { margin = { vertical = 0, horizontal = 1 } },
-        render = function(props)
-          local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
-          local icon, color = require("nvim-web-devicons").get_icon_color(filename)
-          return { { icon, guifg = color }, { " " }, { filename } }
-        end,
       })
     end,
   },
