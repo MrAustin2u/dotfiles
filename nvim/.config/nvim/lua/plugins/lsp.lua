@@ -1,41 +1,60 @@
-local Utils = require("utils")
-local LSPUtils = require("utils.lsp")
-local FormatUtils = require("utils.format")
-
 return {
   {
-    "mhanberg/output-panel.nvim",
-    event = "VeryLazy",
-    config = function()
-      require("output_panel").setup()
-    end
-  },
-  -- neodev
-  {
-    "folke/neodev.nvim",
-    opts = {
-      debug = true,
-      experimental = {
-        pathStrict = true,
-      },
-      library = {
-        runtime = "~/projects/neovim/runtime/",
-      },
-    },
+    "b0o/SchemaStore.nvim",
+    lazy = true,
+    version = false, -- last release is way too old
   },
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
+      {
+        "williamboman/mason.nvim",
+        cmd = "Mason",
+        keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+        build = ":MasonUpdate",
+        opts = {
+          ensure_installed = {
+            "black",
+            "codespell",
+            "delve",
+            "eslint_d",
+            "gofumpt",
+            "goimports",
+            "gomodifytags",
+            "impl",
+            "isort",
+            "prettier",
+            "pylint",
+            "stylua",
+          }
+        },
+        config = function(_, opts)
+          require("mason").setup(opts)
+          local mr = require("mason-registry")
+          local function ensure_installed()
+            for _, tool in ipairs(opts.ensure_installed) do
+              local p = mr.get_package(tool)
+              if not p:is_installed() then
+                p:install()
+              end
+            end
+          end
+          if mr.refresh then
+            mr.refresh(ensure_installed)
+          else
+            ensure_installed()
+          end
+        end,
+      },
       {
         "elixir-tools/elixir-tools.nvim",
         version = "*",
         dev = false,
         event = { "BufReadPre", "BufNewFile" },
-        dependencies = { "nvim-lua/plenary.nvim" }
-      }
+        dependencies = { "nvim-lua/plenary.nvim" },
+      },
     },
     opts = {
       diagnostics = {
@@ -45,34 +64,112 @@ return {
           spacing = 4,
           source = "if_many",
           prefix = "●",
-          -- this will set set the prefix to a function that returns the diagnostics icon based on the severity
-          -- this only works on a recent 0.10.0 build. Will be set to "●" when not supported
-          -- prefix = "icons",
         },
         severity_sort = true,
+        float = {
+          border = 'rounded',
+        },
       },
-      inlay_hints = { enabled = false },
-      capabilities = {},
-      servers = {
-        lua_ls = {
-          single_file_support = true,
-          settings = {
+    },
+    config = function()
+      require("mason-lspconfig").setup({
+        ensure_installed = {
+          "dockerls",
+          "grammarly",
+          "graphql",
+          "lua_ls",
+          "rust_analyzer",
+          "sqlls",
+          "tsserver",
+          "yamlls",
+          "pyright",
+          "zls",
+        },
+        automatic_installlation = true,
+      })
+
+      local lspconfig = require('lspconfig')
+      local format_on_save_group = vim.api.nvim_create_augroup('formatOnSave', {})
+      local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+        callback = function(ev)
+          -- enable completion triggered by <c-x><c-o>
+          vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+          -- diagnostics
+          require("config.keymaps").lsp_diagnostic_mappings()
+          for name, icon in pairs(require('utils').icons.diagnostics) do
+            name = 'DiagnosticSign' .. name
+            vim.fn.sign_define(name, { text = icon, texthl = name, numhl = '' })
+          end
+
+          -- lsp keymaps
+          require("config.keymaps").lsp_mappings()
+        end,
+      })
+
+      local on_attach = function(client, bufnr)
+        if client.supports_method("textDocument/formatting") then
+          vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
+          vim.api.nvim_create_autocmd("BufWritePre", {
+            group = format_on_save_group,
+            buffer = bufnr,
+            callback = function()
+              vim.lsp.buf.format({ bufnr = bufnr })
+            end,
+          })
+        end
+
+        -- PYTHON
+        if client.name == "ruff_lsp" then
+          -- Disable hover in favor of Pyright
+          client.server_capabilities.hoverProvider = false
+        end
+
+        -- GO
+        -- workaround for gopls not supporting semanticTokensProvider
+        -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
+        if client.name == "gopls" then
+          if not client.server_capabilities.semanticTokensProvider then
+            local semantic = client.config.capabilities.textDocument.semanticTokens
+            client.server_capabilities.semanticTokensProvider = {
+              full = true,
+              legend = {
+                tokenTypes = semantic.tokenTypes,
+                tokenModifiers = semantic.tokenModifiers,
+              },
+              range = true,
+            }
+          end
+        end
+
+        if client.server_capabilities.code_lens then
+          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+            buffer = bufnr,
+            callback = vim.lsp.codelens.refresh,
+          })
+          vim.lsp.codelens.refresh()
+        end
+      end
+
+      local opts = {
+        capabilities = capabilities,
+        on_attach = on_attach,
+      }
+
+      require("mason-lspconfig").setup_handlers {
+        ['lua_ls'] = function()
+          opts.settings = {
             Lua = {
               workspace = {
                 checkThirdParty = false,
               },
-              runtime = {
-                -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                version = "LuaJIT",
-              },
+              runtime = { version = "LuaJIT" },
               completion = {
                 workspaceWord = true,
                 callSnippet = "Both",
-              },
-              misc = {
-                parameters = {
-                  -- "--log-level=trace",
-                },
               },
               hint = {
                 enable = true,
@@ -91,7 +188,6 @@ return {
               diagnostics = {
                 globals = { "vim" },
                 disable = { "incomplete-signature-doc", "trailing-space" },
-                -- enable = false,
                 groupSeverity = {
                   strong = "Warning",
                   strict = "Warning",
@@ -124,268 +220,175 @@ return {
                 },
               },
             },
-          },
-        },
-        tailwindcss = {
-          init_options = {
-            userLanguages = {
-              elixir = "phoenix-heex",
-              eruby = "erb",
-              heex = "phoenix-heex",
-              svelte = "html",
+          }
+
+          lspconfig.lua_ls.setup(opts)
+        end,
+
+        ['tsserver'] = function()
+          opts.keys = {
+            {
+              "<leader>co",
+              function()
+                vim.lsp.buf.code_action({
+                  apply = true,
+                  context = {
+                    only = { "source.organizeImports.ts" },
+                    diagnostics = {},
+                  },
+                })
+              end,
+              desc = "Organize Imports",
             },
-          },
-          handlers = {
-            ["tailwindcss/getConfiguration"] = function(_, _, params, _, bufnr, _)
-              vim.lsp.buf_notify(bufnr, "tailwindcss/getConfigurationResponse", { _id = params._id })
-            end,
-          },
-          settings = {
-            includeLanguages = {
-              typescript = "javascript",
-              typescriptreact = "javascript",
-              ["html-eex"] = "html",
-              ["phoenix-heex"] = "html",
-              heex = "html",
-              eelixir = "html",
-              elm = "html",
-              erb = "html",
-              svelte = "html",
-            },
-            tailwindCSS = {
-              experimental = {
-                classRegex = {
-                  [[class= "([^"]*)]],
-                  [[class: "([^"]*)]],
-                  '~H""".*class="([^"]*)".*"""',
-                },
-              },
-            },
-          },
-          filetypes = {
-            "css",
-            "scss",
-            "sass",
-            "html",
-            "heex",
-            "elixir",
-            "eruby",
-            "javascript",
-            "javascriptreact",
-            "typescript",
-            "typescriptreact",
-            "svelte",
-          },
-        },
-        tsserver = {
-          single_file_support = false,
-          settings = {
+          }
+          opts.settings = {
             typescript = {
-              inlayHints = {
-                includeInlayParameterNameHints = "literal",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints = false,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
+              format = {
+                indentSize = vim.o.shiftwidth,
+                convertTabsToSpaces = vim.o.expandtab,
+                tabSize = vim.o.tabstop,
               },
             },
             javascript = {
-              inlayHints = {
-                includeInlayParameterNameHints = "all",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
+              format = {
+                indentSize = vim.o.shiftwidth,
+                convertTabsToSpaces = vim.o.expandtab,
+                tabSize = vim.o.tabstop,
               },
             },
-          },
-        }
-      },
-      setup = {}
-    },
-    config = function(_, opts)
-      -- setup autoformat
-      FormatUtils.register(LSPUtils.formatter())
+            completions = {
+              completeFunctionCalls = true,
+            },
+          }
 
-      -- setup keymaps
-      LSPUtils.on_attach(function(client, bufnr)
-        require("config.keymaps").lsp_mappings()
-        require("config.keymaps").lsp_diagnostic_mappings()
+          lspconfig.tsserver.setup(opts)
+        end,
 
-        if client.server_capabilities.code_lens then
-          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-            buffer = bufnr,
-            callback = vim.lsp.codelens.refresh,
-          })
-          vim.lsp.codelens.refresh()
+        ['gopls'] = function()
+          opts.settings = {
+            gopls = {
+              gofumpt = true,
+              codelenses = {
+                gc_details = false,
+                generate = true,
+                regenerate_cgo = true,
+                run_govulncheck = true,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              analyses = {
+                fieldalignment = true,
+                nilness = true,
+                unusedparams = true,
+                unusedwrite = true,
+                useany = true,
+              },
+              usePlaceholders = true,
+              completeUnimported = true,
+              staticcheck = true,
+              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+              semanticTokens = true,
+            },
+          }
+
+          lspconfig.gopls.setup(opts)
+        end,
+
+        ['pyright'] = function()
+          lspconfig.pyright.setup(opts)
+        end,
+
+        ['tailwindcss'] = function()
+          lspconfig.tailwindcss.setup(opts)
+        end,
+
+        ['jsonls'] = function()
+          opts.on_new_config = function(new_config)
+            new_config.settings.json.schemas = new_config.settings.json.schemas or {}
+            vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
+          end
+
+          opts.settings = {
+            json = {
+              format = {
+                enable = true,
+              },
+              validate = { enable = true },
+            },
+          }
+          lspconfig.jsonls.setup(opts)
+        end,
+
+        ["yamlls"] = function()
+          opts.capabilities = {
+            textDocument = {
+              foldingRange = {
+                dynamicRegistration = false,
+                lineFoldingOnly = true,
+              },
+            },
+          }
+
+          opts.on_new_config = function(new_config)
+            new_config.settings.yaml.schemas = vim.tbl_deep_extend(
+              "force",
+              new_config.settings.yaml.schemas or {},
+              require("schemastore").yaml.schemas()
+            )
+          end
+          opts.settings = {
+            redhat = { telemetry = { enabled = false } },
+            yaml = {
+              keyOrdering = false,
+              format = {
+                enable = true,
+              },
+              validate = true,
+              schemaStore = {
+                -- Must disable built-in schemaStore support to use
+                -- schemas from SchemaStore.nvim plugin
+                enable = false,
+                -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+                url = "",
+              },
+            }
+          }
+
+          lspconfig.yamlls.setup(opts)
         end
-      end)
-
-      local register_capability = vim.lsp.handlers["client/registerCapability"]
-
-      vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
-        local ret = register_capability(err, res, ctx)
-        require("config.keymaps").lsp_mappings()
-        require("config.keymaps").lsp_diagnostic_mappings()
-        return ret
-      end
-
-      -- diagnostics
-      for name, icon in pairs(Utils.icons.diagnostics) do
-        name = "DiagnosticSign" .. name
-        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-      end
-
-      local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
-
-      if opts.inlay_hints.enabled and inlay_hint then
-        LSPUtils.on_attach(function(client, buffer)
-          if client.supports_method("textDocument/inlayHint") then
-            inlay_hint(buffer, true)
-          end
-        end)
-      end
-
-      if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
-        opts.diagnostics.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
-            or function(diagnostic)
-              local icons = Utils.icons.diagnostics
-              for d, icon in pairs(icons) do
-                if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
-                  return icon
-                end
-              end
-            end
-      end
-
-      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
-
-      local servers = opts.servers
-      local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-      local capabilities = vim.tbl_deep_extend(
-        "force",
-        {},
-        vim.lsp.protocol.make_client_capabilities(),
-        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-        opts.capabilities or {}
-      )
-
-      local function setup(server)
-        local server_opts = vim.tbl_deep_extend("force", {
-          capabilities = vim.deepcopy(capabilities),
-        }, servers[server] or {})
-
-        if opts.setup[server] then
-          if opts.setup[server](server, server_opts) then
-            return
-          end
-        elseif opts.setup["*"] then
-          if opts.setup["*"](server, server_opts) then
-            return
-          end
-        end
-        require("lspconfig")[server].setup(server_opts)
-      end
+      }
 
       local elixir = require("elixir")
       local elixirls = require("elixir.elixirls")
 
-      elixir.setup {
+      elixir.setup({
         nextls = { enable = false },
         credo = { enable = true },
         elixirls = {
           on_attach = function(client, bufnr)
-            LSPUtils.on_attach(function(client, bufnr)
-              require("config.keymaps").elixir_mappings()
-            end)
+            on_attach(client, bufnr)
+            require("config.keymaps").elixir_mappings()
           end,
           tag = "v0.16.0",
-          settings = elixirls.settings {
+          settings = elixirls.settings({
             dialyzerEnabled = true,
             fetchDeps = false,
             enableTestLenses = true,
-            suggestSpecs = false
-          }
-        }
-      }
-
-      -- get all the servers that are available through mason-lspconfig
-      local have_mason, mlsp = pcall(require, "mason-lspconfig")
-      local all_mslp_servers = {}
-      if have_mason then
-        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
-      end
-
-      local ensure_installed = {
-        "angularls",
-        "cssls",
-        "gopls",
-        "graphql",
-        "html",
-        "jsonls",
-        "lua_ls",
-        "pyright",
-        "rust_analyzer",
-        "tailwindcss",
-        "tsserver",
-        "yamlls",
-        "zls",
-      }
-
-      for server, server_opts in pairs(servers) do
-        if server_opts then
-          server_opts = server_opts == true and {} or server_opts
-          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-          if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
-            setup(server)
-          else
-            ensure_installed[#ensure_installed + 1] = server
-          end
-        end
-      end
-
-      if have_mason then
-        mlsp.setup({ ensure_installed = ensure_installed, handlers = { setup } })
-      end
-    end,
-  },
-  {
-    "williamboman/mason.nvim",
-    cmd = "Mason",
-    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-    build = ":MasonUpdate",
-    opts = {
-      ensure_installed = {
-        "black",
-        "codespell",
-        "dprint",
-        "eslint_d",
-        "isort",
-        "prettier",
-        "pylint",
-        "stylua",
-      },
-    },
-    config = function(_, opts)
-      require("mason").setup(opts)
-      local mr = require("mason-registry")
-      local function ensure_installed()
-        for _, tool in ipairs(opts.ensure_installed) do
-          local p = mr.get_package(tool)
-          if not p:is_installed() then
-            p:install()
-          end
-        end
-      end
-      if mr.refresh then
-        mr.refresh(ensure_installed)
-      else
-        ensure_installed()
-      end
-    end,
+            suggestSpecs = false,
+          }),
+        },
+      })
+    end
   },
 }

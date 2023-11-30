@@ -1,70 +1,16 @@
 local Utils = require("utils")
-local LSPUtils = require("utils.lsp")
 
 return {
-  -- Icons
-
-  { "nvim-tree/nvim-web-devicons", lazy = true },
-
-  -- UI components
-
-  { "MunifTanjim/nui.nvim",        lazy = true },
   {
-    "echasnovski/mini.animate",
-    event = "VeryLazy",
-    opts = function()
-      -- don't use animate when scrolling with the mouse
-      local mouse_scrolled = false
-      for _, scroll in ipairs({ "Up", "Down" }) do
-        local key = "<ScrollWheel" .. scroll .. ">"
-        vim.keymap.set({ "", "i" }, key, function()
-          mouse_scrolled = true
-          return key
-        end, { expr = true })
-      end
-
-      local animate = require("mini.animate")
-      return {
-        resize = {
-          timing = animate.gen_timing.linear({ duration = 100, unit = "total" }),
-        },
-        scroll = {
-          timing = animate.gen_timing.linear({ duration = 150, unit = "total" }),
-          subscroll = animate.gen_subscroll.equal({
-            predicate = function(total_scroll)
-              if mouse_scrolled then
-                mouse_scrolled = false
-                return false
-              end
-              return total_scroll > 1
-            end,
-          }),
-        },
-      }
-    end,
+    "folke/flash.nvim",
+    enabled = false,
   },
-  -- LSP Symbols
-  {
-    "SmiteshP/nvim-navic",
-    lazy = true,
-    init = function()
-      vim.g.navic_silence = true
-      LSPUtils.on_attach(function(client, buffer)
-        if client.server_capabilities.documentSymbolProvider then
-          require("nvim-navic").attach(client, buffer)
-        end
-      end)
-    end,
-    opts = function()
-      return {
-        separator = " ",
-        highlight = true,
-        depth_limit = 5,
-        icons = Utils.icons.kinds,
-      }
-    end,
-  },
-  -- UI messages, cmdline, and popupmenu
+  -- Better NVIM UI
+  { "MunifTanjim/nui.nvim", lazy = true },
+  { "dressing.nvim" },
+  --
+  -- UI Messages
+  --
   {
     "folke/noice.nvim",
     event = "VeryLazy",
@@ -123,13 +69,17 @@ return {
       },
     },
     opts = {
-      timeout = 1500,
+      timeout = 3000,
       max_height = function()
         return math.floor(vim.o.lines * 0.75)
       end,
       max_width = function()
         return math.floor(vim.o.columns * 0.75)
       end,
+      on_open = function(win)
+        vim.api.nvim_win_set_config(win, { zindex = 100 })
+      end,
+      background_colour = "#000000",
     },
     init = function()
       -- when noice is not enabled, install notify on VeryLazy
@@ -140,184 +90,14 @@ return {
       end
     end,
   },
+  --
+  -- Icons
+  --
+  { "nvim-tree/nvim-web-devicons", lazy = true },
 
-  -- DASHBOARD
-
-  {
-    "goolord/alpha-nvim",
-    event = "VimEnter",
-    config = function()
-      local alpha = require("alpha")
-
-      -- close Lazy and re-open when the dashboard is ready
-      if vim.o.filetype == "lazy" then
-        vim.cmd.close()
-        vim.api.nvim_create_autocmd("User", {
-          pattern = "AlphaReady",
-          callback = function()
-            require("lazy").show()
-          end,
-        })
-      end
-
-      local dashboard = require("alpha.themes.dashboard")
-
-      local logo = [[
-                                               
-        ████ ██████           █████      ██
-       ███████████             █████ 
-       █████████ ███████████████████ ███   ███████████
-      █████████  ███    █████████████ █████ ██████████████
-     █████████ ██████████ █████████ █████ █████ ████ █████
-   ███████████ ███    ███ █████████ █████ █████ ████ █████
-  ██████  █████████████████████ ████ █████ █████ ████ ██████
-  ]]
-
-      dashboard.section.header.val = vim.split(logo, "\n")
-      dashboard.section.buttons.val = {
-        dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
-        dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
-        dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
-        dashboard.button("g", " " .. " Find text", ":Telescope live_grep <CR>"),
-        dashboard.button("c", " " .. " Config", ":e $MYVIMRC <CR>"),
-        dashboard.button("l", "󰒲 " .. " Lazy", ":Lazy<CR>"),
-        dashboard.button("q", " " .. " Quit", ":qa<CR>"),
-      }
-      for _, button in ipairs(dashboard.section.buttons.val) do
-        button.opts.hl = "AlphaButtons"
-        button.opts.hl_shortcut = "AlphaShortcut"
-      end
-      dashboard.section.header.opts.hl = "AlphaHeader"
-      dashboard.section.buttons.opts.hl = "AlphaButtons"
-      dashboard.section.footer.opts.hl = "AlphaFooter"
-      dashboard.opts.layout[1].val = 8
-
-      alpha.setup(dashboard.opts)
-
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "LazyVimStarted",
-        callback = function()
-          local stats = require("lazy").stats()
-          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-          dashboard.section.footer.val = "⚡ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
-          pcall(vim.cmd.AlphaRedraw)
-        end,
-      })
-    end,
-  },
-
-  -- LUALINE
-
-  {
-    "nvim-lualine/lualine.nvim",
-    config = function()
-      require("lualine").setup({
-        options = {
-          theme = "auto",
-          disabled_filetypes = { statusline = { "dashboard", "alpha", "starter" } },
-          globalstatus = true,
-        },
-        sections = {
-          lualine_a = { "mode" },
-          lualine_b = { "branch" },
-          lualine_c = {
-            {
-              "diagnostics",
-              symbols = {
-                error = Utils.icons.diagnostics.Error,
-                warn = Utils.icons.diagnostics.Warn,
-                info = Utils.icons.diagnostics.Info,
-                hint = Utils.icons.diagnostics.Hint,
-              },
-            },
-            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-            { "filename", path = 1, symbols = { modified = "  ", readonly = "", unnamed = "" } },
-          },
-          lualine_x = {
-            {
-              require("lazy.status").updates,
-              cond = require("lazy.status").has_updates,
-              color = { bg = "none", fg = "#ff966c" },
-            },
-          },
-          lualine_y = {
-            { "progress", separator = " ",                  padding = { left = 1, right = 0 } },
-            { "location", padding = { left = 0, right = 1 } },
-          },
-          lualine_z = {
-            function()
-              return " " .. os.date("%a %x %I:%M:%S %p")
-            end,
-          },
-        },
-        extensions = { "neo-tree", "lazy" },
-      })
-    end,
-  },
-  -- SCROLLBAR
-  {
-    "petertriho/nvim-scrollbar",
-    event = "BufReadPost",
-    enabled = false,
-    config = function()
-      local scrollbar = require("scrollbar")
-      local colors = require("tokyonight.colors").setup()
-      scrollbar.setup({
-        handle = { color = colors.bg_highlight },
-        excluded_filetypes = { "prompt", "TelescopePrompt", "noice", "notify" },
-        marks = {
-          Search = { color = colors.orange },
-          Error = { color = colors.error },
-          Warn = { color = colors.warning },
-          Info = { color = colors.info },
-          Hint = { color = colors.hint },
-          Misc = { color = colors.purple },
-        },
-      })
-    end,
-  },
-  -- WHICHKEY
-  {
-    "folke/which-key.nvim",
-    event = "VeryLazy",
-    init = function()
-      vim.o.timeout = true
-      vim.o.timeoutlen = 300
-    end,
-    opts = {
-      defaults = {
-        ["<leader>t"] = { name = "+test" },
-      },
-      plugins = { spelling = true },
-    },
-    config = function()
-      local whichkey = require("which-key")
-
-      whichkey.setup({})
-      local keymaps = {
-        mode = { "n", "v" },
-        ["g"] = { name = "+goto" },
-        ["gz"] = { name = "+surround" },
-        ["]"] = { name = "+next" },
-        ["["] = { name = "+prev" },
-        ["<leader><tab>"] = { name = "+tabs" },
-        ["<leader>b"] = { name = "+buffer" },
-        ["<leader>c"] = { name = "+code" },
-        ["<leader>f"] = { name = "+file/find" },
-        ["<leader>g"] = { name = "+git" },
-        ["<leader>gh"] = { name = "+hunks" },
-        ["<leader>q"] = { name = "+quit/session" },
-        ["<leader>s"] = { name = "+search" },
-        ["<leader>u"] = { name = "+ui" },
-        ["<leader>w"] = { name = "+windows" },
-        ["<leader>x"] = { name = "+diagnostics/quickfix" },
-      }
-      keymaps["<leader>sn"] = { name = "+noice" }
-
-      whichkey.register(keymaps)
-    end,
-  },
+  --
   -- Indent
+  --
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
@@ -378,7 +158,138 @@ return {
       })
     end,
   },
+  --
+  -- Animations
+  --
+  {
+    "echasnovski/mini.animate",
+    event = "VeryLazy",
+    opts = function()
+      -- don't use animate when scrolling with the mouse
+      local mouse_scrolled = false
+      for _, scroll in ipairs({ "Up", "Down" }) do
+        local key = "<ScrollWheel" .. scroll .. ">"
+        vim.keymap.set({ "", "i" }, key, function()
+          mouse_scrolled = true
+          return key
+        end, { expr = true })
+      end
+
+      local animate = require("mini.animate")
+      return {
+        resize = {
+          timing = animate.gen_timing.linear({ duration = 100, unit = "total" }),
+        },
+        scroll = {
+          timing = animate.gen_timing.linear({ duration = 150, unit = "total" }),
+          subscroll = animate.gen_subscroll.equal({
+            predicate = function(total_scroll)
+              if mouse_scrolled then
+                mouse_scrolled = false
+                return false
+              end
+              return total_scroll > 1
+            end,
+          }),
+        },
+      }
+    end,
+  },
+  { "nvimdev/dashboard-nvim",      enabled = false },
+  {
+    "echasnovski/mini.starter",
+    enabled = true,
+    version = false,
+    opts = function()
+      local logo = table.concat({
+        "  █████╗ ███████╗██╗  ██╗████████╗███████╗██╗  ██╗ █████╗  ",
+        " ██╔══██╗██╔════╝██║  ██║╚══██╔══╝██╔════╝██║ ██╔╝██╔══██╗ ",
+        " ███████║███████╗███████║   ██║   █████╗  █████╔╝ ███████║ ",
+        " ██╔══██║╚════██║██╔══██║   ██║   ██╔══╝  ██╔═██╗ ██╔══██║ ",
+        " ██║  ██║███████║██║  ██║   ██║   ███████╗██║  ██╗██║  ██║ ",
+        " ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ",
+      }, "\n")
+      local pad = string.rep(" ", 22)
+      local new_section = function(name, action, section)
+        return { name = name, action = action, section = pad .. section }
+      end
+
+      local starter = require("mini.starter")
+      --stylua: ignore
+      local config = {
+        evaluate_single = true,
+        header = logo,
+        items = {
+          new_section("Find file", "Telescope find_files", "Telescope"),
+          new_section("Recent files", "Telescope oldfiles", "Telescope"),
+          new_section("Grep text", "Telescope live_grep", "Telescope"),
+          new_section("Lazy", "Lazy", "Config"),
+          new_section("New file", "ene | startinsert", "Built-in"),
+          new_section("Quit", "qa", "Built-in"),
+        },
+        content_hooks = {
+          starter.gen_hook.adding_bullet(pad .. "░ ", false),
+          starter.gen_hook.aligning("center", "center"),
+        },
+      }
+      return config
+    end,
+  },
+  -- LUALINE
+
+  {
+    "nvim-lualine/lualine.nvim",
+    config = function()
+      require("lualine").setup({
+        options = {
+          theme = "auto",
+          disabled_filetypes = {
+            "TelescopePrompt",
+            "TelescopeResults",
+            statusline = { "dashboard", "alpha", "starter" }
+          },
+          globalstatus = true,
+        },
+        sections = {
+          lualine_a = { "mode" },
+          lualine_b = { "branch" },
+          lualine_c = {
+            {
+              "diagnostics",
+              symbols = {
+                error = Utils.icons.diagnostics.Error,
+                warn = Utils.icons.diagnostics.Warn,
+                info = Utils.icons.diagnostics.Info,
+                hint = Utils.icons.diagnostics.Hint,
+              },
+            },
+            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
+            { "filename", path = 1, symbols = { modified = "  ", readonly = "", unnamed = "" } },
+          },
+          lualine_x = {
+            {
+              require("lazy.status").updates,
+              cond = require("lazy.status").has_updates,
+              color = { bg = "none", fg = "#ff966c" },
+            },
+          },
+          lualine_y = {
+            { "progress", separator = " ",                  padding = { left = 1, right = 0 } },
+            { "location", padding = { left = 0, right = 1 } },
+          },
+          lualine_z = {
+            function()
+              return " " .. os.date("%a %x %I:%M:%S %p")
+            end,
+          },
+        },
+        extensions = { "neo-tree", "lazy" },
+      })
+    end,
+  },
+  --
   -- Bufferline
+  --
   {
     "akinsho/bufferline.nvim",
     dependencies = "nvim-tree/nvim-web-devicons",
@@ -413,24 +324,5 @@ return {
         ,
       },
     },
-  },
-
-  -- Better VIM ui components
-
-  {
-    "stevearc/dressing.nvim",
-    lazy = true,
-    init = function()
-      ---@diagnostic disable-next-line: duplicate-set-field
-      vim.ui.select = function(...)
-        require("lazy").load({ plugins = { "dressing.nvim" } })
-        return vim.ui.select(...)
-      end
-      ---@diagnostic disable-next-line: duplicate-set-field
-      vim.ui.input = function(...)
-        require("lazy").load({ plugins = { "dressing.nvim" } })
-        return vim.ui.input(...)
-      end
-    end,
   },
 }

@@ -1,15 +1,18 @@
 return {
-  -- colorscheme
+  --
+  -- Transparency
+  --
+  "xiyaowong/nvim-transparent",
+  --
+  -- Colors
+  --
+  { "ellisonleao/gruvbox.nvim" },
   {
     "folke/tokyonight.nvim",
-    lazy = false,
     priority = 1000,
     config = function()
       require("tokyonight").setup({
         on_highlights = function(hl, c)
-          -- hl.LineNr = {
-          --   fg = c.fg_dark,
-          -- }
           hl.CursorLineNr = {
             fg = c.orange,
             bold = true,
@@ -53,12 +56,19 @@ return {
     name = "catppuccin",
     opts = {
       integrations = {
+        aerial = true,
         alpha = true,
         cmp = true,
+        dashboard = true,
+        flash = true,
         gitsigns = true,
+        headlines = true,
         illuminate = true,
-        -- indent_blankline = { enabled = true },
+        indent_blankline = { enabled = true },
+        leap = true,
         lsp_trouble = true,
+        mason = true,
+        markdown = true,
         mini = true,
         native_lsp = {
           enabled = true,
@@ -69,19 +79,22 @@ return {
             information = { "undercurl" },
           },
         },
+        navic = { enabled = true, custom_bg = "lualine" },
         neotest = true,
         neotree = true,
         noice = true,
         notify = true,
-        nvimtree = true,
         semantic_tokens = true,
         telescope = true,
         treesitter = true,
+        treesitter_context = true,
         which_key = true,
       },
     },
   },
+  --
   -- highlight color hex codes with their color (fast!)
+  --
   {
     "norcalli/nvim-colorizer.lua",
     event = "VeryLazy",

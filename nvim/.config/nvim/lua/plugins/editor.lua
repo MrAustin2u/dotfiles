@@ -1,43 +1,9 @@
 local Utils = require("utils")
 
 return {
-  -- file explorer
-  -- {
-  --   'kyazdani42/nvim-tree.lua',
-  --   dependencies = { "nvim-tree/nvim-web-devicons" },
-  --   keys = {
-  --     { '<leader>e', ':NvimTreeFindFileToggle<CR>', desc = "Toggle [E]xplorer (Find File)" },
-  --   },
-  --   opts = {
-  --     diagnostics = {
-  --       enable = true,
-  --     },
-  --     filters = {
-  --       custom = { '.DS_Store', 'fugitive:', '.git' },
-  --       exclude = { '.dev*' }
-  --     },
-  --     view = {
-  --       width = 45,
-  --       side = 'right'
-  --     },
-  --     actions = {
-  --       change_dir = {
-  --         enable = false,
-  --         global = false,
-  --       },
-  --       open_file = {
-  --         quit_on_open = true,
-  --       }
-  --     },
-  --   },
-  --   setup = function()
-  --     vim.cmd [[hi! NvimTreeNormalNC guibg=none ctermbg=none ]]
-  --     vim.cmd [[hi! NvimTreeNormal guibg=none ctermbg=none ]]
-  --     vim.cmd [[hi! NvimTreeWinSeparator guibg=none ctermbg=none ]]
   --
-  --     vim.g.nvim_tree_respect_buf_cwd = 1
-  --   end
-  -- },
+  -- file explorer
+  --
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
@@ -106,7 +72,7 @@ return {
     },
     config = function(_, opts)
       local function on_move(data)
-        Utils.lsp.on_rename(data.source, data.destination)
+        Utils.on_rename(data.source, data.destination)
       end
 
       local events = require("neo-tree.events")
@@ -118,9 +84,9 @@ return {
       require("neo-tree").setup(opts)
     end,
   },
-
+  --
   -- Fuzzy Finder
-
+  --
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
@@ -169,80 +135,9 @@ return {
       }
     end,
   },
-
-  -- Comments
-
-  {
-    "JoosepAlviste/nvim-ts-context-commentstring",
-    lazy = true,
-    opts = {
-      enable_autocmd = false,
-    },
-  },
-  {
-    "echasnovski/mini.comment",
-    event = "VeryLazy",
-    opts = {
-      options = {
-        custom_commentstring = function()
-          return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
-        end,
-      },
-    },
-  },
-
-  -- Finds and lists all of the TODO, HACK, BUG, etc comment
-  -- in your project and loads them into a browsable list.
-
-  {
-    "folke/todo-comments.nvim",
-    cmd = { "TodoTrouble", "TodoTelescope" },
-    config = true,
-    -- stylua: ignore
-    keys = {
-      { "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
-      { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
-      { "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
-      { "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",      desc = "Todo/Fix/Fixme (Trouble)" },
-      { "<leader>st", "<cmd>TodoTelescope<cr>",                            desc = "Todo" },
-      { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>",    desc = "Todo/Fix/Fixme" },
-    },
-  },
-
-  -- Highlight
-  {
-    "tzachar/local-highlight.nvim",
-    config = function()
-      vim.cmd([[hi TSDefinitionUsage guibg=#565f89]])
-
-      require("local-highlight").setup()
-    end,
-  },
-  {
-    "kevinhwang91/nvim-hlslens",
-    config = function()
-      require("hlslens").setup()
-
-      local opts = { noremap = true, silent = true }
-
-      vim.api.nvim_set_keymap(
-        "n",
-        "n",
-        [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
-        opts
-      )
-      vim.api.nvim_set_keymap(
-        "n",
-        "N",
-        [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
-        opts
-      )
-      vim.api.nvim_set_keymap("n", "*", [[*<Cmd>lua require('hlslens').start()<CR>]], opts)
-      vim.api.nvim_set_keymap("n", "#", [[#<Cmd>lua require('hlslens').start()<CR>]], opts)
-      vim.api.nvim_set_keymap("n", "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], opts)
-      vim.api.nvim_set_keymap("n", "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], opts)
-    end,
-  },
+  --
+  -- Buffer
+  --
   {
     "echasnovski/mini.bufremove",
     keys = {
@@ -262,7 +157,9 @@ return {
       },
     },
   },
+  --
   -- GIT
+  --
   {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
@@ -299,44 +196,93 @@ return {
       end,
     },
   },
-  -- Better diagnostics list
   {
-    "folke/trouble.nvim",
-    cmd = { "TroubleToggle", "Trouble" },
-    opts = { use_diagnostic_signs = true },
-    keys = {
-      { "<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>",  desc = "Document Diagnostics (Trouble)" },
-      { "<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics (Trouble)" },
-      { "<leader>xL", "<cmd>TroubleToggle loclist<cr>",               desc = "Location List (Trouble)" },
-      { "<leader>xQ", "<cmd>TroubleToggle quickfix<cr>",              desc = "Quickfix List (Trouble)" },
-      {
-        "[q",
-        function()
-          if require("trouble").is_open() then
-            require("trouble").previous({ skip_groups = true, jump = true })
-          else
-            local ok, err = pcall(vim.cmd.cprev)
-            if not ok then
-              vim.notify(err, vim.log.levels.ERROR)
-            end
-          end
-        end,
-        desc = "Previous trouble/quickfix item",
-      },
-      {
-        "]q",
-        function()
-          if require("trouble").is_open() then
-            require("trouble").next({ skip_groups = true, jump = true })
-          else
-            local ok, err = pcall(vim.cmd.cnext)
-            if not ok then
-              vim.notify(err, vim.log.levels.ERROR)
-            end
-          end
-        end,
-        desc = "Next trouble/quickfix item",
-      },
-    },
+    "akinsho/git-conflict.nvim",
+    keys = require("config.keymaps").git_conflict_mappings,
+    version = "*",
+    config = true,
   },
+  { "ruifm/gitlinker.nvim",  config = true },
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
+  --
+  -- Search and replace in multiple files
+  --
+  {
+    "nvim-pack/nvim-spectre",
+    cmd = "Spectre",
+    opts = { open_cmd = "noswapfile vnew" },
+    -- stylua: ignore
+    keys = {
+      { "<leader>sr",  function() require("spectre").toggle() end,      desc = "Replace in files (Spectre)" },
+      { "<leader>srw", function() require("spectre").open_visual() end, desc = "Replace in files (Spectre) - Search current word", mode = "v" },
+    }
+    ,
+  },
+  --
+  -- Regex
+  --
+  {
+    "bennypowers/nvim-regexplainer",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      require("regexplainer").setup({
+        auto = true,
+        mappings = {
+          toggle = "gR",
+        },
+      })
+    end,
+  },
+  --
+  -- WHICHKEY
+  --
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    init = function()
+      vim.o.timeout = true
+      vim.o.timeoutlen = 300
+    end,
+    opts = {
+      defaults = {
+        ["<leader>t"] = { name = "+test" },
+      },
+      plugins = { spelling = true },
+    },
+    config = function()
+      local whichkey = require("which-key")
+
+      whichkey.setup({})
+      local keymaps = {
+        mode = { "n", "v" },
+        ["g"] = { name = "+goto" },
+        ["gz"] = { name = "+surround" },
+        ["]"] = { name = "+next" },
+        ["["] = { name = "+prev" },
+        ["<leader><tab>"] = { name = "+tabs" },
+        ["<leader>b"] = { name = "+buffer" },
+        ["<leader>c"] = { name = "+code" },
+        ["<leader>f"] = { name = "+file/find" },
+        ["<leader>g"] = { name = "+git" },
+        ["<leader>gh"] = { name = "+hunks" },
+        ["<leader>q"] = { name = "+quit/session" },
+        ["<leader>s"] = { name = "+search" },
+        ["<leader>u"] = { name = "+ui" },
+        ["<leader>w"] = { name = "+windows" },
+        ["<leader>x"] = { name = "+diagnostics/quickfix" },
+      }
+      keymaps["<leader>sn"] = { name = "+noice" }
+
+      whichkey.register(keymaps)
+    end,
+  },
+  --
+  -- Scrolling
+  --
+  { "karb94/neoscroll.nvim", config = true },
 }

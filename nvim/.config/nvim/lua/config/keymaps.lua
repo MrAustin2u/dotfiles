@@ -189,9 +189,17 @@ nmap({
 })
 
 -- floating terminal
-local lazyterm = function() Utils.float_term(nil, { cwd = Utils.get_root() }) end
+local lazyterm = function()
+  Utils.float_term(nil, { cwd = Utils.get_root() })
+end
 nmap({ "<leader>ft", lazyterm, { desc = "Terminal (root dir)" } })
-nmap({ "<leader>fT", function() Utils.float_term() end, { desc = "Terminal (cwd)" } })
+nmap({
+  "<leader>fT",
+  function()
+    Utils.float_term()
+  end,
+  { desc = "Terminal (cwd)" },
+})
 nmap({ "<c-/>", lazyterm, { desc = "Terminal (root dir)" } })
 nmap({ "<c-_>", lazyterm, { desc = "which_key_ignore" } })
 
@@ -203,7 +211,6 @@ tmap({ "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to upper window" } })
 tmap({ "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to right window" } })
 tmap({ "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" } })
 tmap({ "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" } })
-
 
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
@@ -342,6 +349,16 @@ M.lsp_diagnostic_mappings = function()
   nmap({ "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", { desc = "Set loclist to LSP diagnostics" } })
 end
 
+M.neotest_mappings = function(neotest)
+  nmap({ "<leader>tf", function() neotest.run.run(vim.fn.expand("%")) end, { desc = "[T]est [F]ile" } })
+  nmap({ "<leader>ta", function() neotest.run.run(vim.loop.cwd()) end, { desc = "[T]est [A]ll [F]iles" } })
+  nmap({ "<leader>tn", function() neotest.run.run() end, { desc = "[T]est [N]earest" } })
+  nmap({ "<leader>ts", function() neotest.summary.toggle() end, { desc = "Toggle Summary" } })
+  nmap({ "<leader>to", function() neotest.output.open({ enter = true, auto_close = true }) end, { desc = "[T]est [O]utput" } })
+  nmap({ "<leader>tO", function() neotest.output_panel.toggle() end, { desc = "Toggle Output Panel" } })
+  nmap({ "<leader>tS", function() neotest.run.stop() end, { desc = "Stop" } })
+end
+
 M.telescope_mappings = function()
   nmap({ "<leader>,", "<cmd>Telescope buffers show_all_buffers=true<cr>", { desc = "Switch Buffer" } })
   nmap({ "<leader>/", Utils.telescope("live_grep"), { desc = "Grep (root dir)" } })
@@ -400,11 +417,11 @@ M.trouble_mappings = function()
   nmap({ "<leader>xr", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, desc = "Trouble LSP" } })
 end
 
-M.vim_test_mappings = {
-  { "<leader>tn", ":TestNearest<CR>", silent = true, desc = "[T]est [N]earest" },
-  { "<leader>tf", ":TestFile<CR>",    silent = true, desc = "[T]est [F]ile" },
-  { "<leader>ts", ":TestSuite<CR>",   silent = true, desc = "[T]est [S]uite" },
-  { "<leader>tl", ":TestLast<CR>",    silent = true, desc = "[T]est [L]ast" },
-}
+-- M.vim_test_mappings = function()
+--   nmap({ "<leader>tn", ":TestNearest<CR>", { silent = true, desc = "[T]est [N]earest" } })
+--   nmap({ "<leader>tf", ":TestFile<CR>", { silent = true, desc = "[T]est [F]ile" } })
+--   nmap({ "<leader>ts", ":TestSuite<CR>", { silent = true, desc = "[T]est [S]uite" } })
+--   nmap({ "<leader>tl", ":TestLast<CR>", { silent = true, desc = "[T]est [L]ast" } })
+-- end
 
 return M

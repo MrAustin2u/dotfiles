@@ -1,12 +1,7 @@
-local LazyUtil = require("lazy.core.util")
-
 local M = {}
 
 setmetatable(M, {
   __index = function(t, k)
-    if LazyUtil[k] then
-      return LazyUtil[k]
-    end
     t[k] = require("utils." .. k)
     return t[k]
   end,
@@ -65,7 +60,60 @@ M.icons = {
 
 M.root_patterns = { ".git", "lua" }
 
--- Checks if a table contains a value
+function M.notify(msg, opts)
+  if vim.in_fast_event() then
+    return vim.schedule(function()
+      M.notify(msg, opts)
+    end)
+  end
+
+  opts = opts or {}
+  if type(msg) == "table" then
+    msg = table.concat(
+      vim.tbl_filter(function(line)
+        return line or false
+      end, msg),
+      "\n"
+    )
+  end
+  if opts.stacktrace then
+    msg = msg .. M.pretty_trace({ level = opts.stacklevel or 2 })
+  end
+  local lang = opts.lang or "markdown"
+  local n = opts.once and vim.notify_once or vim.notify
+  n(msg, opts.level or vim.log.levels.INFO, {
+    on_open = function(win)
+      local ok = pcall(function()
+        vim.treesitter.language.add("markdown")
+      end)
+      if not ok then
+        pcall(require, "nvim-treesitter")
+      end
+      vim.wo[win].conceallevel = 3
+      vim.wo[win].concealcursor = ""
+      vim.wo[win].spell = false
+      local buf = vim.api.nvim_win_get_buf(win)
+      if not pcall(vim.treesitter.start, buf, lang) then
+        vim.bo[buf].filetype = lang
+        vim.bo[buf].syntax = lang
+      end
+    end,
+    title = opts.title or "ashteka.nvim",
+  })
+end
+
+function M.info(msg, opts)
+  opts = opts or {}
+  opts.level = vim.log.levels.INFO
+  M.notify(msg, opts)
+end
+
+function M.warn(msg, opts)
+  opts = opts or {}
+  opts.level = vim.log.levels.WARN
+  M.notify(msg, opts)
+end
+
 M.contains = function(tbl, item)
   for x in pairs(tbl) do
     if x == item then
@@ -147,7 +195,7 @@ M.get_root = function()
 end
 
 -- this will return a function that calls telescope.
--- cwd will default to lazyvim.util.get_root
+-- cwd will default to get_root
 -- for `files`, git_files or find_files will be chosen depending on .git
 M.telescope = function(builtin, opts)
   local params = { builtin = builtin, opts = opts }
@@ -188,14 +236,14 @@ M.toggle = function(option, silent, values)
     else
       vim.opt_local[option] = values[1]
     end
-    return LazyUtil.info("Set " .. option .. " to " .. vim.opt_local[option]:get(), { title = "Option" })
+    return M.info("Set " .. option .. " to " .. vim.opt_local[option]:get(), { title = "Option" })
   end
   vim.opt_local[option] = not vim.opt_local[option]:get()
   if not silent then
     if vim.opt_local[option]:get() then
-      LazyUtil.info("Enabled " .. option, { title = "Option" })
+      M.info("Enabled " .. option, { title = "Option" })
     else
-      LazyUtil.warn("Disabled " .. option, { title = "Option" })
+      M.warn("Disabled " .. option, { title = "Option" })
     end
   end
 end
@@ -205,15 +253,15 @@ M.toggle_diagnostics = function()
   enabled = not enabled
   if enabled then
     vim.diagnostic.enable()
-    LazyUtil.info("Enabled diagnostics", { title = "Diagnostics" })
+    M.info("Enabled diagnostics", { title = "Diagnostics" })
   else
     vim.diagnostic.disable()
-    LazyUtil.warn("Disabled diagnostics", { title = "Diagnostics" })
+    M.warn("Disabled diagnostics", { title = "Diagnostics" })
   end
 end
 
 M.deprecate = function(old, new)
-  LazyUtil.warn(("`%s` is deprecated. Please use `%s` instead"):format(old, new), { title = "LazyVim" })
+  M.warn(("`%s` is deprecated. Please use `%s` instead"):format(old, new), { title = "LazyVim" })
 end
 
 M.notify = function(msg, opts)
@@ -247,64 +295,6 @@ M.notify = function(msg, opts)
     end,
     title = opts.title or "lazy.nvim",
   })
-end
-
--- delay notifications till vim.notify was replaced or after 500ms
-M.lazy_notify = function()
-  local notifs = {}
-  local function temp(...)
-    table.insert(notifs, vim.F.pack_len(...))
-  end
-
-  local orig = vim.notify
-  vim.notify = temp
-
-  local timer = vim.loop.new_timer()
-  local check = vim.loop.new_check()
-
-  local replay = function()
-    timer:stop()
-    check:stop()
-    if vim.notify == temp then
-      vim.notify = orig -- put back the original notify if needed
-    end
-    vim.schedule(function()
-      ---@diagnostic disable-next-line: no-unknown
-      for _, notif in ipairs(notifs) do
-        vim.notify(vim.F.unpack_len(notif))
-      end
-    end)
-  end
-
-  -- wait till vim.notify has been replaced
-  check:start(function()
-    if vim.notify ~= temp then
-      replay()
-    end
-  end)
-  -- or if it took more than 500ms, then something went wrong
-  timer:start(500, 0, replay)
-end
-
----Determine if a value of any type is empty
-M.falsy = function(item)
-  if not item then
-    return true
-  end
-  local item_type = type(item)
-  if item_type == "boolean" then
-    return not item
-  end
-  if item_type == "string" then
-    return item == ""
-  end
-  if item_type == "number" then
-    return item <= 0
-  end
-  if item_type == "table" then
-    return vim.tbl_isempty(item)
-  end
-  return item ~= nil
 end
 
 local terminals = {}
@@ -354,86 +344,6 @@ M.merge_maps = function(map1, map2)
   return mergedMap
 end
 
---- Convert a list or map of items into a value by iterating all it's fields and transforming
---- them with a callback
-M.fold = function(callback, list, accum)
-  for k, v in pairs(list) do
-    accum = callback(accum, v, k)
-    assert(accum ~= nil, 'The accumulator must be returned on each iteration')
-  end
-  return accum
-end
-
---- Validate the keys passed to as.augroup are valid
-local function validate_autocmd(name, cmd)
-  local keys = { 'event', 'buffer', 'pattern', 'desc', 'command', 'group', 'once', 'nested' }
-  local incorrect = M.fold(function(accum, _, key)
-    if not vim.tbl_contains(keys, key) then
-      table.insert(accum, key)
-    end
-    return accum
-  end, cmd, {})
-  if #incorrect == 0 then
-    return
-  end
-  vim.schedule(function()
-    vim.notify('Incorrect keys: ' .. table.concat(incorrect, ', '), vim.log.levels.ERROR, {
-      title = fmt('Autocmd: %s', name),
-    })
-  end)
-end
-
----Create an autocommand
----returns the group ID so that it can be cleared or manipulated.
-M.augroup = function(name, commands)
-  assert(name ~= 'User', 'The name of an augroup CANNOT be User')
-
-  local id = vim.api.nvim_create_augroup(name, { clear = true })
-
-  for _, autocmd in ipairs(commands) do
-    validate_autocmd(name, autocmd)
-    local is_callback = type(autocmd.command) == 'function'
-    vim.api.nvim_create_autocmd(autocmd.event, {
-      group = id,
-      pattern = autocmd.pattern,
-      desc = autocmd.desc,
-      callback = is_callback and autocmd.command or nil,
-      command = not is_callback and autocmd.command or nil,
-      once = autocmd.once,
-      nested = autocmd.nested,
-      buffer = autocmd.buffer,
-    })
-  end
-
-  return id
-end
-
-M.fg = function(name)
-  local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name }) or
-      vim.api.nvim_get_hl_id_by_name(name, true)
-  local fg = hl and hl.fg or hl.foreground
-  return fg and { fg = string.format("#%06x", fg) }
-end
-
-function M.on_rename(from, to)
-  local clients = vim.lsp.get_active_clients()
-  for _, client in ipairs(clients) do
-    if client:supports_method("workspace/willRenameFiles") then
-      local resp = client.request_sync("workspace/willRenameFiles", {
-        files = {
-          {
-            oldUri = vim.uri_from_fname(from),
-            newUri = vim.uri_from_fname(to),
-          },
-        },
-      }, 1000)
-      if resp and resp.result ~= nil then
-        vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding)
-      end
-    end
-  end
-end
-
 M.on_load = function(name, fn)
   local Config = require("lazy.core.config")
   if Config.plugins[name] and Config.plugins[name]._.loaded then
@@ -448,6 +358,39 @@ M.on_load = function(name, fn)
         end
       end,
     })
+  end
+end
+
+M.get_clients = function(opts)
+  local ret = {}
+
+  ret = vim.lsp.get_active_clients(opts)
+
+  if opts and opts.method then
+    ret = vim.tbl_filter(function(client)
+      return client.supports_method(opts.method, { bufnr = opts.bufnr })
+    end, ret)
+  end
+
+  return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
+end
+
+M.on_rename = function(from, to)
+  local clients = M.get_clients()
+  for _, client in ipairs(clients) do
+    if client:supports_method("workspace/willRenameFiles") then
+      local resp = client.request_sync("workspace/willRenameFiles", {
+        files = {
+          {
+            oldUri = vim.uri_from_fname(from),
+            newUri = vim.uri_from_fname(to),
+          },
+        },
+      }, 1000)
+      if resp and resp.result ~= nil then
+        vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding)
+      end
+    end
   end
 end
 
