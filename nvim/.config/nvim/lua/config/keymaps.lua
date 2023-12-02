@@ -258,6 +258,10 @@ M.formatting_mappings = function(conform)
   end, { desc = "Trigger formatting (in visual mode)" })
 end
 
+M.inc_rename = function()
+  nmap({ "<leader>rn", function() return ":IncRename " .. vim.fn.expand("<cword>") end, { expr = true } })
+end
+
 M.lint_mappings = function(lint)
   nmap({
     "<leader>l",
@@ -408,20 +412,12 @@ M.silicon_mappings = function()
   })
 end
 
-M.trouble_mappings = function()
-  nmap({ "<leader>xx", "<cmd>TroubleToggle<cr>", { silent = true, desc = "Trouble Toggle" } })
-  nmap({ "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { silent = true, desc = "Trouble Workspace" } })
-  nmap({ "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { silent = true, desc = "Trouble Document" } })
-  nmap({ "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true, desc = "Trouble Quickfix" } })
-  nmap({ "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { silent = true, desc = "Trouble Loclist" } })
-  nmap({ "<leader>xr", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, desc = "Trouble LSP" } })
+M.todo_comments_mappings = function(tc)
+  nmap({ "]t", function() tc.jump_next() end, { desc = "Next todo comment" } })
+  nmap({ "[t", function() tc.jump_prev() end, { desc = "Previous todo comment" } })
+  nmap({ "<leader>xt", "<cmd>TodoTrouble<cr>", { desc = "Todo (Trouble)" } })
+  nmap({ "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>", { desc = "Todo/Fix/Fixme (Trouble)" } })
+  nmap({ "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Todo" } })
+  nmap({ "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", { desc = "Todo/Fix/Fixme" } })
 end
-
--- M.vim_test_mappings = function()
---   nmap({ "<leader>tn", ":TestNearest<CR>", { silent = true, desc = "[T]est [N]earest" } })
---   nmap({ "<leader>tf", ":TestFile<CR>", { silent = true, desc = "[T]est [F]ile" } })
---   nmap({ "<leader>ts", ":TestSuite<CR>", { silent = true, desc = "[T]est [S]uite" } })
---   nmap({ "<leader>tl", ":TestLast<CR>", { silent = true, desc = "[T]est [L]ast" } })
--- end
-
 return M

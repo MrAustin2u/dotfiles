@@ -6,8 +6,21 @@ return {
     enabled = false,
   },
   -- Better NVIM UI
-  { "MunifTanjim/nui.nvim", lazy = true },
-  { "dressing.nvim" },
+  { "MunifTanjim/nui.nvim",        lazy = true },
+  {
+    "stevearc/dressing.nvim",
+    config = function()
+      require("dressing").setup {
+        input = {
+          override = function(conf)
+            conf.col = -1
+            conf.row = 0
+            return conf
+          end,
+        }
+      }
+    end
+  },
   --
   -- UI Messages
   --
@@ -38,27 +51,43 @@ return {
           },
           view = "mini",
         },
+        {
+          filter = {
+            event = 'lsp',
+            kind = 'progress',
+            cond = function(message)
+              local title = vim.tbl_get(message.opts, 'progress', 'title')
+              -- skip noisy messages
+              return title == 'code_action'
+            end,
+          },
+          opts = { skip = true },
+        },
+        {
+          filter = {
+            event = "notify",
+            find = "No information available",
+          },
+          opts = { skip = true },
+        }
       }
 
-      table.insert(opts.routes, {
-        filter = {
-          event = "notify",
-          find = "No information available",
-        },
-        opts = { skip = true },
-      })
 
       opts.presets = {
         bottom_search = true,
         command_palette = true,
-        long_message_to_split = true,
         inc_rename = true,
+        long_message_to_split = true,
+        lsp_doc_border = false,
       }
     end,
   },
   -- A better vim.notify
   {
     "rcarriga/nvim-notify",
+    dependencies = {
+      'stevearc/dressing.nvim',
+    },
     keys = {
       {
         "<leader>un",
@@ -68,26 +97,13 @@ return {
         desc = "Dismiss all Notifications",
       },
     },
-    opts = {
-      timeout = 3000,
-      max_height = function()
-        return math.floor(vim.o.lines * 0.75)
-      end,
-      max_width = function()
-        return math.floor(vim.o.columns * 0.75)
-      end,
-      on_open = function(win)
-        vim.api.nvim_win_set_config(win, { zindex = 100 })
-      end,
-      background_colour = "#000000",
-    },
-    init = function()
-      -- when noice is not enabled, install notify on VeryLazy
-      if not Utils.has("noice.nvim") then
-        Utils.on_very_lazy(function()
-          vim.notify = require("notify")
-        end)
-      end
+    config = function()
+      local notify = require('notify')
+      notify.setup({
+        background_colour = '#000000',
+      })
+      vim.notify = notify
+      require('telescope').load_extension('notify')
     end,
   },
   --
@@ -158,44 +174,7 @@ return {
       })
     end,
   },
-  --
-  -- Animations
-  --
-  {
-    "echasnovski/mini.animate",
-    event = "VeryLazy",
-    opts = function()
-      -- don't use animate when scrolling with the mouse
-      local mouse_scrolled = false
-      for _, scroll in ipairs({ "Up", "Down" }) do
-        local key = "<ScrollWheel" .. scroll .. ">"
-        vim.keymap.set({ "", "i" }, key, function()
-          mouse_scrolled = true
-          return key
-        end, { expr = true })
-      end
-
-      local animate = require("mini.animate")
-      return {
-        resize = {
-          timing = animate.gen_timing.linear({ duration = 100, unit = "total" }),
-        },
-        scroll = {
-          timing = animate.gen_timing.linear({ duration = 150, unit = "total" }),
-          subscroll = animate.gen_subscroll.equal({
-            predicate = function(total_scroll)
-              if mouse_scrolled then
-                mouse_scrolled = false
-                return false
-              end
-              return total_scroll > 1
-            end,
-          }),
-        },
-      }
-    end,
-  },
-  { "nvimdev/dashboard-nvim",      enabled = false },
+  { "nvimdev/dashboard-nvim", enabled = false },
   {
     "echasnovski/mini.starter",
     enabled = true,
