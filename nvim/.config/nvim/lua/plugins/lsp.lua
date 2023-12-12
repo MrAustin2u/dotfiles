@@ -16,6 +16,7 @@ return {
         build = ":MasonUpdate",
         opts = {
           ensure_installed = {
+            "biome",
             "black",
             "codespell",
             "delve",
@@ -28,6 +29,7 @@ return {
             "prettier",
             "pylint",
             "stylua",
+            "tflint"
           }
         },
         config = function(_, opts)
@@ -74,12 +76,14 @@ return {
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
+          "biome",
           "dockerls",
           "grammarly",
           "graphql",
           "lua_ls",
           "rust_analyzer",
           "sqlls",
+          "terraformls",
           "tsserver",
           "yamlls",
           "pyright",
@@ -311,6 +315,10 @@ return {
 
         ['tailwindcss'] = function()
           lspconfig.tailwindcss.setup(opts)
+        end,
+
+        ['terraformls'] = function()
+          lspconfig.terraformls.setup(opts)
         end,
 
         ['jsonls'] = function()
