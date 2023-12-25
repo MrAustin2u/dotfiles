@@ -378,7 +378,6 @@ return {
       }
 
       local elixir = require("elixir")
-      local elixirls = require("elixir.elixirls")
 
       elixir.setup({
         nextls = { enable = false },
@@ -388,13 +387,7 @@ return {
             on_attach(client, bufnr)
             require("config.keymaps").elixir_mappings()
           end,
-          tag = "v0.16.0",
-          settings = elixirls.settings({
-            dialyzerEnabled = true,
-            fetchDeps = false,
-            enableTestLenses = true,
-            suggestSpecs = false,
-          }),
+          tag = "v0.17.0",
         },
       })
     end
