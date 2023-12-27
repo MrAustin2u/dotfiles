@@ -227,24 +227,16 @@ return {
             "TelescopeResults",
             statusline = { "dashboard", "alpha", "starter" }
           },
+          component_separators = '|',
+          section_separators = { left = '', right = '' },
           globalstatus = true,
         },
         sections = {
-          lualine_a = { "mode" },
-          lualine_b = { "branch" },
-          lualine_c = {
-            {
-              "diagnostics",
-              symbols = {
-                error = Utils.icons.diagnostics.Error,
-                warn = Utils.icons.diagnostics.Warn,
-                info = Utils.icons.diagnostics.Info,
-                hint = Utils.icons.diagnostics.Hint,
-              },
-            },
-            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-            { "filename", path = 1, symbols = { modified = "  ", readonly = "", unnamed = "" } },
+          lualine_a = {
+            { 'mode', separator = { left = '' }, right_padding = 2 },
           },
+          lualine_b = { 'branch', 'diff', 'diagnostics' },
+          lualine_c = { 'filename' },
           lualine_x = {
             {
               require("lazy.status").updates,
@@ -252,14 +244,9 @@ return {
               color = { bg = "none", fg = "#ff966c" },
             },
           },
-          lualine_y = {
-            { "progress", separator = " ",                  padding = { left = 1, right = 0 } },
-            { "location", padding = { left = 0, right = 1 } },
-          },
+          lualine_y = { 'filetype', 'progress' },
           lualine_z = {
-            function()
-              return " " .. os.date("%a %x %I:%M:%S %p")
-            end,
+            { 'location', separator = { right = '' }, left_padding = 2 },
           },
         },
         extensions = { "neo-tree", "lazy" },
