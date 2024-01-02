@@ -387,7 +387,7 @@ return {
             on_attach(client, bufnr)
             require("config.keymaps").elixir_mappings()
           end,
-          tag = "v0.17.0",
+          tag = "v0.16.0",
         },
       })
     end
