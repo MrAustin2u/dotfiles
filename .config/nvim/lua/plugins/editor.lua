@@ -90,51 +90,45 @@ return {
   --
   {
     "nvim-telescope/telescope.nvim",
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      'nvim-telescope/telescope-file-browser.nvim'
+    },
     cmd = "Telescope",
     version = false,
     keys = require("config.keymaps").telescope_mappings(),
     opts = function()
-      local actions = require("telescope.actions")
-
-      local open_with_trouble = function(...)
-        return require("trouble.providers.telescope").open_with_trouble(...)
-      end
-      local open_selected_with_trouble = function(...)
-        return require("trouble.providers.telescope").open_selected_with_trouble(...)
-      end
-      local find_files_no_ignore = function()
-        local action_state = require("telescope.actions.state")
-        local line = action_state.get_current_line()
-        Utils.telescope("find_files", { no_ignore = true, default_text = line })()
-      end
-      local find_files_with_hidden = function()
-        local action_state = require("telescope.actions.state")
-        local line = action_state.get_current_line()
-        Utils.telescope("find_files", { hidden = true, default_text = line })()
-      end
-
       return {
         defaults = {
-          prompt_prefix = " ",
-          selection_caret = " ",
-          mappings = {
-            i = {
-              ["<c-t>"] = open_with_trouble,
-              ["<a-t>"] = open_selected_with_trouble,
-              ["<a-i>"] = find_files_no_ignore,
-              ["<a-h>"] = find_files_with_hidden,
-              ["<C-Down>"] = actions.cycle_history_next,
-              ["<C-Up>"] = actions.cycle_history_prev,
-              ["<C-f>"] = actions.preview_scrolling_down,
-              ["<C-b>"] = actions.preview_scrolling_up,
-            },
-            n = {
-              ["q"] = actions.close,
-            },
+          layout_config = {
+            center = { width = 0.8 },
           },
         },
+        pickers = {
+          find_files = {
+            theme = "ivy",
+            prompt_prefix = " ",
+            previewer = false,
+          },
+          live_grep = {
+            prompt_prefix = " ",
+          },
+        },
+        extensions = {
+          persisted = {
+            layout_config = { width = 0.55, height = 0.55 }
+          }
+        }
       }
     end,
+    config = function(_, opts)
+      require('telescope').setup(opts)
+      require('telescope').load_extension('fzf')
+      require("telescope").load_extension('file_browser')
+      vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "none" })
+      vim.api.nvim_set_hl(0, "TelescopeBorder", { bg = "none" })
+    end
   },
   --
   -- Buffer

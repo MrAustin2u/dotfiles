@@ -12,6 +12,7 @@ return {
     priority = 1000,
     config = function()
       require("tokyonight").setup({
+        tokyonight_dark_float = false,
         on_highlights = function(hl, c)
           hl.CursorLineNr = {
             fg = c.orange,
@@ -48,6 +49,7 @@ return {
 
       vim.cmd([[colorscheme tokyonight]])
       vim.cmd([[hi TabLine guibg=NONE guifg=NONE]])
+      vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
     end,
   },
   {
