@@ -355,14 +355,11 @@ M.lsp_diagnostic_mappings = function()
   nmap({ "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", { desc = "Set loclist to LSP diagnostics" } })
 end
 
-M.neotest_mappings = function(neotest)
-  nmap({ "<leader>tf", function() neotest.run.run(vim.fn.expand("%")) end, { desc = "[T]est [F]ile" } })
-  nmap({ "<leader>ta", function() neotest.run.run(vim.loop.cwd()) end, { desc = "[T]est [A]ll [F]iles" } })
-  nmap({ "<leader>tn", function() neotest.run.run() end, { desc = "[T]est [N]earest" } })
-  nmap({ "<leader>ts", function() neotest.summary.toggle() end, { desc = "Toggle Summary" } })
-  nmap({ "<leader>to", function() neotest.output.open({ enter = true, auto_close = true }) end, { desc = "[T]est [O]utput" } })
-  nmap({ "<leader>tO", function() neotest.output_panel.toggle() end, { desc = "Toggle Output Panel" } })
-  nmap({ "<leader>tS", function() neotest.run.stop() end, { desc = "Stop" } })
+M.vim_test_mappings = function()
+  nmap({ '<leader>tn', ':TestNearest<CR>', { desc = '[T]est [N]earest' } })
+  nmap({ '<leader>tf', ':TestFile<CR>', { desc = '[T]est [F]ile' } })
+  nmap({ '<leader>ts', ':TestSuite<CR>', { desc = '[T]est [S]uite' } })
+  nmap({ '<leader>tl', ':TestLast<CR>', { desc = '[T]est [L]ast' } })
 end
 
 M.telescope_mappings = function()

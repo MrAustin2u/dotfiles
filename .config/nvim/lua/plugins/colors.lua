@@ -82,7 +82,7 @@ return {
           },
         },
         navic = { enabled = true, custom_bg = "lualine" },
-        neotest = true,
+        vimtest = true,
         neotree = true,
         noice = true,
         notify = true,
