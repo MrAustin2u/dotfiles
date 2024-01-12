@@ -30,7 +30,12 @@ return {
             "pylint",
             "stylua",
             "tflint"
-          }
+          },
+          ui = {
+            border = "single",
+            width = 0.7,
+            height = 0.8,
+          },
         },
         config = function(_, opts)
           require("mason").setup(opts)
