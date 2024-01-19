@@ -16,7 +16,6 @@ return {
         build = ":MasonUpdate",
         opts = {
           ensure_installed = {
-            "biome",
             "black",
             "codespell",
             "delve",
@@ -81,7 +80,6 @@ return {
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
-          "biome",
           "dockerls",
           "grammarly",
           "graphql",
@@ -92,7 +90,6 @@ return {
           "tsserver",
           "yamlls",
           "pyright",
-          "zls",
         },
         automatic_installlation = true,
       })
