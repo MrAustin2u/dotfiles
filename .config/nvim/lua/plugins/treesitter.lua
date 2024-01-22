@@ -1,27 +1,29 @@
 return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
-    build = ":TSUpdate",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
-      "nvim-treesitter/playground",
-      "RRethy/nvim-treesitter-textsubjects",
-      "windwp/nvim-ts-autotag",
-      "RRethy/nvim-treesitter-endwise",
-    },
-    init = function(plugin)
-      require("lazy.core.loader").add_to_rtp(plugin)
-      require("nvim-treesitter.query_predicates")
-    end,
-    opts = {
-      ensure_installed = "all",
-      endwise = {
-        enable = true,
-      },
-      ignore_install = { "liquidsoap" },
+  'nvim-treesitter/nvim-treesitter',
+  dependencies = {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    'nvim-treesitter/playground',
+    'RRethy/nvim-treesitter-textsubjects',
+    'windwp/nvim-ts-autotag',
+    'JoosepAlviste/nvim-ts-context-commentstring',
+    'IndianBoy42/tree-sitter-just',
+  },
+  config = function()
+    require "nvim-treesitter.install".compilers = { "gcc-11" }
+    require('tree-sitter-just').setup {}
+    require('nvim-treesitter.configs').setup({
+      ensure_installed = { 'angular', 'arduino', 'astro', 'awk', 'bash', 'c', 'clojure', 'cmake', 'comment',
+        'commonlisp', 'cpp', 'css', 'csv', 'dart', 'diff', 'dockerfile', 'dot', 'eex', 'elixir', 'elm', 'erlang',
+        'fennel', 'fish', 'git_config', 'git_rebase', 'gitattributes', 'gitcommit', 'gitignore', 'gleam', 'go', 'gomod',
+        'gosum', 'gowork', 'gpg', 'graphql', 'hack', 'haskell', 'hcl', 'heex', 'http', 'html', 'ini',
+        'java', 'javascript', 'jsdoc', 'json', 'json5', 'jsonc', 'jsonnet', 'julia', 'kotlin', 'latex',
+        'ledger', 'lua', 'make', 'markdown', 'markdown_inline', 'mermaid', 'nix', 'ocaml', 'ocaml_interface',
+        'ocamllex', 'pascal', 'passwd', 'pem', 'perl', 'php', 'phpdoc', 'po', 'prisma', 'properties', 'proto', 'prql',
+        'psv', 'pug', 'puppet', 'pymanifest', 'python', 'query', 'r', 'regex', 'requirements', 'robot', 'ruby', 'rust',
+        'scala', 'scheme', 'scss', 'solidity', 'sparql', 'sql', 'ssh_config', 'supercollider', 'surface', 'svelte',
+        'swift', 'terraform', 'tsv', 'tsx', 'typescript', 'vim', 'vimdoc', 'vue', 'xml', 'yaml', 'zig' },
       indent = {
-        enable = true,
+        enable = true
       },
       highlight = {
         enable = true,
@@ -31,6 +33,13 @@ return {
       autotag = {
         enable = true,
       },
+      disable = function(lang, buf)
+        local max_filesize = 10 * 1024 -- 10 KB
+        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+        if ok and stats and stats.size > max_filesize then
+          return true
+        end
+      end,
       textobjects = {
         select = {
           enable = true,
@@ -41,7 +50,7 @@ return {
             ["am"] = "@class.outer",
             ["im"] = "@class.inner",
             ["ac"] = "@comment.outer",
-            ["as"] = "@statement.outer",
+            ["as"] = "@statement.outer"
           },
         },
         move = {
@@ -68,32 +77,9 @@ return {
       textsubjects = {
         enable = true,
         keymaps = {
-          ["."] = "textsubjects-smart",
-        },
+          ['.'] = 'textsubjects-smart',
+        }
       },
-    },
-    config = function(_, opts)
-      vim.g.skip_ts_context_commentstring_module = true
-
-      if type(opts.ensure_installed) == "table" then
-        local added = {}
-        opts.ensure_installed = vim.tbl_filter(function(lang)
-          if added[lang] then
-            return false
-          end
-          added[lang] = true
-          return true
-        end, opts.ensure_installed)
-      end
-
-      require("nvim-treesitter.configs").setup(opts)
-    end,
-  },
-  -- Show context of the current function
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    event = { "VeryLazy" },
-    enabled = true,
-    opts = { mode = "cursor", max_lines = 3 },
-  },
+    })
+  end
 }
