@@ -108,69 +108,6 @@ function confirm() {
   fi
 }
 
-dev() {
-  # Set Session Name
-  SESSION="BLVD"
-  SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
-
-  # Only create tmux session if it doesn't already exist
-  if [ "$SESSIONEXISTS" = "" ]
-  then
-      # Start New Session with our name
-      tmux new-session -d -s $SESSION
-
-      # start servers
-      tmux rename-window -t 1 'Servers'
-      tmux send-keys -t 1 "clear && sched" Enter "mps" Enter
-      tmux split-window -h -p 50
-      tmux send-keys -t 2 "clear && dashboard" Enter "yrs" Enter
-
-      #Sched
-      tmux new-window
-      tmux rename-window "Sched"
-      tmux send-keys -t 1 "clear && sched" Enter
-
-       # Dashboard
-      tmux new-window
-      tmux rename-window "Dashboard"
-      tmux send-keys -t 1 "clear && dashboard" Enter
-
-      #Dotfiles
-      tmux new-window
-      tmux rename-window "Nvim Config"
-      tmux send-keys -t 1 "clear && cd ~/dotfiles/.config/ && vim" Enter
-
-      #Ngrok
-      tmux new-window
-      tmux rename-window "Ngrok"
-      tmux send-keys -t 1 "ngrok http --region=us --domain=aaustin-blvd.ngrok.io 4000" Enter
-
-      tmux select-window -t "Servers"
-  fi
-
-  # Attach Session, on the Main window
-  tmux attach-session -t $SESSION
-}
-
-nerd() {
-  # Set Session Name
-  SESSION="NERD"
-  SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
-
-  # Only create tmux session if it doesn't already exist
-  if [ "$SESSIONEXISTS" = "" ]
-  then
-      # Start New Session with our name
-      tmux new-session -d -s $SESSION
-      tmux rename-window "Coding"
-      tmux send-keys -t 1 "tmux source ~/.config/tmux/tmux.conf" Enter
-      tmux select-window -t "Coding"
-  fi
-
-  # Attach Session, on the Main window
-  tmux attach-session -t $SESSION
-}
-
 httpless() {
     # `httpless example.org'
     http --pretty=all --print=hb "$@" | less -R;
