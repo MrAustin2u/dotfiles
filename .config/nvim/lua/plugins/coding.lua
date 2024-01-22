@@ -375,25 +375,6 @@ return {
       require("config.keymaps").silicon_mappings()
     end,
   },
-  {
-    "pwntester/octo.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "nvim-treesitter/nvim-treesitter",
-    },
-    config = function()
-      local octo = require("octo")
-
-      octo.setup({
-        default_remote = { "origin" },
-      })
-
-      local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-      parser_config.markdown.filetype_to_parsername = "octo"
-    end,
-  },
   --
   -- Scratch files
   --
