@@ -274,68 +274,6 @@ M.lint_mappings = function(lint)
   })
 end
 
-M.lsp_mappings = function()
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
-  -- gD = go Declaration
-  nmap({
-    "gD",
-    "<cmd>lua vim.lsp.buf.declaration()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [D]eclaration" }),
-  })
-  -- gD = go definition
-  nmap({
-    "gd",
-    "<cmd>lua vim.lsp.buf.definition()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [d]efinition" }),
-  })
-
-  -- gr = go to references
-  nmap({
-    "gr",
-    Utils.telescope("lsp_references"),
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [r]eferences" }),
-  })
-
-  -- gi = go implementation
-  nmap({
-    "gi",
-    "<cmd>lua vim.lsp.buf.implementation()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[g]o to [i]mplementation" }),
-  })
-  -- fs = function signature
-  nmap({
-    "<leader>fs",
-    "<cmd>lua vim.lsp.buf.signature_help()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[f]unction [s]ignature" }),
-  })
-  -- wa = workspace add
-  nmap({
-    "<leader>wa",
-    "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[w]orkspace [a]dd" }),
-  })
-  -- D = <type> Definition
-  nmap({
-    "<leader>D",
-    "<cmd>lua vim.lsp.buf.type_definition()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[D]efinition" }),
-  })
-  -- ca = code action
-  nmap({
-    "<leader>ca",
-    "<cmd>lua vim.lsp.buf.code_action()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "[c]ode [a]ctions" }),
-  })
-  -- K = hover doc
-  nmap({
-    "K",
-    "<cmd>lua vim.lsp.buf.hover()<CR>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "LSP hover doc" }),
-  })
-  -- bf = buffer format
-  nmap({ "<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>" })
-end
-
 M.lsp_diagnostic_mappings = function()
   local function diagnostic_goto(next, severity)
     local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
