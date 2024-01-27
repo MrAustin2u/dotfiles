@@ -169,49 +169,6 @@ end
 -- LSP Restart
 nmap({ "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } })
 
--- Lazy
-nmap({ "<leader>l", "<cmd>Lazy<CR>", { desc = "Lazy" } })
-
--- Lazygit
-nmap({
-  "<leader>gg",
-  function()
-    Utils.float_term({ "lazygit" }, { cwd = Utils.get_root(), esc_esc = false })
-  end,
-  Utils.merge_maps(default_opts, { desc = "Lazygit (root dir)" }),
-})
-nmap({
-  "<leader>gG",
-  function()
-    Utils.float_term({ "lazygit" }, { esc_esc = false })
-  end,
-  Utils.merge_maps(default_opts, { desc = "Lazygit (cwd)" }),
-})
-
--- floating terminal
-local lazyterm = function()
-  Utils.float_term(nil, { cwd = Utils.get_root() })
-end
-nmap({ "<leader>ft", lazyterm, { desc = "Terminal (root dir)" } })
-nmap({
-  "<leader>fT",
-  function()
-    Utils.float_term()
-  end,
-  { desc = "Terminal (cwd)" },
-})
-nmap({ "<c-/>", lazyterm, { desc = "Terminal (root dir)" } })
-nmap({ "<c-_>", lazyterm, { desc = "which_key_ignore" } })
-
--- Terminal Mappings
-tmap({ "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" } })
-tmap({ "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to left window" } })
-tmap({ "<C-j>", "<cmd>wincmd j<cr>", { desc = "Go to lower window" } })
-tmap({ "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to upper window" } })
-tmap({ "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to right window" } })
-tmap({ "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" } })
-tmap({ "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" } })
-
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
   nmap({ "<leader>an", attempt.new_select, Utils.merge_maps(default_opts, { desc = "New Attempt" }) })
