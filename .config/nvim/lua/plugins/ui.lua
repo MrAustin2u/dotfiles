@@ -236,7 +236,7 @@ return {
             { 'mode', separator = { left = '' }, right_padding = 2 },
           },
           lualine_b = { 'branch', 'diff', 'diagnostics' },
-          lualine_c = { 'filename' },
+          lualine_c = { { "filename", path = 1 } },
           lualine_x = {
             {
               require("lazy.status").updates,
@@ -244,7 +244,6 @@ return {
               color = { bg = "none", fg = "#ff966c" },
             },
           },
-          lualine_y = { 'filetype', 'progress' },
           lualine_z = {
             { 'location', separator = { right = '' }, left_padding = 2 },
           },
@@ -254,7 +253,7 @@ return {
     end,
   },
   -- COKELINE
-  
+
   {
     'willothy/nvim-cokeline',
     lazy = false,
