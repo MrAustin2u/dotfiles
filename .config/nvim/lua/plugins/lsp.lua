@@ -95,7 +95,7 @@ local function lsp_keymaps(bufnr)
   keymap(bufnr, "n", "<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
   keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
   keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<cr>", opts)
-  keymap(bufnr, "n", "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
+  keymap(bufnr, "n", "<leader>lr", "<cmd>LspRestart<cr>", opts)
 
   if vim.lsp.inlay_hint then
     vim.keymap.set("n", "<leader>lh", function() vim.lsp.inlay_hint(0, nil) end,
