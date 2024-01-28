@@ -5,28 +5,28 @@ vim.g.maplocalleader = " "
 vim.g.matchup_surround_enabled = true
 vim.g.matchup_matchparen_deferred = true
 vim.g.matchup_matchparen_offscreen = {
-  method = "popup",
-  fullwidth = true,
-  highlight = "Normal",
-  border = "shadow",
+	method = "popup",
+	fullwidth = true,
+	highlight = "Normal",
+	border = "shadow",
 }
 vim.g.markdown_fenced_languages = {
-  "shell=sh",
-  "bash=sh",
-  "zsh=sh",
-  "console=sh",
-  "vim",
-  "lua",
-  "cpp",
-  "sql",
-  "elixir",
-  "python",
-  "javascript",
-  "typescript",
-  "js=javascript",
-  "ts=typescript",
-  "yaml",
-  "json",
+	"shell=sh",
+	"bash=sh",
+	"zsh=sh",
+	"console=sh",
+	"vim",
+	"lua",
+	"cpp",
+	"sql",
+	"elixir",
+	"python",
+	"javascript",
+	"typescript",
+	"js=javascript",
+	"ts=typescript",
+	"yaml",
+	"json",
 }
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -52,7 +52,7 @@ vim.opt.diffopt:append("algorithm:patience")
 vim.opt.diffopt:append("indent-heuristic")
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0           -- Command line height
+vim.opt.ch = 0 -- Command line height
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
 vim.opt.foldenable = false
@@ -96,6 +96,6 @@ vim.opt_global.spell = true
 
 -- persistent undo between file reloads
 if vim.fn.has("persistent_undo") then
-  vim.opt.undofile = true
-  vim.opt.undodir = cache_dir .. "undo/"
+	vim.opt.undofile = true
+	vim.opt.undodir = cache_dir .. "undo/"
 end

@@ -1,4 +1,4 @@
-local Utils = require("utils")
+local Utils = require("config.utils")
 local M = {}
 
 --[[
@@ -21,24 +21,9 @@ local M = {}
 --
 local default_opts = { noremap = true, silent = true }
 
-local map = function(tbl)
-  local opts = tbl[4] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
-  vim.keymap.set(tbl[1], tbl[2], tbl[3], opts)
-end
-
-local imap = function(tbl)
-  local opts = tbl[4] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
-  vim.keymap.set("i", tbl[1], tbl[2], opts)
-end
-
 local nmap = function(tbl)
   local opts = tbl[3] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
   vim.keymap.set("n", tbl[1], tbl[2], opts)
-end
-
-local tmap = function(tbl)
-  local opts = tbl[3] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
-  vim.keymap.set("t", tbl[1], tbl[2], opts)
 end
 
 local vmap = function(tbl)
@@ -217,8 +202,19 @@ M.formatting_mappings = function(conform)
   end, { desc = "Trigger formatting (in visual mode)" })
 end
 
+M.harpoon_mappings = function()
+  nmap({ "<s-m>", "<cmd>lua require('user.harpoon').mark_file()<cr>", default_opts })
+  nmap({ "<TAB>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", default_opts })
+end
+
 M.inc_rename = function()
-  nmap({ "<leader>rn", function() return ":IncRename " .. vim.fn.expand("<cword>") end, { expr = true } })
+  nmap({
+    "<leader>rn",
+    function()
+      return ":IncRename " .. vim.fn.expand("<cword>")
+    end,
+    { expr = true },
+  })
 end
 
 M.lint_mappings = function(lint)
@@ -251,10 +247,10 @@ M.lsp_diagnostic_mappings = function()
 end
 
 M.vim_test_mappings = function()
-  nmap({ '<leader>tn', ':TestNearest<CR>', { desc = '[T]est [N]earest' } })
-  nmap({ '<leader>tf', ':TestFile<CR>', { desc = '[T]est [F]ile' } })
-  nmap({ '<leader>ts', ':TestSuite<CR>', { desc = '[T]est [S]uite' } })
-  nmap({ '<leader>tl', ':TestLast<CR>', { desc = '[T]est [L]ast' } })
+  nmap({ "<leader>tn", ":TestNearest<CR>", { desc = "[T]est [N]earest" } })
+  nmap({ "<leader>tf", ":TestFile<CR>", { desc = "[T]est [F]ile" } })
+  nmap({ "<leader>ts", ":TestSuite<CR>", { desc = "[T]est [S]uite" } })
+  nmap({ "<leader>tl", ":TestLast<CR>", { desc = "[T]est [L]ast" } })
 end
 
 M.telescope_mappings = function()
@@ -307,8 +303,20 @@ M.silicon_mappings = function()
 end
 
 M.todo_comments_mappings = function(tc)
-  nmap({ "]t", function() tc.jump_next() end, { desc = "Next todo comment" } })
-  nmap({ "[t", function() tc.jump_prev() end, { desc = "Previous todo comment" } })
+  nmap({
+    "]t",
+    function()
+      tc.jump_next()
+    end,
+    { desc = "Next todo comment" },
+  })
+  nmap({
+    "[t",
+    function()
+      tc.jump_prev()
+    end,
+    { desc = "Previous todo comment" },
+  })
   nmap({ "<leader>xt", "<cmd>TodoTrouble<cr>", { desc = "Todo (Trouble)" } })
   nmap({ "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>", { desc = "Todo/Fix/Fixme (Trouble)" } })
   nmap({ "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Todo" } })
