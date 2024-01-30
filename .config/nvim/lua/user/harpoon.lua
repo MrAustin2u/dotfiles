@@ -7,11 +7,13 @@ local M = {
 }
 
 function M.config()
-  local keymap = vim.keymap.set
-  local opts = { noremap = true, silent = true }
+  local ui = require("harpoon.ui")
 
-  keymap("n", "<s-m>", "<cmd>lua require('user.harpoon').mark_file()<cr>", opts)
-  keymap("n", "<TAB>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", opts)
+  local opts = { noremap = true, silent = true }
+  vim.keymap.set("n", "<leader>a", "<cmd>lua require('user.harpoon').mark_file()<cr>", opts)
+  vim.keymap.set("n", "<TAB>", ui.nav_next, opts)
+  vim.keymap.set("n", "<S-TAB>", ui.nav_prev, opts)
+  vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu, opts)
 end
 
 function M.mark_file()

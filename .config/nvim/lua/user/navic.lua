@@ -10,12 +10,10 @@ function M.config()
     lsp = {
       auto_attach = true,
     },
-    click = true,
-    separator = " " .. icons.ui.ChevronRight .. " ",
+    click = false,
     depth_limit = 0,
     depth_limit_indicator = "..",
   }
 end
 
 return M
-
