@@ -17,7 +17,6 @@ local M = {
       typescript = { "prettier" },
       typescriptreact = { "prettier" },
       yaml = { "prettier" },
-      go = { "goimports", "gofumpt" },
     },
     format_on_save = {
       lsp_fallback = true,

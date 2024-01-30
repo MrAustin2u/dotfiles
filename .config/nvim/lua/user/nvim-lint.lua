@@ -11,7 +11,6 @@ function M.config()
     elixir = { "credo" },
     javascript = { "eslint_d" },
     javascriptreact = { "eslint_d" },
-    python = { "pylint" },
     typescript = { "eslint_d" },
     typescriptreact = { "eslint_d" },
     yaml = { "yamllint" },

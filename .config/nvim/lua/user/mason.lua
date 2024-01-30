@@ -8,19 +8,12 @@ local M = {
   },
   opts = {
     ensure_installed = {
-      "black",
       "codespell",
-      "delve",
       "eslint_d",
-      "gofumpt",
-      "goimports",
-      "gomodifytags",
-      "impl",
-      "isort",
       "prettier",
-      "pylint",
       "stylua",
       "tflint",
+      "yamllint",
     },
     ui = {
       border = "single",
