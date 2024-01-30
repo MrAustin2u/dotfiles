@@ -167,13 +167,6 @@ M.attempt_mappings = function(attempt)
   nmap({ "<leader>al", attempt.open_select, Utils.merge_maps(default_opts, { desc = "Select Attempt" }) })
 end
 
-M.cokeline_mappings = function()
-  nmap({ "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true, desc = "Prev Tab" } })
-  nmap({ "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Tab" } })
-  nmap({ "<Leader>p", "<Plug>(cokeline-switch-prev)", { silent = true, desc = "Switch Prev Buffer" } })
-  nmap({ "<Leader>n", "<Plug>(cokeline-switch-next)", { silent = true, desc = "Switch Next Buffer" } })
-end
-
 M.elixir_mappings = function()
   nmap({
     "<space>fp",
