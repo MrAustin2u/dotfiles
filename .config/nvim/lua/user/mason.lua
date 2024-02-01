@@ -10,7 +10,7 @@ local M = {
     ensure_installed = {
       "codespell",
       "eslint_d",
-      "prettier",
+      "prettierd",
       "stylua",
       "tflint",
       "yamllint",
