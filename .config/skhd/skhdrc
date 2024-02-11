@@ -5,13 +5,10 @@ shift + alt - b : brew services restart sketchybar
 shift + alt - p : brew services restart postgresql
 
 # open terminal
-shift + alt - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~ &> /dev/null
+shift + alt - return : /Applications/WezTerm.app/Contents/MacOS/wezterm --single-instance -d ~ &> /dev/null
 
 #close window
 shift + alt - backspace : $(yabai -m window $(yabai -m query --windows --window | jq -re ".id") --close)
-
-# open chrome
-cmd + shift - return : open -n -a "Google Chrome"
 
 # Navigation
 alt - h : yabai -m window --focus west
