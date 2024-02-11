@@ -9,8 +9,8 @@ local M = {
   opts = {
     ensure_installed = {
       "codespell",
-      "eslint_d",
-      "prettierd",
+      "prettier",
+      "eslint-lsp",
       "stylua",
       "tflint",
       "yamllint",

@@ -1,3 +1,24 @@
+local has_words_before = function()
+  unpack = unpack or table.unpack
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
+local tmux_source = {
+  name = 'tmux',
+  option = { all_panes = true },
+}
+
+local all_buffers_completion_source = {
+  name = 'buffer',
+  option = {
+    get_bufnrs = function()
+      -- complete from all buffers
+      return vim.api.nvim_list_bufs()
+    end,
+  },
+}
+
 local M = {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
@@ -27,6 +48,15 @@ local M = {
       event = "InsertEnter",
     },
     {
+      'petertriho/cmp-git',
+      event = "InsertEnter",
+
+    },
+    {
+      'andersevenrud/cmp-tmux',
+      event = "InsertEnter"
+    },
+    {
       "L3MON4D3/LuaSnip",
       event = "InsertEnter",
       dependencies = {
@@ -51,18 +81,14 @@ local M = {
   opts = function(_, _)
     local cmp = require("cmp")
     local luasnip = require("luasnip")
-    local defaults = require("cmp.config.default")()
+    -- local defaults = require("cmp.config.default")()
     local icons = require("config.icons")
     require("luasnip/loaders/from_vscode").lazy_load()
 
     vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
     vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#FDE030" })
 
-    local has_words_before = function()
-      unpack = unpack or table.unpack
-      local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-      return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-    end
+
 
     local opts = {
       window = {
@@ -110,16 +136,10 @@ local M = {
         { name = "nvim_lua" },
         { name = "luasnip" },
         { name = "path" },
-        {
-          name = 'buffer',
-          option = {
-            get_bufnrs = function()
-              return vim.api.nvim_list_bufs()
-            end
-          }
-        },
+        all_buffers_completion_source,
         { name = "calc" },
         { name = "emoji" },
+        tmux_source,
         { name = "crates" },
       }),
       formatting = {
@@ -132,10 +152,27 @@ local M = {
             vim_item.kind_hl_group = "CmpItemKindEmoji"
           end
 
+          -- find icon based on kind
+          -- Source
+          local source = ({
+            buffer = '[BUF]',
+            cmdline = '[CMD]',
+            copilot = '[COP]',
+            emoji = '[EMJ]',
+            luasnip = '[SNP]',
+            nvim_lsp = '[LSP]',
+            nvim_lua = '[LUA]',
+            path = '[PTH]',
+            tmux = '[TMX]'
+          })[entry.source.name]
+
+          vim_item.menu = string.format('%s', source)
+
           return vim_item
         end,
       },
-      sorting = defaults.sorting,
+      preselect = cmp.PreselectMode.None,
+      -- sorting = defaults.sorting,
     }
 
     local format_kinds = opts.formatting.format
@@ -150,6 +187,39 @@ local M = {
 function M.config(_, opts)
   local cmp = require("cmp")
   cmp.setup(opts)
+
+  -- completion for neovim lua configs
+  cmp.setup.filetype('lua', {
+    sources = cmp.config.sources({
+      { name = 'nvim_lua' },
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
+      { name = 'path' },
+    }, {
+      all_buffers_completion_source,
+      tmux_source,
+    }),
+  })
+
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'git' }, -- `cmp_git`
+    }, {
+      all_buffers_completion_source,
+      tmux_source,
+      { name = 'emoji' },
+    }),
+  })
+
+  -- Use buffer source for `/`
+  -- (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline('/', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' },
+    },
+  })
 end
 
 return M

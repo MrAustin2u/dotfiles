@@ -3,8 +3,10 @@ local M = {
   version = "*",
   dev = false,
   event = { "BufReadPre", "BufNewFile" },
-  keys = require("config.keymaps").elixir_mappings(),
-  dependencies = { "nvim-lua/plenary.nvim" },
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    "mhanberg/workspace-folders.nvim",
+  },
 }
 
 function M.config(_, _)
@@ -13,8 +15,10 @@ function M.config(_, _)
   local on_attach = require("user.lspconfig").on_attach
 
   elixir.setup({
+    nextls = { enable = false },
+    credo = { enable = false },
     elixirls = {
-      on_attach = on_attach,
+      enable = true,
       tag = "v0.16.0",
       settings = elixirls.settings({
         dialyzerEnabled = true,
@@ -22,6 +26,10 @@ function M.config(_, _)
         enableTestLenses = true,
         suggestSpecs = false,
       }),
+      on_attach = function(client, bufnr)
+        require("config.keymaps").elixir_mappings()
+        on_attach(client, bufnr)
+      end,
     },
   })
 end

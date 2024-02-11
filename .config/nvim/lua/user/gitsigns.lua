@@ -66,7 +66,7 @@ function M.config(_, _)
       map("n", "<leader>gR", gs.reset_buffer, "Reset Buffer")
       map("n", "]h", gs.next_hunk, "Next Hunk")
       map("n", "[h", gs.next_hunk, "Previous Hunk")
-      map("n", "<leader>gl", function() gs.blame_line() end, "Blame Line")
+      map("n", "<leader>gl", gs.toggle_current_line_blame, "Blame Line")
       map("n", "<leader>gL", function() gs.blame_line({ full = true }) end, "Blame Line")
     end,
   })

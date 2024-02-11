@@ -183,6 +183,18 @@ function M.config()
       require("neodev").setup({})
     end
 
+    if server == "yamlls" then
+      local schemastore_avail, schemastore = pcall(require, "schemastore")
+      if schemastore_avail then opts.settings = { yaml = { schemas = schemastore.yaml.schemas() } } end
+    end
+
+    if server == "jsonls" then -- by default add json schemas
+      local schemastore_avail, schemastore = pcall(require, "schemastore")
+      if schemastore_avail then
+        opts.settings = { json = { schemas = schemastore.json.schemas(), validate = { enable = true } } }
+      end
+    end
+
     lspconfig[server].setup(opts)
   end
 end
