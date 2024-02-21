@@ -154,6 +154,7 @@ function M.config()
     "bashls",
     "cssls",
     "dockerls",
+    "elixirls",
     "eslint",
     "html",
     "pyright",
@@ -177,6 +178,24 @@ function M.config()
     local require_ok, settings = pcall(require, "user.lspsettings." .. server)
     if require_ok then
       opts = vim.tbl_deep_extend("force", settings, opts)
+    end
+
+    if server == "elixirls" then
+      opts.root_dir = function(fname)
+        local path = lspconfig.util.path
+        local child_or_root_path = lspconfig.util.root_pattern({ "mix.exs", ".git" })(fname)
+        local maybe_umbrella_path = lspconfig.util.root_pattern({ "mix.exs" })(
+          vim.loop.fs_realpath(path.join({ child_or_root_path, ".." }))
+        )
+
+        local has_ancestral_mix_exs_path = vim.startswith(child_or_root_path,
+          path.join({ maybe_umbrella_path, "apps" }))
+        if maybe_umbrella_path and not has_ancestral_mix_exs_path then
+          maybe_umbrella_path = ""
+        end
+
+        return Utils.get_data(maybe_umbrella_path) or child_or_root_path or vim.loop.os_homedir()
+      end
     end
 
     if server == "lua_ls" then

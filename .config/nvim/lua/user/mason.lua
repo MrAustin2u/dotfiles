@@ -8,9 +8,11 @@ local M = {
   },
   opts = {
     ensure_installed = {
+      "black",
       "codespell",
-      "prettier",
-      "eslint-lsp",
+      "eslint_d",
+      "isort",
+      "prettierd",
       "stylua",
       "tflint",
       "yamllint",
@@ -46,6 +48,7 @@ function M.config(_, mason_opts)
       "bashls",
       "cssls",
       "dockerls",
+      "elixirls",
       "eslint",
       "html",
       "pyright",
