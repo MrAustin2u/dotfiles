@@ -61,10 +61,6 @@ function M.on_attach(client, bufnr)
     })
   end
 
-  if client.supports_method("textDocument/inlayHint") then
-    vim.lsp.inlay_hint.enable(bufnr, true)
-  end
-
   if client.server_capabilities.code_lens then
     vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
       buffer = bufnr,
@@ -180,31 +176,15 @@ function M.config()
       opts = vim.tbl_deep_extend("force", settings, opts)
     end
 
-    if server == "elixirls" then
-      opts.root_dir = function(fname)
-        local path = lspconfig.util.path
-        local child_or_root_path = lspconfig.util.root_pattern({ "mix.exs", ".git" })(fname)
-        local maybe_umbrella_path = lspconfig.util.root_pattern({ "mix.exs" })(
-          vim.loop.fs_realpath(path.join({ child_or_root_path, ".." }))
-        )
-
-        local has_ancestral_mix_exs_path = vim.startswith(child_or_root_path,
-          path.join({ maybe_umbrella_path, "apps" }))
-        if maybe_umbrella_path and not has_ancestral_mix_exs_path then
-          maybe_umbrella_path = ""
-        end
-
-        return Utils.get_data(maybe_umbrella_path) or child_or_root_path or vim.loop.os_homedir()
-      end
-    end
-
     if server == "lua_ls" then
       require("neodev").setup({})
     end
 
     if server == "yamlls" then
       local schemastore_avail, schemastore = pcall(require, "schemastore")
-      if schemastore_avail then opts.settings = { yaml = { schemas = schemastore.yaml.schemas() } } end
+      if schemastore_avail then
+        opts.settings = { yaml = { schemas = schemastore.yaml.schemas() } }
+      end
     end
 
     if server == "jsonls" then -- by default add json schemas
