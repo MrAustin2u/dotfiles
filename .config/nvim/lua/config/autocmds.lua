@@ -64,3 +64,21 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.spell = true
   end,
 })
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev)
+    -- diagnostics
+    require("user.lsp").lsp_diagnostic_mappings()
+    require("user.lsp").lsp_diagnostics()
+    -- enable completion triggered by <c-x><c-o>
+    vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
+
+    -- diagnostics
+    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+    require("lspconfig.ui.windows").default_options.border = "rounded"
+
+    -- lsp keymaps
+    require("user.lsp").lsp_keymaps(ev.buf)
+  end,
+})

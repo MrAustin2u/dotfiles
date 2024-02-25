@@ -8,7 +8,6 @@ function M.config()
 
   lint.linters_by_ft = {
     ["*"] = { "codespell" },
-    elixir = { "credo" },
     javascript = { "eslint" },
     javascriptreact = { "eslint" },
     typescript = { "eslint" },

@@ -5,9 +5,14 @@ local M = {
   build = ":MasonUpdate",
   dependencies = {
     "williamboman/mason-lspconfig.nvim",
+    "neovim/nvim-lspconfig",
+    "folke/neodev.nvim",
+    "hrsh7th/cmp-nvim-lsp",
+    { "b0o/schemastore.nvim", lazy = true },
   },
   opts = {
     ensure_installed = {
+      -- Null LS
       "black",
       "codespell",
       "eslint_d",
@@ -16,6 +21,26 @@ local M = {
       "stylua",
       "tflint",
       "yamllint",
+      -- LSPs
+      "bash-language-server",
+      "css-lsp",
+      "erlang-ls",
+      "eslint-lsp",
+      "go-debug-adapter",
+      "goimports",
+      "golangci-lint",
+      "golangci-lint-langserver",
+      "gomodifytags",
+      "gopls",
+      "html-lsp",
+      "json-lsp",
+      "rust-analyzer",
+      "sqlls",
+      "tailwindcss-language-server",
+      "terraform-ls",
+      "typescript-language-server",
+      "vim-language-server",
+      "yaml-language-server"
     },
     ui = {
       border = "single",
@@ -27,6 +52,8 @@ local M = {
 
 function M.config(_, mason_opts)
   require("mason").setup(mason_opts)
+  local lspconfig = require('lspconfig')
+  local mason_lspconfig = require('mason-lspconfig')
 
   local mr = require("mason-registry")
   local function ensure_installed()
@@ -37,32 +64,60 @@ function M.config(_, mason_opts)
       end
     end
   end
+
   if mr.refresh then
     mr.refresh(ensure_installed)
   else
     ensure_installed()
   end
 
-  require("mason-lspconfig").setup({
-    ensure_installed = {
-      "bashls",
-      "cssls",
-      "dockerls",
-      "elixirls",
-      "eslint",
-      "html",
-      "pyright",
-      "graphql",
-      "jsonls",
-      "lua_ls",
-      "pyright",
-      "rust_analyzer",
-      "sqlls",
-      "terraformls",
-      "tsserver",
-      "yamlls",
-    },
-    automatic_installlation = true,
+  -- inject our custom on_attach after the built in on_attach from the lspconfig
+  lspconfig.util.on_setup = lspconfig.util.add_hook_after(lspconfig.util.on_setup, function(config)
+    if config.on_attach then
+      config.on_attach = lspconfig.util.add_hook_after(config.on_attach, M.on_attach)
+    else
+      config.on_attach = require("user.lsp").on_attach
+    end
+
+    config.capabilities = require("user.lsp").common_capabilities()
+  end)
+
+  mason_lspconfig.setup()
+  mason_lspconfig.setup_handlers({
+    function(server_name)
+      lspconfig[server_name].setup {}
+    end,
+
+    -- JSON
+    ['jsonls'] = function()
+      local overrides = require("user.lspsettings.jsonls")
+      lspconfig.jsonls.setup(overrides)
+    end,
+
+    -- GO
+    ['gopls'] = function()
+      local overrides = require("user.lspsettings.gopls")
+      lspconfig.gopls.setup(overrides)
+    end,
+
+    -- Lua
+    ['lua_ls'] = function()
+      local overrides = require("user.lspsettings.lua_ls")
+      require("neodev").setup()
+      lspconfig.lua_ls.setup(overrides)
+    end,
+
+    -- Typescript
+    ['tsserver'] = function()
+      local overrides = require("user.lspsettings.tsserver")
+      lspconfig.tsserver.setup(overrides)
+    end,
+
+    -- YAML
+    ['yamlls'] = function()
+      local overrides = require("user.lspsettings.yamlls")
+      lspconfig.yamlls.setup(overrides)
+    end,
   })
 end
 

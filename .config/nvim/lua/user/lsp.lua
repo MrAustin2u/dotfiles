@@ -1,31 +1,21 @@
 local Utils = require("config.utils")
 
-local M = {
-  "neovim/nvim-lspconfig",
-  event = { "BufReadPre", "BufNewFile" },
-  dependencies = {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
-    { "folke/neodev.nvim" },
-  },
-  opts = {
-    diagnostics = {
-      underline = true,
-      update_in_insert = false,
-      virtual_text = {
-        spacing = 4,
-        source = "if_many",
-        prefix = "●",
-      },
-      severity_sort = true,
-      float = {
-        border = "rounded",
-      },
-    },
-  },
+local lspconfig_present, lspconfig = pcall(require, 'lspconfig')
+local cmp_lsp_present, _cmp_lsp = pcall(require, 'cmp_nvim_lsp')
+
+local deps = {
+  cmp_lsp_present,
+  lspconfig_present,
 }
 
-local function lsp_keymaps(bufnr)
+if Utils.contains(deps, false) then
+  vim.notify 'Failed to load dependencies in plugins/lsp.lua'
+  return
+end
+
+local M = {}
+
+function M.lsp_keymaps(bufnr)
   local opts = { noremap = true, silent = true }
   local keymap = vim.api.nvim_buf_set_keymap
   keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
@@ -70,13 +60,13 @@ function M.on_attach(client, bufnr)
   end
 end
 
-local function common_capabilities()
+function M.common_capabilities()
   local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   return capabilities
 end
 
-local function lsp_diagnostics()
+function M.lsp_diagnostics()
   local icons = require("config.icons")
   local default_diagnostic_config = {
     signs = {
@@ -88,7 +78,14 @@ local function lsp_diagnostics()
         { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
       },
     },
-    virtual_text = false,
+    virtual_text = {
+      spacing = 4,
+      source = 'if_many',
+      prefix = '●',
+      -- this will set set the prefix to a function that returns the diagnostics icon based on the severity
+      -- this only works on a recent 0.10.0 build. Will be set to "●" when not supported
+      -- prefix = "icons",
+    },
     update_in_insert = false,
     underline = true,
     severity_sort = true,
@@ -109,7 +106,7 @@ local function lsp_diagnostics()
   end
 end
 
-local function lsp_diagnostic_mappings()
+function M.lsp_diagnostic_mappings()
   local function diagnostic_goto(next, severity)
     local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
     severity = severity and vim.diagnostic.severity[severity] or nil
@@ -124,78 +121,6 @@ local function lsp_diagnostic_mappings()
   vim.keymap.set("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" })
   vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" })
   vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
-end
-
-function M.config()
-  local lspconfig = require("lspconfig")
-
-  vim.api.nvim_create_autocmd("LspAttach", {
-    group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-    callback = function(ev)
-      -- enable completion triggered by <c-x><c-o>
-      vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
-
-      -- diagnostics
-      lsp_diagnostic_mappings()
-      lsp_diagnostics()
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-      require("lspconfig.ui.windows").default_options.border = "rounded"
-
-      -- lsp keymaps
-      lsp_keymaps(ev.buf)
-    end,
-  })
-
-  local servers = {
-    "bashls",
-    "cssls",
-    "dockerls",
-    "elixirls",
-    "eslint",
-    "html",
-    "pyright",
-    "graphql",
-    "jsonls",
-    "lua_ls",
-    "pyright",
-    "rust_analyzer",
-    "sqlls",
-    "terraformls",
-    "tsserver",
-    "yamlls",
-  }
-
-  for _, server in pairs(servers) do
-    local opts = {
-      on_attach = M.on_attach,
-      capabilities = common_capabilities(),
-    }
-
-    local require_ok, settings = pcall(require, "user.lspsettings." .. server)
-    if require_ok then
-      opts = vim.tbl_deep_extend("force", settings, opts)
-    end
-
-    if server == "lua_ls" then
-      require("neodev").setup({})
-    end
-
-    if server == "yamlls" then
-      local schemastore_avail, schemastore = pcall(require, "schemastore")
-      if schemastore_avail then
-        opts.settings = { yaml = { schemas = schemastore.yaml.schemas() } }
-      end
-    end
-
-    if server == "jsonls" then -- by default add json schemas
-      local schemastore_avail, schemastore = pcall(require, "schemastore")
-      if schemastore_avail then
-        opts.settings = { json = { schemas = schemastore.json.schemas(), validate = { enable = true } } }
-      end
-    end
-
-    lspconfig[server].setup(opts)
-  end
 end
 
 return M
