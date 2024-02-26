@@ -1,19 +1,24 @@
 local M = {
   "nvim-treesitter/nvim-treesitter",
+  build = ":TSUpdate",
+  init = function(plugin)
+    -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
+    -- This is needed because a bunch of plugins no longer `require("nvim-treesitter")`, which
+    -- no longer trigger the **nvim-treeitter** module to be loaded in time.
+    -- Luckily, the only thins that those plugins need are the custom queries, which lazy makes available
+    -- during startup.
+    require("lazy.core.loader").add_to_rtp(plugin)
+    require("nvim-treesitter.query_predicates")
+  end,
   dependencies = {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    "nvim-treesitter/playground",
     "RRethy/nvim-treesitter-textsubjects",
+    "nvim-treesitter/nvim-treesitter-textobjects",
     "windwp/nvim-ts-autotag",
-    "JoosepAlviste/nvim-ts-context-commentstring",
-    "IndianBoy42/tree-sitter-just",
+    'JoosepAlviste/nvim-ts-context-commentstring',
   },
-}
-
-function M.config()
-  require("nvim-treesitter.install").compilers = { "gcc-11" }
-  require("tree-sitter-just").setup({})
-  require("nvim-treesitter.configs").setup({
+  opts = {
+    autotag = { enable = true },
+    endwise = { enable = true },
     ensure_installed = {
       "bash",
       "comment",
@@ -35,24 +40,28 @@ function M.config()
       "gowork",
       "graphql",
       "heex",
-      "http",
       "html",
+      "http",
       "javascript",
       "jsdoc",
       "json",
       "json5",
       "jsonc",
       "lua",
+      "luadoc",
+      "luap",
       "markdown",
       "markdown_inline",
       "prisma",
       "python",
+      "query",
       "regex",
       "rust",
       "scss",
       "sql",
       "ssh_config",
       "terraform",
+      "toml",
       "tsx",
       "typescript",
       "vim",
@@ -60,24 +69,13 @@ function M.config()
       "xml",
       "yaml",
     },
-    indent = {
-      enable = true,
-    },
     highlight = {
+      additional_vim_regex_highlighting = false,
       enable = true,
       use_languagetree = true,
-      additional_vim_regex_highlighting = false,
     },
-    autotag = {
-      enable = true,
-    },
-    disable = function(lang, buf)
-      local max_filesize = 10 * 1024 -- 10 KB
-      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then
-        return true
-      end
-    end,
+    incremental_selection = { enable = true },
+    indent = { enable = true },
     textobjects = {
       select = {
         enable = true,
@@ -88,7 +86,7 @@ function M.config()
           ["am"] = "@class.outer",
           ["im"] = "@class.inner",
           ["ac"] = "@comment.outer",
-          ["as"] = "@statement.outer",
+          ["as"] = "@statement.outer"
         },
       },
       move = {
@@ -115,10 +113,25 @@ function M.config()
     textsubjects = {
       enable = true,
       keymaps = {
-        ["."] = "textsubjects-smart",
-      },
+        ['.'] = 'textsubjects-smart',
+      }
     },
-  })
+  },
+}
+
+function M.config(_, opts)
+  if type(opts.ensure_installed) == "table" then
+    ---@type table<string, boolean>
+    local added = {}
+    opts.ensure_installed = vim.tbl_filter(function(lang)
+      if added[lang] then
+        return false
+      end
+      added[lang] = true
+      return true
+    end, opts.ensure_installed)
+  end
+  require("nvim-treesitter.configs").setup(opts)
 end
 
 return M
