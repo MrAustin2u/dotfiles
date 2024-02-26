@@ -24,7 +24,6 @@ local M = {
       -- LSPs
       "bash-language-server",
       "css-lsp",
-      "erlang-ls",
       "eslint-lsp",
       "go-debug-adapter",
       "goimports",

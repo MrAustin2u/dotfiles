@@ -1,18 +1,5 @@
 local Utils = require("config.utils")
 
-local lspconfig_present, lspconfig = pcall(require, 'lspconfig')
-local cmp_lsp_present, _cmp_lsp = pcall(require, 'cmp_nvim_lsp')
-
-local deps = {
-  cmp_lsp_present,
-  lspconfig_present,
-}
-
-if Utils.contains(deps, false) then
-  vim.notify 'Failed to load dependencies in plugins/lsp.lua'
-  return
-end
-
 local M = {}
 
 function M.lsp_keymaps(bufnr)
@@ -69,6 +56,8 @@ end
 function M.lsp_diagnostics()
   local icons = require("config.icons")
   local default_diagnostic_config = {
+    float = { border = "rounded" },
+    severity_sort = true,
     signs = {
       active = true,
       values = {
@@ -78,25 +67,14 @@ function M.lsp_diagnostics()
         { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
       },
     },
-    virtual_text = {
-      spacing = 4,
-      source = 'if_many',
-      prefix = '●',
-      -- this will set set the prefix to a function that returns the diagnostics icon based on the severity
-      -- this only works on a recent 0.10.0 build. Will be set to "●" when not supported
-      -- prefix = "icons",
-    },
-    update_in_insert = false,
-    underline = true,
-    severity_sort = true,
-    float = {
-      focusable = true,
-      style = "minimal",
-      border = "rounded",
-      source = "always",
-      header = "",
-      prefix = "",
-    },
+    underline = false,
+    update_in_insert = true,
+    virtual_text = false,
+    -- virtual_text = {
+    --   spacing = 4,
+    --   source = 'if_many',
+    --   prefix = '●'
+    -- },
   }
 
   vim.diagnostic.config(default_diagnostic_config)
