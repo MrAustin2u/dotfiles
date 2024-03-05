@@ -1,9 +1,12 @@
 *~
-
 .DS_Store
+.elixir_ls/
+.env
 .luarc.json
-
+.mix_tasks
+.vscode/
+_build/
+deps/
+node_modules
 nvim/.config/nvim/plugin/
-
 tmux/.config/tmux/plugins/
-
