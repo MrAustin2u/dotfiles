@@ -146,10 +146,8 @@ vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window 
 vim.keymap.set("n", "<S-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
 vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
--- highlights under cursor
-if vim.fn.has("nvim-0.9.0") == 1 then
-  vim.keymap.set("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
-end
+-- Surround
+vim.keymap.set('n', '<Leader>sq', function() vim.cmd [[%s/^\(.*\)$/"\1",/]] end, { silent = true })
 
 -- LSP Restart
 nmap({ "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } })
