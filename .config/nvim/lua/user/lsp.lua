@@ -67,15 +67,24 @@ function M.lsp_diagnostics()
         { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
       },
     },
-    underline = false,
-    update_in_insert = true,
-    virtual_text = false,
-    -- virtual_text = {
-    --   spacing = 4,
-    --   source = 'if_many',
-    --   prefix = '●'
-    -- },
+    underline = true,
+    update_in_insert = false,
+    virtual_text = {
+      spacing = 4,
+      source = 'if_many',
+      prefix = '●'
+    },
   }
+  if type(default_diagnostic_config.virtual_text) == "table" and default_diagnostic_config.virtual_text.prefix == "icons" then
+    default_diagnostic_config.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
+        or function(diagnostic)
+          for d, icon in pairs(icons) do
+            if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
+              return icon
+            end
+          end
+        end
+  end
 
   vim.diagnostic.config(default_diagnostic_config)
 

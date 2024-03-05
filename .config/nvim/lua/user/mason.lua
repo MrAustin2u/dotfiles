@@ -12,15 +12,17 @@ local M = {
   },
   opts = {
     ensure_installed = {
-      -- Null LS
+      -- Formatters
       "black",
+      "stylua",
+      "prettierd",
+      "isort",
+      -- Linters
       "codespell",
       "eslint_d",
-      "isort",
-      "prettierd",
-      "stylua",
       "tflint",
       "yamllint",
+      "commitlint",
       -- LSPs
       "bash-language-server",
       "css-lsp",
