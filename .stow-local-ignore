@@ -1,0 +1,13 @@
+.DS_Store
+.elixir_ls/
+.env
+.gitignore
+.luarc.json
+.mix_tasks
+.vscode/
+\.git
+_build/
+deps/
+node_modules
+package.json
+yarn.lock
