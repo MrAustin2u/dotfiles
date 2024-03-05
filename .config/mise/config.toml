@@ -1,0 +1,13 @@
+[tools]
+elixir = "1.16.0-otp-26"
+erlang = "26.2.1"
+go = "1.22.0"
+neovim = "stable"
+node = "20.11.1"
+rust = "stable"
+terraform = "1.0.11"
+yarn = "1.22.5"
+java = "liberica-18.0.1+12"
+
+[settings]
+experimental = true
