@@ -11,6 +11,9 @@ function M.config()
     tabline = true,
     tabline_prefix = "   ",
     tabline_suffix = "   ",
+    menu = {
+      width = vim.api.nvim_win_get_width(0) - 100,
+    }
   })
 
   -- mappings
