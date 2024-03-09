@@ -15,6 +15,7 @@ local M = {
     "nvim-treesitter/nvim-treesitter-textobjects",
     "windwp/nvim-ts-autotag",
     'JoosepAlviste/nvim-ts-context-commentstring',
+    'IndianBoy42/tree-sitter-just',
   },
   opts = {
     autotag = { enable = true },
@@ -47,6 +48,7 @@ local M = {
       "json",
       "json5",
       "jsonc",
+      "just",
       "lua",
       "luadoc",
       "luap",
@@ -131,6 +133,7 @@ function M.config(_, opts)
       return true
     end, opts.ensure_installed)
   end
+  require('tree-sitter-just').setup {}
   require("nvim-treesitter.configs").setup(opts)
 end
 
