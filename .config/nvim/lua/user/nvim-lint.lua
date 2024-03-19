@@ -8,12 +8,12 @@ function M.config()
 
   lint.linters_by_ft = {
     ["*"] = { "codespell" },
+    gitcommit = { "commitlint" },
     javascript = { "eslint" },
     javascriptreact = { "eslint" },
     typescript = { "eslint" },
     typescriptreact = { "eslint" },
     yaml = { "yamllint" },
-    gitcommit = { "commitlint" },
   }
 
   local lint_augroup = vim.api.nvim_create_augroup("lint", {
