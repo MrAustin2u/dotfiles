@@ -15,7 +15,7 @@ local M = {
       -- Formatters
       "black",
       "stylua",
-      "prettierd",
+      "prettier",
       "isort",
       -- Linters
       "codespell",
