@@ -48,6 +48,7 @@ spec("user.local-highlight")
 spec("user.virt-column")
 spec("user.colorizer")
 spec("user.vim-test")
+spec("user.vim-tmux-navigator")
 spec("user.emmet")
 spec("user.toggleterm")
 
