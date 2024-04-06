@@ -15,6 +15,7 @@ function M.config()
     nextls = { enable = false },
     credo = { enable = true },
     elixirls = {
+      tag = "v0.20.0",
       enable = true,
       settings = elixirls.settings({
         dialyzerEnabled = true,
