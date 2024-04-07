@@ -16,7 +16,7 @@ local M = {
       python = { "isort", "black" },
       typescript = { "prettier" },
       typescriptreact = { "prettier" },
-      yaml = { "prettier" },
+      yaml = { "prettier", "yamlfmt", "yamlfix" },
     },
     format = {
       timeout_ms = 3000,
