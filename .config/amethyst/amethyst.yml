@@ -175,7 +175,7 @@ select-fullscreen-layout:
 # Select column layout
 select-column-layout:
   mod: mod1
-  key: f
+  key: c
 
 # Move the currently focused window to the space to the left.
 throw-space-left:
