@@ -147,7 +147,8 @@ vim.keymap.set("n", "<S-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decreas
 vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
 -- Surround
-vim.keymap.set('n', '<Leader>sq', function() vim.cmd [[%s/^\(.*\)$/"\1",/]] end, { silent = true })
+vim.keymap.set('n', '<Leader>sq', function() vim.cmd [[%s/^\(.*\)$/'\1',/]] end, { silent = true })
+vim.keymap.set('n', '<Leader>sQ', function() vim.cmd [[%s/^\(.*\)$/"\1",/]] end, { silent = true })
 
 -- LSP Restart
 nmap({ "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } })
