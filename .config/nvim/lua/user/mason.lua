@@ -35,6 +35,7 @@ local M = {
       "gopls",
       "html-lsp",
       "json-lsp",
+      "lexical",
       "rust-analyzer",
       "sqlls",
       "tailwindcss-language-server",
@@ -99,6 +100,15 @@ function M.config(_, mason_opts)
     ['gopls'] = function()
       local overrides = require("user.lspsettings.gopls")
       lspconfig.gopls.setup(overrides)
+    end,
+
+    -- Lua
+    ['lexical'] = function()
+      lspconfig.lexical.setup({
+        cmd = { "/Users/aaustin/.local/share/nvim/mason/bin/lexical", "server" },
+        root_dir = lspconfig.util.root_pattern { "mix.exs" },
+      }
+      )
     end,
 
     -- Lua
