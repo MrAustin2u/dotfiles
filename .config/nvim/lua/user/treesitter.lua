@@ -52,6 +52,7 @@ local M = {
       "lua",
       "luadoc",
       "luap",
+      "make",
       "markdown",
       "markdown_inline",
       "prisma",

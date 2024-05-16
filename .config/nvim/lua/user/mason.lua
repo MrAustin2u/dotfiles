@@ -102,7 +102,7 @@ function M.config(_, mason_opts)
       lspconfig.gopls.setup(overrides)
     end,
 
-    -- Lua
+    -- Elixir
     ['lexical'] = function()
       lspconfig.lexical.setup({
         cmd = { "/Users/aaustin/.local/share/nvim/mason/bin/lexical", "server" },
@@ -119,10 +119,10 @@ function M.config(_, mason_opts)
     end,
 
     -- Typescript
-    ['tsserver'] = function()
-      local overrides = require("user.lspsettings.tsserver")
-      lspconfig.tsserver.setup(overrides)
-    end,
+    -- ['tsserver'] = function()
+    --   local overrides = require("user.lspsettings.tsserver")
+    --   lspconfig.tsserver.setup(overrides)
+    -- end,
 
     -- YAML
     ['yamlls'] = function()

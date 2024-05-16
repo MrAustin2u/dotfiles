@@ -1,8 +1,8 @@
 local M = {
   "folke/noice.nvim",
   event = "VeryLazy",
-  opts = function(_, opts)
-    opts.lsp = {
+  opts = {
+    lsp = {
       override = {
         ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
         ["vim.lsp.util.stylize_markdown"] = true,
@@ -11,9 +11,8 @@ local M = {
       hover = {
         enabled = false,
       },
-    }
-
-    opts.routes = {
+    },
+    routes = {
       {
         filter = {
           event = "msg_show",
@@ -44,16 +43,15 @@ local M = {
         },
         opts = { skip = true },
       },
-    }
-
-    opts.presets = {
+    },
+    presets = {
       bottom_search = true,
       command_palette = true,
       inc_rename = true,
       long_message_to_split = true,
       lsp_doc_border = false,
     }
-  end,
+  },
 }
 
 function M.config(_, opts)
