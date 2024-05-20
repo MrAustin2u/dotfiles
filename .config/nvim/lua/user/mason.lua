@@ -105,10 +105,16 @@ function M.config(_, mason_opts)
     -- Elixir
     ['lexical'] = function()
       lspconfig.lexical.setup({
-        cmd = { "/Users/aaustin/.local/share/nvim/mason/bin/lexical", "server" },
-        root_dir = lspconfig.util.root_pattern { "mix.exs" },
-      }
-      )
+        default_config = {
+          filetypes = { "elixir", "eelixir", "heex" },
+          -- cmd = { "/Users/aaustin/.local/share/nvim/mason/bin/lexical", "server" },
+          cmd = { "$HOME/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
+          root_dir = function(fname)
+            return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
+          end,
+          settings = {}
+        },
+      })
     end,
 
     -- Lua
