@@ -151,41 +151,6 @@ M.get_root = function()
   return root
 end
 
--- this will return a function that calls telescope.
--- cwd will default to get_root
--- for `files`, git_files or find_files will be chosen depending on .git
-M.telescope = function(builtin, opts)
-  local params = { builtin = builtin, opts = opts }
-  return function()
-    builtin = params.builtin
-    opts = params.opts
-    opts = vim.tbl_deep_extend("force", { cwd = M.get_root() }, opts or {})
-    if builtin == "files" then
-      if vim.loop.fs_stat((opts.cwd or vim.loop.cwd()) .. "/.git") then
-        opts.show_untracked = true
-        builtin = "git_files"
-      else
-        builtin = "find_files"
-      end
-    end
-    if opts.cwd and opts.cwd ~= vim.loop.cwd() then
-      opts.attach_mappings = function(_, map)
-        map("i", "<a-c>", function()
-          local action_state = require("telescope.actions.state")
-          local line = action_state.get_current_line()
-          M.telescope(
-            params.builtin,
-            vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line })
-          )()
-        end)
-        return true
-      end
-    end
-
-    require("telescope.builtin")[builtin](opts)
-  end
-end
-
 M.toggle = function(option, silent, values)
   if values then
     if vim.opt_local[option]:get() == values[1] then
@@ -202,18 +167,6 @@ M.toggle = function(option, silent, values)
     else
       M.warn("Disabled " .. option, { title = "Option" })
     end
-  end
-end
-
-local enabled = true
-M.toggle_diagnostics = function()
-  enabled = not enabled
-  if enabled then
-    vim.diagnostic.enable()
-    M.info("Enabled diagnostics", { title = "Diagnostics" })
-  else
-    vim.diagnostic.disable()
-    M.warn("Disabled diagnostics", { title = "Diagnostics" })
   end
 end
 
@@ -286,16 +239,19 @@ M.on_load = function(name, fn)
 end
 
 M.get_clients = function(opts)
-  local ret = {}
-
-  ret = vim.lsp.get_active_clients(opts)
-
-  if opts and opts.method then
-    ret = vim.tbl_filter(function(client)
-      return client.supports_method(opts.method, { bufnr = opts.bufnr })
-    end, ret)
+  local ret = {} ---@type vim.lsp.Client[]
+  if vim.lsp.get_clients then
+    ret = vim.lsp.get_clients(opts)
+  else
+    ---@diagnostic disable-next-line: deprecated
+    ret = vim.lsp.get_active_clients(opts)
+    if opts and opts.method then
+      ---@param client vim.lsp.Client
+      ret = vim.tbl_filter(function(client)
+        return client.supports_method(opts.method, { bufnr = opts.bufnr })
+      end, ret)
+    end
   end
-
   return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
 end
 

@@ -1,5 +1,7 @@
-local Utils = require("config.utils")
 local M = {}
+local TELESCOPE = require("config.utils.telescope")
+local TOGGLE = require("config.utils.toggle")
+local UTILS = require("config.utils")
 
 --[[
 ╭────────────────────────────────────────────────────────────────────────────╮
@@ -22,12 +24,12 @@ local M = {}
 local default_opts = { noremap = true, silent = true }
 
 local nmap = function(tbl)
-  local opts = tbl[3] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and UTILS.merge_maps(default_opts, tbl[3]) or default_opts
   vim.keymap.set("n", tbl[1], tbl[2], opts)
 end
 
 local vmap = function(tbl)
-  local opts = tbl[3] and Utils.merge_maps(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and UTILS.merge_maps(default_opts, tbl[3]) or default_opts
   vim.keymap.set("v", tbl[1], tbl[2], opts)
 end
 
@@ -64,23 +66,23 @@ vim.keymap.set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
 
 -- toggle options
 vim.keymap.set("n", "<leader>us", function()
-  Utils.toggle("spell")
+  TOGGLE.option("spell")
 end, { desc = "Toggle Spelling" })
 
 vim.keymap.set("n", "<leader>uw", function()
-  Utils.toggle("wrap")
+  TOGGLE.option("wrap")
 end, { desc = "Toggle Word Wrap" })
 
 vim.keymap.set("n", "<leader>ul", function()
-  Utils.toggle("relativenumber", true)
-  Utils.toggle("number")
+  TOGGLE.option("relativenumber", true)
+  TOGGLE.option("number")
 end, { desc = "Toggle Line Numbers" })
 
-vim.keymap.set("n", "<leader>ud", Utils.toggle_diagnostics, { desc = "Toggle Diagnostics" })
+vim.keymap.set("n", "<leader>ud", TOGGLE.diagnostics, { desc = "Toggle Diagnostics" })
 local conceallevel = vim.o.conceallevel > 0 and vim.o.conceallevel or 3
 
 vim.keymap.set("n", "<leader>uc", function()
-  Utils.toggle("conceallevel", false, { 0, conceallevel })
+  TOGGLE.option("conceallevel", false, { 0, conceallevel })
 end, { desc = "Toggle Conceal" })
 
 -- ================================
@@ -155,32 +157,32 @@ nmap({ "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } })
 
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
-  nmap({ "<leader>an", attempt.new_select, Utils.merge_maps(default_opts, { desc = "New Attempt" }) })
+  nmap({ "<leader>an", attempt.new_select, UTILS.merge_maps(default_opts, { desc = "New Attempt" }) })
   -- run current attempt buffer
-  nmap({ "<leader>ar", attempt.run, Utils.merge_maps(default_opts, { desc = "Run Attempt" }) })
+  nmap({ "<leader>ar", attempt.run, UTILS.merge_maps(default_opts, { desc = "Run Attempt" }) })
   -- delete attempt from current buffer
-  nmap({ "<leader>ad", attempt.delete_buf, Utils.merge_maps(default_opts, { desc = "Delete Attempt" }) })
+  nmap({ "<leader>ad", attempt.delete_buf, UTILS.merge_maps(default_opts, { desc = "Delete Attempt" }) })
   -- rename attempt from current buffer
-  nmap({ "<leader>ac", attempt.rename_buf, Utils.merge_maps(default_opts, { desc = "Rename Attempt" }) })
+  nmap({ "<leader>ac", attempt.rename_buf, UTILS.merge_maps(default_opts, { desc = "Rename Attempt" }) })
   -- open one of the existing scratch buffers
-  nmap({ "<leader>al", attempt.open_select, Utils.merge_maps(default_opts, { desc = "Select Attempt" }) })
+  nmap({ "<leader>al", attempt.open_select, UTILS.merge_maps(default_opts, { desc = "Select Attempt" }) })
 end
 
 M.elixir_mappings = function()
   nmap({
     "<space>fp",
     ":ElixirFromPipe<cr>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
+    UTILS.merge_maps(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
   })
   nmap({
     "<space>tp",
     ":ElixirToPipe<cr>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
+    UTILS.merge_maps(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
   })
   vmap({
     "<space>em",
     ":ElixirExpandMacro<cr>",
-    Utils.merge_maps(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
+    UTILS.merge_maps(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
   })
 end
 
@@ -247,15 +249,15 @@ end
 
 M.telescope_mappings = function()
   nmap({ "<leader>,", "<cmd>Telescope buffers show_all_buffers=true<cr>", { desc = "Switch Buffer" } })
-  nmap({ "<leader>/", Utils.telescope("live_grep"), { desc = "Grep (root dir)" } })
+  nmap({ "<leader>/", TELESCOPE.telescope("live_grep"), { desc = "Grep (root dir)" } })
   nmap({ "<leader>:", "<cmd>Telescope command_history<cr>", { desc = "Command History" } })
-  nmap({ "<leader><space>", Utils.telescope("files"), { desc = "Find Files (root dir)" } })
+  nmap({ "<leader><space>", TELESCOPE.telescope("files"), { desc = "Find Files (root dir)" } })
   -- find
   nmap({ "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Buffers" } })
-  nmap({ "<leader>ff", Utils.telescope("files"), { desc = "Find Files (root dir)" } })
-  nmap({ "<leader>fF", Utils.telescope("files", { cwd = false }), { desc = "Find Files (cwd)" } })
+  nmap({ "<leader>ff", TELESCOPE.telescope("files"), { desc = "Find Files (root dir)" } })
+  nmap({ "<leader>fF", TELESCOPE.telescope("files", { cwd = false }), { desc = "Find Files (cwd)" } })
   nmap({ "<leader>fr", "<cmd>Telescope oldfiles<cr>", { desc = "Recent" } })
-  nmap({ "<leader>fR", Utils.telescope("oldfiles", { cwd = vim.loop.cwd() }), { desc = "Recent (cwd)" } })
+  nmap({ "<leader>fR", TELESCOPE.telescope("oldfiles", { cwd = vim.loop.cwd() }), { desc = "Recent (cwd)" } })
   -- git
   nmap({ "<leader>gc", "<cmd>Telescope git_commits<CR>", { desc = "commits" } })
   nmap({ "<leader>gs", "<cmd>Telescope git_status<CR>", { desc = "status" } })
@@ -265,14 +267,14 @@ M.telescope_mappings = function()
   nmap({ "<leader>sC", "<cmd>Telescope commands<cr>", { desc = "Commands" } })
   nmap({ "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", { desc = "Document diagnostics" } })
   nmap({ "<leader>sD", "<cmd>Telescope diagnostics<cr>", { desc = "Workspace diagnostics" } })
-  nmap({ "<leader>sg", Utils.telescope("live_grep"), { desc = "Grep (root dir)" } })
-  nmap({ "<leader>sG", Utils.telescope("live_grep", { cwd = false }), { desc = "Grep (cwd)" } })
+  nmap({ "<leader>sg", TELESCOPE.telescope("live_grep"), { desc = "Grep (root dir)" } })
+  nmap({ "<leader>sG", TELESCOPE.telescope("live_grep", { cwd = false }), { desc = "Grep (cwd)" } })
   nmap({ "<leader>sh", "<cmd>Telescope help_tags<cr>", { desc = "Help Pages" } })
   nmap({ "<leader>sk", "<cmd>Telescope keymaps<cr>", { desc = "Key Maps" } })
-  nmap({ "<leader>sw", Utils.telescope("grep_string", { word_match = "-w" }), { desc = "Word (root dir)" } })
-  nmap({ "<leader>sW", Utils.telescope("grep_string", { cwd = false, word_match = "-w" }), { desc = "Word (cwd)" } })
-  vmap({ "<leader>sw", Utils.telescope("grep_string"), { desc = "Selection (root dir)" } })
-  vmap({ "<leader>sW", Utils.telescope("grep_string", { cwd = false }), { desc = "Selection (cwd)" } })
+  nmap({ "<leader>sw", TELESCOPE.telescope("grep_string", { word_match = "-w" }), { desc = "Word (root dir)" } })
+  nmap({ "<leader>sW", TELESCOPE.telescope("grep_string", { cwd = false, word_match = "-w" }), { desc = "Word (cwd)" } })
+  vmap({ "<leader>sw", TELESCOPE.telescope("grep_string"), { desc = "Selection (root dir)" } })
+  vmap({ "<leader>sW", TELESCOPE.telescope("grep_string", { cwd = false }), { desc = "Selection (cwd)" } })
 end
 
 M.git_conflict_mappings = function()

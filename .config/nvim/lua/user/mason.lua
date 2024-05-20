@@ -1,3 +1,4 @@
+local ICONS = require("config.icons")
 local M = {
   "williamboman/mason.nvim",
   cmd = "Mason",
@@ -125,10 +126,10 @@ function M.config(_, mason_opts)
     end,
 
     -- Typescript
-    -- ['tsserver'] = function()
-    --   local overrides = require("user.lspsettings.tsserver")
-    --   lspconfig.tsserver.setup(overrides)
-    -- end,
+    ['tsserver'] = function()
+      local overrides = require("user.lspsettings.tsserver")
+      lspconfig.tsserver.setup(overrides)
+    end,
 
     -- YAML
     ['yamlls'] = function()

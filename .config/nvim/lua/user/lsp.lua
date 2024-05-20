@@ -1,4 +1,6 @@
-local Utils = require("config.utils")
+local TELESCOPE = require("config.utils.telescope")
+local TOGGLE = require("config.utils.toggle")
+local UTILS = require("config.utils")
 
 local M = {}
 
@@ -6,10 +8,10 @@ function M.lsp_keymaps(bufnr)
   local opts = { noremap = true, silent = true }
   local keymap = vim.api.nvim_buf_set_keymap
   keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-  vim.keymap.set("n", "gd", Utils.telescope("lsp_definitions"), opts)
+  vim.keymap.set("n", "gd", TELESCOPE.telescope("lsp_definitions"), opts)
   keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
   keymap(bufnr, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  vim.keymap.set("n", "gr", Utils.telescope("lsp_references"), opts)
+  vim.keymap.set("n", "gr", TELESCOPE.telescope("lsp_references"), opts)
   keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
   keymap(bufnr, "n", "fs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   keymap(bufnr, "n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
@@ -21,13 +23,13 @@ function M.lsp_keymaps(bufnr)
   if vim.lsp.inlay_hint then
     vim.keymap.set("n", "<leader>lh", function()
       vim.lsp.inlay_hint(0, nil)
-    end, Utils.merge_maps(opts, { desc = "Toggle Inlay Hints" }))
+    end, UTILS.merge_maps(opts, { desc = "Toggle Inlay Hints" }))
   end
 end
 
 local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
 function M.on_attach(client, bufnr)
-  if client.supports_method("textDocument/formatting") then
+  if client.supports_method("textDocument/formatting", { bufnr = bufnr }) then
     vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
     vim.api.nvim_create_autocmd("BufWritePre", {
       group = format_on_save_group,
@@ -38,12 +40,17 @@ function M.on_attach(client, bufnr)
     })
   end
 
-  if client.server_capabilities.code_lens then
+  if vim.fn.has("nvim-0.10") == 1 and client.supports_method("textDocument/codeLens", { bufnr = bufnr }) then
+    TOGGLE.inlay_hints(bufnr, true)
+  end
+
+  -- code lens
+  if client.supports_method("textDocument/codeLens", { bufnr = bufnr }) then
+    vim.lsp.codelens.refresh()
     vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
       buffer = bufnr,
       callback = vim.lsp.codelens.refresh,
     })
-    vim.lsp.codelens.refresh()
   end
 end
 
@@ -75,22 +82,8 @@ function M.lsp_diagnostics()
       prefix = '●'
     },
   }
-  if type(default_diagnostic_config.virtual_text) == "table" and default_diagnostic_config.virtual_text.prefix == "icons" then
-    default_diagnostic_config.virtual_text.prefix = vim.fn.has("nvim-0.10.0") == 0 and "●"
-        or function(diagnostic)
-          for d, icon in pairs(icons) do
-            if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
-              return icon
-            end
-          end
-        end
-  end
 
   vim.diagnostic.config(default_diagnostic_config)
-
-  for _, sign in ipairs(vim.tbl_get(vim.diagnostic.config(), "signs", "values") or {}) do
-    vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = sign.name })
-  end
 end
 
 function M.lsp_diagnostic_mappings()
