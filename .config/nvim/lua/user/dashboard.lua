@@ -1,45 +1,62 @@
+local TELESCOPE = require("config.utils.telescope")
 local M = {
-	"echasnovski/mini.starter",
-	enabled = true,
-	version = false,
-	opts = function()
-		local logo = table.concat({
-			"  █████╗ ███████╗██╗  ██╗████████╗███████╗██╗  ██╗ █████╗  ",
-			" ██╔══██╗██╔════╝██║  ██║╚══██╔══╝██╔════╝██║ ██╔╝██╔══██╗ ",
-			" ███████║███████╗███████║   ██║   █████╗  █████╔╝ ███████║ ",
-			" ██╔══██║╚════██║██╔══██║   ██║   ██╔══╝  ██╔═██╗ ██╔══██║ ",
-			" ██║  ██║███████║██║  ██║   ██║   ███████╗██║  ██╗██║  ██║ ",
-			" ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ",
-		}, "\n")
-		local pad = string.rep(" ", 22)
-		local new_section = function(name, action, section)
-			return { name = name, action = action, section = pad .. section }
-		end
-
-		local starter = require("mini.starter")
-      --stylua: ignore
-      local config = {
-        evaluate_single = true,
-        header = logo,
-        items = {
-          new_section("Find file", "Telescope find_files", "Telescope"),
-          new_section("Recent files", "Telescope oldfiles", "Telescope"),
-          new_section("Grep text", "Telescope live_grep", "Telescope"),
-          new_section("Lazy", "Lazy", "Config"),
-          new_section("New file", "ene | startinsert", "Built-in"),
-          new_section("Quit", "qa", "Built-in"),
+  "nvimdev/dashboard-nvim",
+  dependencies = { { 'nvim-tree/nvim-web-devicons' } },
+  event = 'VimEnter',
+  lazy = false,
+  opts = function()
+    local logo = [[
+        █████╗ ███████╗██╗  ██╗████████╗███████╗██╗  ██╗ █████╗
+       ██╔══██╗██╔════╝██║  ██║╚══██╔══╝██╔════╝██║ ██╔╝██╔══██╗
+       ███████║███████╗███████║   ██║   █████╗  █████╔╝ ███████║
+       ██╔══██║╚════██║██╔══██║   ██║   ██╔══╝  ██╔═██╗ ██╔══██║
+       ██║  ██║███████║██║  ██║   ██║   ███████╗██║  ██╗██║  ██║
+       ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
+    ]]
+    logo = string.rep("\n", 8) .. logo .. "\n\n"
+    local opts = {
+      theme = "doom",
+      hide = { statuslinke = false },
+      config = {
+        center = {
+          { action = TELESCOPE.telescope("files"), desc = " Find File", icon = " ", key = "f" },
+          { action = "ene | startinsert", desc = " New File", icon = " ", key = "n" },
+          { action = "Telescope oldfiles", desc = " Recent Files", icon = " ", key = "r" },
+          { action = "Telescope live_grep", desc = " Find Text", icon = " ", key = "g" },
+          { action = [[lua LazyVim.telescope.config_files()()]], desc = " Config", icon = " ", key = "c" },
+          { action = "Lazy", desc = " Lazy", icon = "󰒲 ", key = "l" },
+          { action = "qa", desc = " Quit", icon = " ", key = "q" },
         },
-        content_hooks = {
-          starter.gen_hook.adding_bullet(pad .. "░ ", false),
-          starter.gen_hook.aligning("center", "center"),
-        },
+        footer = function()
+          local stats = require("lazy").stats()
+          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+          return { "⚡ Neovim loaded " .. stats.loaded .. "/" .. stats.count .. " plugins in " .. ms .. "ms" }
+        end,
       }
-		return config
-	end,
+    }
+
+    for _, button in ipairs(opts.config.center) do
+      button.desc = button.desc .. string.rep(" ", 43 - #button.desc)
+      button.key_format = "  %s"
+    end
+
+    -- close Lazy and re-open when the dashboard is ready
+    if vim.o.filetype == "lazy" then
+      vim.cmd.close()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "DashboardLoaded",
+        callback = function()
+          require("lazy").show()
+        end,
+      })
+    end
+
+    return opts
+  end,
 }
 
 function M.config(_, opts)
-	require("mini.starter").setup(opts)
+  require("dashboard").setup(opts)
 end
 
 return M
