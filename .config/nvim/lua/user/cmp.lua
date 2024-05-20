@@ -69,14 +69,12 @@ local M = {
     },
     { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
     {
-      "Saecki/crates.nvim",
-      event = { "BufRead Cargo.toml" },
-      opts = {
-        src = {
-          cmp = { enabled = true },
-        },
-      },
-    },
+      'saecki/crates.nvim',
+      tag = 'stable',
+      config = function(_, opts)
+        require('crates').setup(opts)
+      end,
+    }
   },
   opts = function(_, _)
     local cmp = require("cmp")
