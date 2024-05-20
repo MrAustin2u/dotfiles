@@ -1,4 +1,4 @@
-local Utils = require("config.utils")
+local UTILS = require("config.utils")
 
 local M = {
   "nvim-neo-tree/neo-tree.nvim",
@@ -13,7 +13,7 @@ local M = {
     {
       "<leader>fe",
       function()
-        require("neo-tree.command").execute({ toggle = true, dir = Utils.get_root() })
+        require("neo-tree.command").execute({ toggle = true, dir = UTILS.get_root() })
       end,
       desc = "Explorer NeoTree (root dir)",
     },
@@ -76,7 +76,7 @@ local M = {
 
 function M.config(_, opts)
   local function on_move(data)
-    Utils.on_rename(data.source, data.destination)
+    UTILS.on_rename(data.source, data.destination)
   end
 
   local events = require("neo-tree.events")
