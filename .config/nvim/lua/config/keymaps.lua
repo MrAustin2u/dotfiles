@@ -254,8 +254,8 @@ M.telescope_mappings = function()
   nmap({ "<leader><space>", TELESCOPE.telescope("files"), { desc = "Find Files (root dir)" } })
   -- find
   nmap({ "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Buffers" } })
-  nmap({ "<leader>ff", TELESCOPE.telescope("files"), { desc = "Find Files (root dir)" } })
-  nmap({ "<leader>fF", TELESCOPE.telescope("files", { cwd = false }), { desc = "Find Files (cwd)" } })
+  nmap({ "<leader>ff", TELESCOPE.telescope("files", { cwd = false }), { desc = "Find Files (root dir)" } })
+  nmap({ "<leader>fF", TELESCOPE.telescope("files"), { desc = "Find Files (cwd)" } })
   nmap({ "<leader>fr", "<cmd>Telescope oldfiles<cr>", { desc = "Recent" } })
   nmap({ "<leader>fR", TELESCOPE.telescope("oldfiles", { cwd = vim.loop.cwd() }), { desc = "Recent (cwd)" } })
   -- git
