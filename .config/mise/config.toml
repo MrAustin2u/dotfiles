@@ -2,14 +2,15 @@
 elixir = "1.16.0-otp-26"
 erlang = "26.2"
 go = "1.22.0"
+java = "liberica-18.0.1+12"
+just = "1.26.0"
 neovim = "stable"
 node = "lts"
 python = "latest"
 rust = "stable"
 terraform = "1.6.6"
-yarn = "1.22.5"
-java = "liberica-18.0.1+12"
 typos = "1.21.0"
+yarn = "1.22.5"
 
 [settings]
 experimental = true
