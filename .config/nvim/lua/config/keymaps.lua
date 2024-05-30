@@ -316,4 +316,9 @@ M.todo_comments_mappings = function(tc)
   nmap({ "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Todo" } })
   nmap({ "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", { desc = "Todo/Fix/Fixme" } })
 end
+
+M.oil_mappings = function()
+  nmap({ "-", "<cmd>Oil<CR>", { desc = "Open parent directory" } })
+  nmap({ "<leader>-", function() require('oil').toggle_float() end, { desc = "Open parent directory (float)" } })
+end
 return M
