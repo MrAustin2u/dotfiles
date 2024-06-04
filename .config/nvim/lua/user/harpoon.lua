@@ -4,45 +4,34 @@ local M = {
   event = "VeryLazy",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "nvim-telescope/telescope.nvim",
   },
+  opts = {
+    menu = {
+      width = vim.api.nvim_win_get_width(0) - 4,
+    },
+    settings = {
+      save_on_toggle = true,
+    },
+  }
 }
 
-function M.config()
+function M.config(_, opts)
   local harpoon = require("harpoon")
 
-  harpoon:setup()
-
-  -- basic telescope configuration
-  local conf = require("telescope.config").values
-  local function toggle_telescope(harpoon_files)
-    local file_paths = {}
-    for _, item in ipairs(harpoon_files.items) do
-      table.insert(file_paths, item.value)
-    end
-
-    require("telescope.pickers").new({}, {
-      prompt_title = "Harpoon",
-      finder = require("telescope.finders").new_table({
-        results = file_paths,
-      }),
-      previewer = conf.file_previewer({}),
-      sorter = conf.generic_sorter({}),
-    }):find()
-  end
+  harpoon:setup(opts)
 
   -- mappings
   vim.keymap.set("n", "<leader>a", function()
       harpoon:list():add()
       vim.notify "󱡅  marked file"
     end,
-    { noremap = true, silent = true, desc = "[harpoon] add file" })
+    { noremap = true, silent = true, desc = "Harpoon Add File" })
   vim.keymap.set("n", "<TAB>", function() harpoon:list():next() end,
-    { noremap = true, silent = true, desc = "[harpoon] next buffer" })
+    { noremap = true, silent = true, desc = "Harpoon Next Buffer" })
   vim.keymap.set("n", "<S-TAB>", function() harpoon:list():prev() end,
-    { noremap = true, silent = true, desc = "[harpoon] previous buffer" })
-  vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
-    { noremap = true, silent = true, desc = "[harpoon] Open window" })
+    { noremap = true, silent = true, desc = "Harpoon Previous Buffer" })
+  vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
+    { noremap = true, silent = true, desc = "Harpoon Quick Menu" })
 end
 
 return M
