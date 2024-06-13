@@ -109,7 +109,6 @@ function M.config(_, mason_opts)
       lspconfig.lexical.setup({
         default_config = {
           filetypes = { "elixir", "eelixir", "heex" },
-          -- cmd = { "/Users/aaustin/.local/share/nvim/mason/bin/lexical", "server" },
           cmd = { "$HOME/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
           root_dir = function(fname)
             local path = lspconfig.util.path
