@@ -296,29 +296,47 @@ M.silicon_mappings = function()
   })
 end
 
-M.todo_comments_mappings = function(tc)
-  nmap({
-    "]t",
-    function()
-      tc.jump_next()
-    end,
-    { desc = "Next todo comment" },
-  })
-  nmap({
-    "[t",
-    function()
-      tc.jump_prev()
-    end,
-    { desc = "Previous todo comment" },
-  })
-  nmap({ "<leader>xt", "<cmd>TodoTrouble<cr>", { desc = "Todo (Trouble)" } })
-  nmap({ "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>", { desc = "Todo/Fix/Fixme (Trouble)" } })
-  nmap({ "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Todo" } })
-  nmap({ "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", { desc = "Todo/Fix/Fixme" } })
-end
-
 M.oil_mappings = function()
   nmap({ "-", "<cmd>Oil<CR>", { desc = "Open parent directory" } })
   nmap({ "<leader>-", function() require('oil').toggle_float() end, { desc = "Open parent directory (float)" } })
+end
+
+M.trouble_mappings = function(trouble)
+  nmap({ '<leader>xw', '<cmd>Trouble diagnostics toggle<cr>', { desc = 'Workspace Diagnostics' } })
+  nmap({ '<leader>xd', '<cmd>Trouble diagnostics toggle filter.buf=0<cr>', { desc = 'Document Diagnostics' } })
+  nmap({ '<leader>xl', '<cmd>Trouble loclist toggle<cr>', { desc = 'Open Loclist' } })
+  nmap({ '<leader>xq', '<cmd>Trouble qflist toggle<cr>', { desc = 'Open Quickfix' } })
+  nmap({ '<leader>cs', '<cmd>Trouble symbols toggle focus=false<cr>', { desc = 'Symbols (Trouble)' } })
+  nmap({ '<leader>cl', '<cmd>Trouble lsp toggle focus=false win.position=right<cr>', { desc = 'LSP Definitions / references / ... (Trouble)' } })
+  -- smart `[q` and `]q` mappings that work for both qf list and trouble
+  nmap({
+    '[q',
+    function()
+      if trouble.is_open() then
+        trouble.prev { skip_groups = true, jump = true }
+      else
+        local ok, err = pcall(vim.cmd.cprev)
+        if not ok then
+          vim.notify(err, vim.log.levels.ERROR)
+        end
+      end
+    end,
+    { desc = 'Previous trouble/quickfix item' }
+  })
+  nmap({
+    ']q',
+    function()
+      if trouble.is_open() then
+        trouble.next { skip_groups = true, jump = true }
+      else
+        local ok, err = pcall(vim.cmd.cnext)
+        if not ok then
+          vim.notify(err, vim.log.levels.ERROR)
+        end
+      end
+    end,
+    { desc = 'Next trouble/quickfix item' }
+  })
+  nmap({ 'gR', '<cmd>Trouble lsp_references<cr>', { desc = '[G]o to [R]eferences (Trouble)' } })
 end
 return M
