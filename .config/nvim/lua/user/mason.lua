@@ -43,7 +43,8 @@ local M = {
       "terraform-ls",
       "typescript-language-server",
       "vim-language-server",
-      "yaml-language-server"
+      "yaml-language-server",
+      "vtsls"
     },
     ui = {
       border = "single",
@@ -139,8 +140,12 @@ function M.config(_, mason_opts)
 
     -- Typescript
     ['tsserver'] = function()
-      local overrides = require("user.lspsettings.tsserver")
-      lspconfig.tsserver.setup(overrides)
+      lspconfig.tsserver.setup({ enabled = false })
+    end,
+
+    ['vtsls'] = function()
+      local overrides = require("user.lspsettings.vtsls")
+      lspconfig.vtsls.setup(overrides)
     end,
 
     -- YAML
