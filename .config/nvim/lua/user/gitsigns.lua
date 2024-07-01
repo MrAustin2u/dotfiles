@@ -9,34 +9,22 @@ function M.config(_, _)
   require("gitsigns").setup({
     signs = {
       add = {
-        hl = "GitSignsAdd",
-        text = icons.ui.BoldLineMiddle,
-        numhl = "GitSignsAddNr",
-        linehl = "GitSignsAddLn",
+        text = icons.ui.BoldLineLeft,
       },
       change = {
-        hl = "GitSignsChange",
         text = icons.ui.BoldLineDashedMiddle,
-        numhl = "GitSignsChangeNr",
-        linehl = "GitSignsChangeLn",
       },
       delete = {
-        hl = "GitSignsDelete",
-        text = icons.ui.TriangleShortArrowRight,
-        numhl = "GitSignsDeleteNr",
-        linehl = "GitSignsDeleteLn",
+        text = icons.ui.TriangleMediumArrowRight,
       },
       topdelete = {
-        hl = "GitSignsDelete",
-        text = icons.ui.TriangleShortArrowRight,
-        numhl = "GitSignsDeleteNr",
-        linehl = "GitSignsDeleteLn",
+        text = icons.ui.TriangleMediumArrowRight,
       },
       changedelete = {
-        hl = "GitSignsChange",
-        text = icons.ui.BoldLineMiddle,
-        numhl = "GitSignsChangeNr",
-        linehl = "GitSignsChangeLn",
+        text = icons.ui.BoldLineLeft
+      },
+      untracked = {
+        text = icons.ui.BoldLineLeft
       },
     },
     watch_gitdir = {
