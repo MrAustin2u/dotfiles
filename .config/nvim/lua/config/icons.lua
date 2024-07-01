@@ -135,6 +135,7 @@ return {
     Text = " ",
     Tree = "",
     Triangle = "󰐊",
+    TriangleMediumArrowRight = "",
     TriangleShortArrowDown = "",
     TriangleShortArrowLeft = "",
     TriangleShortArrowRight = "",
