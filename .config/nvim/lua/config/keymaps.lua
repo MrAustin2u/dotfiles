@@ -151,6 +151,7 @@ vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increa
 -- Surround
 vim.keymap.set('n', '<Leader>sq', function() vim.cmd [[%s/^\(.*\)$/'\1',/]] end, { silent = true })
 vim.keymap.set('n', '<Leader>sQ', function() vim.cmd [[%s/^\(.*\)$/"\1",/]] end, { silent = true })
+vim.keymap.set('n', '<Leader>s,', function() vim.cmd [[%s/^\(.*\)$/\1,/]] end, { silent = true })
 
 -- LSP Restart
 nmap({ "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } })
