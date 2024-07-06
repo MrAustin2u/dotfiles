@@ -7,8 +7,9 @@ local M = {
   opts = {
     columns = { 'icon' },
     keymaps = {
-      ['<C-h>'] = false,
-      ['<S-CR>'] = 'actions.select_split',
+      ['<C-c>'] = false,
+      ["q"] = "actions.close",
+      [">"] = "actions.toggle_hidden",
     },
     view_options = {
       show_hidden = true,
