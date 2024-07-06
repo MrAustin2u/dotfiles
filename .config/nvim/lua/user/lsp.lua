@@ -19,12 +19,6 @@ function M.lsp_keymaps(bufnr)
   keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
   keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<cr>", opts)
   keymap(bufnr, "n", "<leader>lr", "<cmd>LspRestart<cr>", opts)
-
-  -- if vim.lsp.inlay_hint then
-  --   vim.keymap.set("n", "<leader>lh", function()
-  --     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ buffer = bufnr }))
-  --   end, UTILS.merge_maps(opts, { desc = "Toggle Inlay Hints" }))
-  -- end
 end
 
 local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
@@ -39,18 +33,6 @@ function M.on_attach(client, bufnr)
       end,
     })
   end
-
-  -- if vim.fn.has("nvim-0.10") == 1 and client.supports_method("textDocument/codeLens", { bufnr = bufnr }) and vim.lsp.inlay_hint then
-  --   TOGGLE.inlay_hints(bufnr, true)
-  -- end
-
-  -- code lens
-  -- if client.supports_method("textDocument/codeLens", { bufnr = bufnr }) then
-  --   vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-  --     buffer = bufnr,
-  --     callback = vim.lsp.codelens.refresh,
-  --   })
-  -- end
 end
 
 function M.common_capabilities()
