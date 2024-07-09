@@ -1,4 +1,3 @@
-local ICONS = require("config.icons")
 local M = {
   "williamboman/mason.nvim",
   cmd = "Mason",

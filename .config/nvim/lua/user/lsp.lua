@@ -1,6 +1,4 @@
 local TELESCOPE = require("config.utils.telescope")
-local TOGGLE = require("config.utils.toggle")
-local UTILS = require("config.utils")
 
 local M = {}
 
