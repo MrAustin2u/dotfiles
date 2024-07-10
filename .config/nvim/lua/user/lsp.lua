@@ -1,85 +1,137 @@
-local TELESCOPE = require("config.utils.telescope")
+local M = {
+  "neovim/nvim-lspconfig",
+  dependencies = {
+    "folke/neodev.nvim",
+    "hrsh7th/cmp-nvim-lsp",
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
 
-local M = {}
+    { "j-hui/fidget.nvim", opts = {} },
+    { "https://git.sr.ht/~whynothugo/lsp_lines.nvim" },
 
-function M.lsp_keymaps(bufnr)
-  local opts = { noremap = true, silent = true }
-  local keymap = vim.api.nvim_buf_set_keymap
-  keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-  vim.keymap.set("n", "gd", TELESCOPE.telescope("lsp_definitions"), opts)
-  keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  keymap(bufnr, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  vim.keymap.set("n", "gr", TELESCOPE.telescope("lsp_references"), opts)
-  keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
-  keymap(bufnr, "n", "fs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-  keymap(bufnr, "n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-  keymap(bufnr, "n", "<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
-  keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-  keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<cr>", opts)
-  keymap(bufnr, "n", "<leader>lr", "<cmd>LspRestart<cr>", opts)
-end
+    -- Autoformatting
+    "stevearc/conform.nvim",
 
-local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
-function M.on_attach(client, bufnr)
-  if client.supports_method("textDocument/formatting", { bufnr = bufnr }) then
-    vim.api.nvim_clear_autocmds({ group = format_on_save_group, buffer = bufnr })
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      group = format_on_save_group,
-      buffer = bufnr,
-      callback = function()
-        vim.lsp.buf.format({ bufnr = bufnr })
-      end,
-    })
+    -- Schema information
+    "b0o/SchemaStore.nvim",
+  },
+}
+
+function M.config()
+  require("neodev").setup {}
+
+  local capabilities = nil
+  if pcall(require, "cmp_nvim_lsp") then
+    capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+    capabilities.textDocument.completion.completionItem.snippetSupport = true
   end
-end
 
-function M.common_capabilities()
-  local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  return capabilities
-end
+  local lspconfig = require "lspconfig"
 
-function M.lsp_diagnostics()
-  local icons = require("config.icons")
-  local default_diagnostic_config = {
-    float = { border = "rounded" },
-    severity_sort = true,
-    signs = {
-      active = true,
-      values = {
-        { name = "DiagnosticSignError", text = icons.diagnostics.Error },
-        { name = "DiagnosticSignWarn",  text = icons.diagnostics.Warning },
-        { name = "DiagnosticSignHint",  text = icons.diagnostics.Hint },
-        { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
-      },
-    },
-    underline = true,
-    update_in_insert = false,
-    virtual_text = {
-      spacing = 4,
-      source = 'if_many',
-      prefix = '●'
+  local servers = {
+    bashls = true,
+    biome = true,
+    cssls = true,
+    html = true,
+    pyright = true,
+    rust_analyzer = true,
+    sqlls = true,
+    terraformls = true,
+
+    gopls = require "user.lspsettings.gopls",
+    jsonls = require "user.lspsettings.jsonls",
+    lexical = require("user.lspsettings.lexical").config(lspconfig),
+    lua_ls = require "user.lspsettings.lua_ls",
+    tsserver = require "user.lspsettings.tsserver",
+    yamlls = require "user.lspsettings.yamlls",
+  }
+
+  local servers_to_install = vim.tbl_filter(function(key)
+    local t = servers[key]
+    if type(t) == "table" then
+      return not t.manual_install
+    else
+      return t
+    end
+  end, vim.tbl_keys(servers))
+
+  require("mason").setup()
+  local ensure_installed = {
+    "commitlint",
+    "lua_ls",
+    "stylua",
+    "tailwindcss-language-server",
+  }
+
+  vim.list_extend(ensure_installed, servers_to_install)
+  require("mason-tool-installer").setup { ensure_installed = ensure_installed }
+
+  for name, config in pairs(servers) do
+    if config == true then
+      config = {}
+    end
+    config = vim.tbl_deep_extend("force", {}, {
+      capabilities = capabilities,
+    }, config)
+
+    lspconfig[name].setup(config)
+  end
+
+  local disable_semantic_tokens = { lua = true }
+
+  vim.api.nvim_create_autocmd("LspAttach", {
+    callback = function(args)
+      local bufnr = args.buf
+      local client = assert(vim.lsp.get_client_by_id(args.data.client_id), "must have valid client")
+
+      local settings = servers[client.name]
+      if type(settings) ~= "table" then
+        settings = {}
+      end
+
+      require("config.keymaps").lsp_diagnostic_mappings()
+      require("config.keymaps").lsp_mappings()
+
+      local filetype = vim.bo[bufnr].filetype
+      if disable_semantic_tokens[filetype] then
+        client.server_capabilities.semanticTokensProvider = nil
+      end
+
+      -- Override server capabilities
+      if settings.server_capabilities then
+        for k, v in pairs(settings.server_capabilities) do
+          if v == vim.NIL then
+            ---@diagnostic disable-next-line: cast-local-type
+            v = nil
+          end
+
+          client.server_capabilities[k] = v
+        end
+      end
+    end,
+  })
+
+  -- Autoformatting Setup
+  require("conform").setup {
+    formatters_by_ft = {
+      lua = { "stylua" },
     },
   }
 
-  vim.diagnostic.config(default_diagnostic_config)
-end
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    callback = function(args)
+      require("conform").format {
+        bufnr = args.buf,
+        lsp_fallback = true,
+        quiet = true,
+      }
+    end,
+  })
 
-function M.lsp_diagnostic_mappings()
-  local function diagnostic_goto(next, severity)
-    local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
-    severity = severity and vim.diagnostic.severity[severity] or nil
-    return function()
-      go({ severity = severity })
-    end
-  end
+  require("lsp_lines").setup()
 
-  vim.keymap.set("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
-  vim.keymap.set("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
-  vim.keymap.set("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" })
-  vim.keymap.set("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" })
-  vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" })
-  vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
+  vim.diagnostic.config { virtual_text = false }
 end
 
 return M

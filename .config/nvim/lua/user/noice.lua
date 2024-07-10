@@ -3,6 +3,7 @@ local M = {
   event = "VeryLazy",
   opts = {
     lsp = {
+      progress = { enabled = false },
       override = {
         ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
         ["vim.lsp.util.stylize_markdown"] = true,
@@ -22,7 +23,7 @@ local M = {
             { find = "; before #%d+" },
           },
         },
-        view = "mini",
+        view = "notify",
       },
       {
         filter = {
@@ -50,7 +51,7 @@ local M = {
       inc_rename = true,
       long_message_to_split = true,
       lsp_doc_border = false,
-    }
+    },
   },
 }
 

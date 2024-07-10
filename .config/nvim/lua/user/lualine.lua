@@ -17,7 +17,7 @@ local M = {
         { "mode", separator = { left = "" }, right_padding = 2 },
       },
       lualine_b = { "branch", "diff", "diagnostics" },
-      lualine_c = { 'filename', function() return require('lsp-progress').progress() end },
+      lualine_c = { "filename" },
       lualine_x = {
         {
           require("lazy.status").updates,
@@ -25,7 +25,7 @@ local M = {
           color = { bg = "none", fg = "#ff966c" },
         },
       },
-      lualine_y = { 'filetype', 'progress' },
+      lualine_y = { "filetype", "progress" },
       lualine_z = {
         { "location", separator = { right = "" }, left_padding = 2 },
       },
