@@ -7,7 +7,6 @@ local M = {
     "williamboman/mason-lspconfig.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
 
-    { "j-hui/fidget.nvim", opts = {} },
     { "https://git.sr.ht/~whynothugo/lsp_lines.nvim" },
 
     -- Autoformatting
@@ -18,8 +17,19 @@ local M = {
   },
 }
 
+M.capabilities = function()
+  local capabilities = nil
+  if pcall(require, "cmp_nvim_lsp") then
+    capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+    capabilities.textDocument.completion.completionItem.snippetSupport = true
+  end
+
+  return capabilities
+end
+
 function M.config()
   require("neodev").setup {}
+  local lspconfig = require "lspconfig"
 
   local capabilities = nil
   if pcall(require, "cmp_nvim_lsp") then
@@ -27,17 +37,42 @@ function M.config()
     capabilities.textDocument.completion.completionItem.snippetSupport = true
   end
 
-  local lspconfig = require "lspconfig"
+  local on_attach = function(client, bufnr)
+    if client.supports_method "textDocument/formatting" then
+      local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
+
+      vim.api.nvim_clear_autocmds { group = format_on_save_group, buffer = bufnr }
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        group = format_on_save_group,
+        buffer = bufnr,
+        callback = function(args)
+          require("conform").format {
+            bufnr = args.buf,
+            lsp_fallback = true,
+            quiet = true,
+          }
+        end,
+      })
+    end
+
+    if client.server_capabilities.code_lens then
+      vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+        buffer = bufnr,
+        callback = vim.lsp.codelens.refresh,
+      })
+      vim.lsp.codelens.refresh()
+    end
+  end
 
   local servers = {
-    bashls = true,
-    biome = true,
-    cssls = true,
-    html = true,
-    pyright = true,
-    rust_analyzer = true,
-    sqlls = true,
-    terraformls = true,
+    bashls = {},
+    biome = {},
+    cssls = {},
+    html = {},
+    pyright = {},
+    rust_analyzer = {},
+    sqlls = {},
+    terraformls = {},
 
     gopls = require "user.lspsettings.gopls",
     jsonls = require "user.lspsettings.jsonls",
@@ -72,13 +107,16 @@ function M.config()
       config = {}
     end
     config = vim.tbl_deep_extend("force", {}, {
-      capabilities = capabilities,
+      capabilities = M.capabilities(),
+      on_attach = on_attach,
     }, config)
 
     lspconfig[name].setup(config)
   end
 
-  local disable_semantic_tokens = { lua = true }
+  local disable_semantic_tokens = {
+    lua = true,
+  }
 
   vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
@@ -118,16 +156,6 @@ function M.config()
       lua = { "stylua" },
     },
   }
-
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    callback = function(args)
-      require("conform").format {
-        bufnr = args.buf,
-        lsp_fallback = true,
-        quiet = true,
-      }
-    end,
-  })
 
   require("lsp_lines").setup()
 

@@ -1,4 +1,7 @@
 return {
+  server_capabilities = {
+    semanticTokensProvider = vim.NIL,
+  },
   settings = {
     Lua = {
       workspace = {
