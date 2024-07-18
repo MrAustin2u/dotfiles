@@ -5,10 +5,10 @@ local M = {
 
 function M.config()
   local execs = {
-    { nil,       "<M-1>",      "Horizontal Terminal", "horizontal", 0.3 },
-    { nil,       "<M-2>",      "Vertical Terminal",   "vertical",   0.4 },
-    { nil,       "<M-3>",      "Float Terminal",      "float",      nil },
-    { "lazygit", "<leader>gg", "LazyGit",             "float",      0.9 },
+    { nil, "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
+    { nil, "<M-2>", "Vertical Terminal", "vertical", 0.4 },
+    { nil, "<M-3>", "Float Terminal", "float", nil },
+    { "lazygit", "<leader>gg", "LazyGit", "float", 0.9 },
   }
 
   local function get_buf_size()
@@ -36,19 +36,19 @@ function M.config()
 
   local exec_toggle = function(opts)
     local Terminal = require("toggleterm.terminal").Terminal
-    local term = Terminal:new({ cmd = opts.cmd, count = opts.count, direction = opts.direction })
+    local term = Terminal:new { cmd = opts.cmd, count = opts.count, direction = opts.direction }
     term:toggle(opts.size, opts.direction)
   end
 
   local add_exec = function(opts)
-    local binary = opts.cmd:match("(%S+)")
+    local binary = opts.cmd:match "(%S+)"
     if vim.fn.executable(binary) ~= 1 then
       vim.notify("Skipping configuring executable " .. binary .. ". Please make sure it is installed properly.")
       return
     end
 
     vim.keymap.set({ "n", "t" }, opts.keymap, function()
-      exec_toggle({ cmd = opts.cmd, count = opts.count, direction = opts.direction, size = opts.size() })
+      exec_toggle { cmd = opts.cmd, count = opts.count, direction = opts.direction, size = opts.size() }
     end, { desc = opts.label, noremap = true, silent = true })
   end
 
@@ -69,19 +69,19 @@ function M.config()
     add_exec(opts)
   end
 
-  require("toggleterm").setup({
+  require("toggleterm").setup {
     size = 20,
     open_mapping = [[<c-\>]],
     hide_numbers = true, -- hide the number column in toggleterm buffers
     shade_filetypes = {},
     shade_terminals = true,
-    shading_factor = 2,     -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
+    shading_factor = 2, -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
     start_in_insert = true,
     insert_mappings = true, -- whether or not the open mapping applies in insert mode
     persist_size = false,
     direction = "float",
     close_on_exit = true, -- close the terminal window when the process exits
-    shell = nil,          -- change the default shell
+    shell = nil, -- change the default shell
     float_opts = {
       border = "rounded",
       winblend = 0,
@@ -90,30 +90,7 @@ function M.config()
         background = "Normal",
       },
     },
-  })
-  vim.cmd([[
-  augroup terminal_setup | au!
-  autocmd TermOpen * nnoremap <buffer><LeftRelease> <LeftRelease>i
-  autocmd TermEnter * startinsert!
-  augroup end
-  ]])
-
-  vim.api.nvim_create_autocmd({ "TermEnter" }, {
-    pattern = { "*" },
-    callback = function()
-      vim.cmd("startinsert")
-      _G.set_terminal_keymaps()
-    end,
-  })
-
-  local opts = { noremap = true, silent = true }
-  function _G.set_terminal_keymaps()
-    vim.api.nvim_buf_set_keymap(0, "t", "<m-h>", [[<C-\><C-n><C-W>h]], opts)
-    vim.api.nvim_buf_set_keymap(0, "t", "<m-j>", [[<C-\><C-n><C-W>j]], opts)
-    vim.api.nvim_buf_set_keymap(0, "t", "<m-k>", [[<C-\><C-n><C-W>k]], opts)
-    vim.api.nvim_buf_set_keymap(0, "t", "<m-l>", [[<C-\><C-n><C-W>l]], opts)
-    vim.api.nvim_buf_set_keymap(0, "t", "<esc>", "<esc>", { noremap = true, silent = true, nowait = true })
-  end
+  }
 end
 
 return M

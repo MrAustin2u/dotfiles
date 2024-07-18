@@ -162,6 +162,22 @@ end, { silent = true })
 -- LSP Restart
 nmap { "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } }
 
+-- ================================
+-- # Terminal
+-- ================================
+-- Easily hit escape in terminal mode.
+vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>")
+
+-- Open a terminal at the bottom of the screen with a fixed height.
+vim.keymap.set("n", ",tt", function()
+  vim.cmd.new()
+  vim.cmd.wincmd "J"
+  vim.api.nvim_win_set_height(0, 12)
+  vim.wo.winfixheight = true
+  vim.cmd.term()
+end)
+-- ================================
+
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
   nmap { "<leader>an", attempt.new_select, UTILS.merge_maps(default_opts, { desc = "New Attempt" }) }
