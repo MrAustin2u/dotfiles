@@ -1,43 +1,31 @@
 local M = {
-	"folke/which-key.nvim",
-	event = "VeryLazy",
-	init = function()
-		vim.o.timeout = true
-		vim.o.timeoutlen = 300
-	end,
-	opts = {
-		defaults = {
-			["<leader>t"] = { name = "+test" },
-		},
-		plugins = { spelling = true },
-	},
+  "folke/which-key.nvim",
+  event = "VeryLazy",
 }
 
-function M.config(_, opts)
-	local whichkey = require("which-key")
-	whichkey.setup(opts)
+function M.config()
+  local wk = require "which-key"
 
-	local keymaps = {
-		mode = { "n", "v" },
-		["g"] = { name = "+goto" },
-		["gz"] = { name = "+surround" },
-		["]"] = { name = "+next" },
-		["["] = { name = "+prev" },
-		["<leader><tab>"] = { name = "+tabs" },
-		["<leader>b"] = { name = "+buffer" },
-		["<leader>c"] = { name = "+code" },
-		["<leader>f"] = { name = "+file/find" },
-		["<leader>g"] = { name = "+git" },
-		["<leader>gh"] = { name = "+hunks" },
-		["<leader>q"] = { name = "+quit/session" },
-		["<leader>s"] = { name = "+search" },
-		["<leader>u"] = { name = "+ui" },
-		["<leader>w"] = { name = "+windows" },
-		["<leader>x"] = { name = "+diagnostics/quickfix" },
-	}
-	keymaps["<leader>sn"] = { name = "+noice" }
-
-	whichkey.register(keymaps)
+  wk.add {
+    mode = { "n", "v" },
+    { "<leader>q", group = "quit/session" },
+    { "<leader>s", group = "search" },
+    { "<leader>sn", group = "noice" },
+    { "<leader>u", group = "ui" },
+    { "<leader>t", group = "test" },
+    { "<leader>w", group = "windows" },
+    { "<leader>x", group = "diagnostics/quickfix" },
+    { "[", group = "prev" },
+    { "]", group = "next" },
+    { "g", group = "goto" },
+    { "gz", group = "surround" },
+    { "<leader><tab>", group = "tabs" },
+    { "<leader>b", group = "buffer" },
+    { "<leader>c", group = "code" },
+    { "<leader>f", group = "file/find" },
+    { "<leader>g", group = "git" },
+    { "<leader>gh", group = "hunks" },
+  }
 end
 
 return M
