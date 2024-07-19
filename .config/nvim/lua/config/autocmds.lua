@@ -64,21 +64,3 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.spell = true
   end,
 })
-
-vim.api.nvim_create_autocmd("TermOpen", {
-  group = vim.api.nvim_create_augroup("custom-term-open", {}),
-  callback = function()
-    vim.cmd "startinsert"
-    vim.opt_local.number = false
-    vim.opt_local.relativenumber = false
-    vim.opt_local.scrolloff = 0
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "TermEnter" }, {
-  pattern = { "*" },
-  callback = function()
-    vim.cmd "startinsert"
-    _G.set_terminal_keymaps()
-  end,
-})
