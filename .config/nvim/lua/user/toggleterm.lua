@@ -8,7 +8,8 @@ function M.config()
     { nil, "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
     { nil, "<M-2>", "Vertical Terminal", "vertical", 0.4 },
     { nil, "<M-3>", "Float Terminal", "float", nil },
-    { "lazygit", "<leader>gg", "LazyGit", "float", 0.9 },
+    -- NOTE: conflicts with git whichkey
+    -- { "lazygit", "<leader>gg", "LazyGit", "float", 0.9 },
   }
 
   local function get_buf_size()
@@ -91,6 +92,21 @@ function M.config()
       },
     },
   }
+
+  vim.cmd [[
+  augroup terminal_setup | au!
+  autocmd TermOpen * nnoremap <buffer><LeftRelease> <LeftRelease>i
+  autocmd TermEnter * startinsert!
+  augroup end
+  ]]
+
+  vim.api.nvim_create_autocmd({ "TermEnter" }, {
+    pattern = { "*" },
+    callback = function()
+      vim.cmd "startinsert"
+      _G.set_terminal_keymaps()
+    end,
+  })
 end
 
 return M
