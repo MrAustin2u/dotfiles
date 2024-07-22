@@ -37,42 +37,15 @@ function M.config()
     capabilities.textDocument.completion.completionItem.snippetSupport = true
   end
 
-  local on_attach = function(client, bufnr)
-    if client.supports_method "textDocument/formatting" then
-      local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
-
-      vim.api.nvim_clear_autocmds { group = format_on_save_group, buffer = bufnr }
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        group = format_on_save_group,
-        buffer = bufnr,
-        callback = function(args)
-          require("conform").format {
-            bufnr = args.buf,
-            lsp_fallback = true,
-            quiet = true,
-          }
-        end,
-      })
-    end
-
-    if client.server_capabilities.code_lens then
-      vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-        buffer = bufnr,
-        callback = vim.lsp.codelens.refresh,
-      })
-      vim.lsp.codelens.refresh()
-    end
-  end
-
   local servers = {
-    bashls = {},
-    biome = {},
-    cssls = {},
-    html = {},
-    pyright = {},
-    rust_analyzer = {},
-    sqlls = {},
-    terraformls = {},
+    bashls = true,
+    biome = true,
+    cssls = true,
+    html = true,
+    pyright = true,
+    rust_analyzer = true,
+    sqlls = true,
+    terraformls = true,
 
     gopls = require "user.lspsettings.gopls",
     jsonls = require "user.lspsettings.jsonls",
@@ -108,7 +81,6 @@ function M.config()
     end
     config = vim.tbl_deep_extend("force", {}, {
       capabilities = M.capabilities(),
-      on_attach = on_attach,
     }, config)
 
     lspconfig[name].setup(config)
@@ -135,18 +107,6 @@ function M.config()
       if disable_semantic_tokens[filetype] then
         client.server_capabilities.semanticTokensProvider = nil
       end
-
-      -- Override server capabilities
-      if settings.server_capabilities then
-        for k, v in pairs(settings.server_capabilities) do
-          if v == vim.NIL then
-            ---@diagnostic disable-next-line: cast-local-type
-            v = nil
-          end
-
-          client.server_capabilities[k] = v
-        end
-      end
     end,
   })
 
@@ -160,6 +120,16 @@ function M.config()
   require("lsp_lines").setup()
 
   vim.diagnostic.config { virtual_text = false }
+
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    callback = function(args)
+      require("conform").format {
+        bufnr = args.buf,
+        lsp_fallback = true,
+        quiet = true,
+      }
+    end,
+  })
 end
 
 return M
