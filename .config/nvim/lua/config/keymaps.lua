@@ -134,14 +134,6 @@ vim.keymap.set("n", "<space>ba", ":%bdelete|edit#|bdelete# <CR>", { silent = tru
 vim.keymap.set("n", "<space>vs", ":vs<CR>")
 vim.keymap.set("n", "<space>hs", ":split<CR>")
 
--- windows
--- vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window" })
--- vim.keymap.set("n", "<leader>wd", "<C-W>c", { desc = "Delete window" })
--- vim.keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split window below" })
--- vim.keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split window right" })
--- vim.keymap.set("n", "<leader>-", "<C-W>s", { desc = "Split window below" })
--- vim.keymap.set("n", "<leader>|", "<C-W>v", { desc = "Split window right" })
-
 -- Resize window using <ctrl> arrow keys
 vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
 vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
@@ -161,21 +153,6 @@ end, { silent = true })
 
 -- LSP Restart
 nmap { "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } }
-
--- ================================
--- # Terminal
--- ================================
--- Easily hit escape in terminal mode.
-vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>")
-
--- Open a terminal at the bottom of the screen with a fixed height.
-vim.keymap.set("n", ",tt", function()
-  vim.cmd.new()
-  vim.cmd.wincmd "J"
-  vim.api.nvim_win_set_height(0, 12)
-  vim.wo.winfixheight = true
-  vim.cmd.term()
-end)
 -- ================================
 
 M.attempt_mappings = function(attempt)
