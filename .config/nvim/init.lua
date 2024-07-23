@@ -1,54 +1,21 @@
-require "config.launch"
-require "config.globals"
-require "config.options"
-require "config.keymaps"
-require "config.autocmds"
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
-spec "user.colorscheme"
-spec "user.catppuccin"
-spec "user.devicons"
-spec "user.mini-icons"
-spec "user.treesitter"
-spec "user.surround"
-spec "user.lsp"
-spec "user.cmp"
-spec "user.telescope"
-spec "user.dashboard"
-spec "user.copilot"
-spec "user.gitsigns"
-spec "user.gitlinker"
-spec "user.git-conflict"
-spec "user.whichkey"
-spec "user.neo-tree"
-spec "user.oil"
-spec "user.trouble"
-spec "user.comment"
-spec "user.bufremove"
-spec "user.lualine"
-spec "user.cokeline"
-spec "user.navic"
-spec "user.breadcrumbs"
-spec "user.vim-test"
-spec "user.dressing"
-spec "user.noice"
-spec "user.hslens"
-spec "user.nui"
-spec "user.inc-rename"
-spec "user.neoscroll"
-spec "user.spectre"
-spec "user.silicon"
-spec "user.notify"
-spec "user.repeat"
-spec "user.autopairs"
-spec "user.indent-blankline"
-spec "user.indent-scope"
-spec "user.local-highlight"
-spec "user.virt-column"
-spec "user.colorizer"
-spec "user.vim-test"
-spec "user.vim-tmux-navigator"
-spec "user.emmet"
-spec "user.toggleterm"
-spec "user.vim-dadbod"
+vim.loader.enable()
+
+local modules = {
+  "config.launch",
+  "config.globals",
+  "config.options",
+  "config.keymaps",
+  "config.autocmds",
+}
+
+for _, module in ipairs(modules) do
+  local ok, err = pcall(require, module)
+  if not ok then
+    error("Error loading " .. module .. "\n\n" .. err)
+  end
+end
 
 require "config.lazy"

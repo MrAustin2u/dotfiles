@@ -1,0 +1,1 @@
+return { "ruifm/gitlinker.nvim" }

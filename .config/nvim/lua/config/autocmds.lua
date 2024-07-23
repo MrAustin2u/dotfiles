@@ -64,3 +64,10 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.spell = true
   end,
 })
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = augroup "lsp_stuff",
+  callback = function(args)
+    vim.bo[args.buf].formatexpr = nil
+  end,
+})
