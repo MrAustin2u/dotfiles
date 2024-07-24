@@ -369,4 +369,23 @@ M.trouble_mappings = function(trouble)
   nmap { "gR", "<cmd>Trouble lsp_references<cr>", { desc = "[G]o to [R]eferences (Trouble)" } }
 end
 
+M.todo_comments_mappings = {
+  {
+    "]t",
+    function()
+      require("todo-comments").jump_next()
+    end,
+    desc = "Next todo comment",
+  },
+  {
+    "[t",
+    function()
+      require("todo-comments").jump_prev()
+    end,
+    desc = "Previous todo comment",
+  },
+  { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo" },
+  { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
+}
+
 return M
