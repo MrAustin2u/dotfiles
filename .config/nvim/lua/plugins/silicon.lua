@@ -1,5 +1,5 @@
 return {
-  "narutoxy/silicon.lua",
+  "MrAustin2u/silicon.lua",
   dependencies = { "nvim-lua/plenary.nvim" },
   opts = {
     font = "MonoLisa",
