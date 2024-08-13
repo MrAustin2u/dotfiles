@@ -201,16 +201,6 @@ M.harpoon_mappings = function()
   nmap { "<TAB>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", default_opts }
 end
 
-M.inc_rename = function()
-  nmap {
-    "<leader>rn",
-    function()
-      return ":IncRename " .. vim.fn.expand "<cword>"
-    end,
-    { expr = true },
-  }
-end
-
 M.lint_mappings = function(lint)
   nmap {
     "<leader>l",
@@ -230,8 +220,8 @@ M.lsp_diagnostic_mappings = function()
     end
   end
 
-  nmap { "]d", diagnostic_goto(true), { desc = "Next Diagnostic" } }
-  nmap { "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" } }
+  nmap { "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", { desc = "Next Diagnostic" } }
+  nmap { "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", { desc = "Prev Diagnostic" } }
   nmap { "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" } }
   nmap { "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" } }
   nmap { "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" } }
@@ -247,16 +237,15 @@ M.lsp_mappings = function()
   vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
   nmap { "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts }
   nmap { "gd", builtin.lsp_definitions, opts }
-  nmap { "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts }
+  nmap { "K", "<cmd>Lspsaga hover_doc ++quiet<CR>", opts }
   nmap { "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts }
   nmap { "gr", builtin.lsp_references, opts }
   nmap { "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts }
   nmap { "fs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts }
   nmap { "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts }
   nmap { "<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts }
-  nmap { "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts }
-  nmap { "<leader>li", "<cmd>LspInfo<cr>", opts }
-  nmap { "<leader>lr", "<cmd>LspRestart<cr>", opts }
+  nmap { "<leader>ca", "<cmd>Lspsaga code_action<CR>", opts }
+  nmap { "<leader>rn", "<cmd>Lspsaga rename<CR>", opts }
 end
 
 M.vim_test_mappings = function()
@@ -285,9 +274,7 @@ M.telescope_mappings = function()
   nmap { "<leader>sc", "<cmd>Telescope command_history<cr>", { desc = "Command History" } }
   nmap { "<leader>sC", "<cmd>Telescope commands<cr>", { desc = "Commands" } }
   nmap { "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", { desc = "Document diagnostics" } }
-  nmap { "<leader>sD", "<cmd>Telescope diagnostics<cr>", { desc = "Workspace diagnostics" } }
-  nmap { "<leader>sg", TELESCOPE.telescope "live_grep", { desc = "Grep (root dir)" } }
-  nmap { "<leader>sG", TELESCOPE.telescope("live_grep", { cwd = false }), { desc = "Grep (cwd)" } }
+  nmap { "<leader>sg", "<cmd>Telescope live_grep<cr>", { desc = "Grep" } }
   nmap { "<leader>sh", "<cmd>Telescope help_tags<cr>", { desc = "Help Pages" } }
   nmap { "<leader>sk", "<cmd>Telescope keymaps<cr>", { desc = "Key Maps" } }
   nmap { "<leader>sw", TELESCOPE.telescope("grep_string", { word_match = "-w" }), { desc = "Word (root dir)" } }
