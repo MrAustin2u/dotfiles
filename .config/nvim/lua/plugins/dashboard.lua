@@ -26,6 +26,7 @@ return {
           { action = "Telescope live_grep", desc = " Find Text", icon = " ", key = "g" },
           { action = [[lua LazyVim.telescope.config_files()()]], desc = " Config", icon = " ", key = "c" },
           { action = "Lazy", desc = " Lazy", icon = "󰒲 ", key = "l" },
+          { action = "Mason", desc = " Mason", icon = " ", key = "m" },
           { action = "qa", desc = " Quit", icon = " ", key = "q" },
         },
         footer = function()
