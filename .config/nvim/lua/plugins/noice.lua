@@ -4,7 +4,7 @@ return {
   opts = {
     lsp = {
       progress = {
-        enabled = true,
+        enabled = false,
       },
       override = {
         ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
@@ -27,18 +27,18 @@ return {
         },
         view = "notify",
       },
-      {
-        filter = {
-          event = "lsp",
-          kind = "progress",
-          cond = function(message)
-            local title = vim.tbl_get(message.opts, "progress", "title")
-            -- skip noisy messages
-            return title == "code_action"
-          end,
-        },
-        opts = { skip = true },
-      },
+      -- {
+      --   filter = {
+      --     event = "lsp",
+      --     kind = "progress",
+      --     cond = function(message)
+      --       local title = vim.tbl_get(message.opts, "progress", "title")
+      --       -- skip noisy messages
+      --       return title == "code_action"
+      --     end,
+      --   },
+      --   opts = { skip = true },
+      -- },
       {
         filter = {
           event = "notify",
