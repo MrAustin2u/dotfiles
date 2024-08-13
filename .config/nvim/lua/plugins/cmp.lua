@@ -1,217 +1,108 @@
-local has_words_before = function()
-  unpack = unpack or table.unpack
-  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
-end
-
-local tmux_source = {
-  name = "tmux",
-  option = { all_panes = true },
-}
-
-local all_buffers_completion_source = {
-  name = "buffer",
-  option = {
-    get_bufnrs = function()
-      -- complete from all buffers
-      return vim.api.nvim_list_bufs()
-    end,
-  },
-}
-
 return {
   "hrsh7th/nvim-cmp",
-  event = "InsertEnter",
-  dependencies = {
+  keys = {
     {
-      "hrsh7th/cmp-nvim-lsp",
-      event = "InsertEnter",
+      "<Tab>",
+      "vsnip#jumpable(1)  ? '<Plug>(vsnip-jump-next)'      : '<Tab>'",
+      expr = true,
+      remap = true,
+      replace_keycodes = false,
+      mode = { "i", "s" },
     },
     {
-      "hrsh7th/cmp-emoji",
-      event = "InsertEnter",
-    },
-    {
-      "hrsh7th/cmp-buffer",
-      event = "InsertEnter",
-    },
-    {
-      "hrsh7th/cmp-path",
-      event = "InsertEnter",
-    },
-    {
-      "hrsh7th/cmp-cmdline",
-      event = "InsertEnter",
-    },
-    {
-      "saadparwaiz1/cmp_luasnip",
-      event = "InsertEnter",
-    },
-    {
-      "petertriho/cmp-git",
-      event = "InsertEnter",
-    },
-    {
-      "andersevenrud/cmp-tmux",
-      event = "InsertEnter",
-    },
-    {
-      "L3MON4D3/LuaSnip",
-      event = "InsertEnter",
-      dependencies = {
-        "rafamadriz/friendly-snippets",
-      },
-    },
-    {
-      "hrsh7th/cmp-nvim-lua",
-      event = "InsertEnter",
-    },
-    { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
-    {
-      "saecki/crates.nvim",
-      tag = "stable",
-      config = function(_, opts)
-        require("crates").setup(opts)
-      end,
+      "<S-Tab>",
+      "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'",
+      expr = true,
+      remap = true,
+      replace_keycodes = false,
+      mode = { "i", "s" },
     },
   },
-  opts = function(_, _)
+  version = false, -- last release is way too old
+  event = "InsertEnter",
+  dependencies = {
+    "andersevenrud/cmp-tmux",
+    "hrsh7th/cmp-buffer",
+    "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-nvim-lsp-signature-help",
+    "hrsh7th/cmp-nvim-lua",
+    "hrsh7th/cmp-path",
+    "hrsh7th/cmp-vsnip",
+    "hrsh7th/vim-vsnip",
+    "onsails/lspkind.nvim",
+  },
+  opts = function()
     local cmp = require "cmp"
-    local luasnip = require "luasnip"
-    -- local defaults = require("cmp.config.default")()
-    local icons = require "config.icons"
-    require("luasnip/loaders/from_vscode").lazy_load()
+    local lspkind = require "lspkind"
+    local defaults = require "cmp.config.default"()
+    local auto_select = true
 
-    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
-    vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#FDE030" })
+    vim.g.vsnip_snippet_dir = "~/.config/nvim/snippets"
+    vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+    vim.api.nvim_set_hl(0, "CmpItemKindSupermaven", { fg = "#6CC644" })
 
-    local opts = {
+    return {
       window = {
-        border = "rounded",
         completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
       },
       snippet = {
         expand = function(args)
-          luasnip.lsp_expand(args.body)
+          vim.fn["vsnip#anonymous"](args.body)
         end,
       },
       completion = {
-        completeopt = "menu,menuone,noinsert",
+        completeopt = "menu,menuone,noinsert" .. (auto_select and "" or ",noselect"),
       },
+      preselect = auto_select and cmp.PreselectMode.Item or cmp.PreselectMode.None,
       mapping = {
-        ["<CR>"] = cmp.mapping.confirm { select = true },
-        ["<Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_next_item()
-            -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-            -- this way you will only jump inside the snippet region
-          elseif luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
-          elseif has_words_before() then
-            cmp.complete()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
+        ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-f>"] = cmp.mapping.scroll_docs(4),
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-y>"] = cmp.mapping.close(),
+        ["<C-c>"] = cmp.mapping.abort(),
+        ["<CR>"] = cmp.mapping.confirm { select = false },
+        ["<Tab>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
+        ["<S-Tab>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
+        ["<C-n>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
+        ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
       },
-      sources = cmp.config.sources {
-        { name = "copilot" },
+      sources = {
+        { name = "supermaven" },
         { name = "nvim_lsp" },
         { name = "nvim_lsp_signature_help" },
         { name = "nvim_lua" },
-        { name = "luasnip" },
+        { name = "vsnip" },
         { name = "path" },
-        all_buffers_completion_source,
-        { name = "calc" },
-        { name = "emoji" },
-        tmux_source,
-        { name = "crates" },
+        { name = "tmux" },
+        {
+          name = "buffer",
+          option = {
+            get_bufnrs = function()
+              return vim.api.nvim_list_bufs()
+            end,
+          },
+        },
       },
       formatting = {
         fields = { "kind", "abbr", "menu" },
-        format = function(entry, vim_item)
-          vim_item.kind = icons.kind[vim_item.kind]
+        format = lspkind.cmp_format {
+          symbol_map = {
+            Supermaven = "",
+          },
+          before = function(entry, vim_item)
+            vim_item.menu = ({
+              buffer = " Buffer",
+              nvim_lsp = vim_item.kind,
+              path = " Path",
+              luasnip = " LuaSnip",
+            })[entry.source.name]
 
-          if entry.source.name == "emoji" then
-            vim_item.kind = icons.misc.Smiley
-            vim_item.kind_hl_group = "CmpItemKindEmoji"
-          end
-
-          -- find icon based on kind
-          -- Source
-          local source = ({
-            buffer = "[BUF]",
-            cmdline = "[CMD]",
-            copilot = "[COP]",
-            emoji = "[EMJ]",
-            luasnip = "[SNP]",
-            nvim_lsp = "[LSP]",
-            nvim_lua = "[LUA]",
-            path = "[PTH]",
-            tmux = "[TMX]",
-          })[entry.source.name]
-
-          vim_item.menu = string.format("%s", source)
-
-          return vim_item
-        end,
+            return vim_item
+          end,
+        },
       },
-      preselect = cmp.PreselectMode.None,
-      -- sorting = defaults.sorting,
+      sorting = defaults.sorting,
     }
-
-    local format_kinds = opts.formatting.format
-    opts.formatting.format = function(entry, item)
-      format_kinds(entry, item) -- add icons
-      return require("tailwindcss-colorizer-cmp").formatter(entry, item)
-    end
-    return opts
-  end,
-  config = function(_, opts)
-    local cmp = require "cmp"
-    cmp.setup(opts)
-
-    -- completion for neovim lua configs
-    cmp.setup.filetype("lua", {
-      sources = cmp.config.sources({
-        { name = "nvim_lua" },
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "path" },
-      }, {
-        all_buffers_completion_source,
-        tmux_source,
-      }),
-    })
-
-    -- Set configuration for specific filetype.
-    cmp.setup.filetype("gitcommit", {
-      sources = cmp.config.sources({
-        { name = "git" }, -- `cmp_git`
-      }, {
-        all_buffers_completion_source,
-        tmux_source,
-        { name = "emoji" },
-      }),
-    })
-
-    -- Use buffer source for `/`
-    -- (if you enabled `native_menu`, this won't work anymore).
-    cmp.setup.cmdline("/", {
-      mapping = cmp.mapping.preset.cmdline(),
-      sources = {
-        { name = "buffer" },
-      },
-    })
   end,
 }
