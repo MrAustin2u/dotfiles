@@ -31,7 +31,7 @@ vim.g.markdown_fenced_languages = {
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-vim.cmd.syntax("off")
+vim.cmd.syntax "off"
 vim.opt.backupdir = cache_dir .. "backup/"
 vim.opt.bg = "dark"
 vim.opt.ch = 0
@@ -44,15 +44,15 @@ vim.opt.completeopt = "menu,menuone,noselect"
 -- https://vimways.org/2018/the-power-of-diff/
 ----------------------------------------------
 -- Always use vertical diffs
-vim.opt.diffopt:append("vertical")
-vim.opt.diffopt:append("filler")
+vim.opt.diffopt:append "vertical"
+vim.opt.diffopt:append "filler"
 -- ignore whitespace
-vim.opt.diffopt:append("iwhite")
-vim.opt.diffopt:append("algorithm:patience")
-vim.opt.diffopt:append("indent-heuristic")
+vim.opt.diffopt:append "iwhite"
+vim.opt.diffopt:append "algorithm:patience"
+vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0           -- Command line height
+vim.opt.ch = 0 -- Command line height
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
 vim.opt.foldenable = false
@@ -61,7 +61,7 @@ vim.opt.hidden = true
 vim.opt.hlsearch = false
 vim.opt.laststatus = 3
 vim.opt.list = true
-vim.opt.listchars = "tab:»·,trail:·,nbsp:·" --  Display extra whitespace
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.opt.matchtime = 1
 vim.opt.mouse = "a"
 vim.opt.number = true
@@ -72,7 +72,7 @@ vim.opt.scrolloff = 8
 vim.opt.shiftwidth = 2
 vim.opt.showcmd = true
 vim.opt.showmatch = true
-vim.opt.shortmess:append({ W = true, I = true, c = true })
+vim.opt.shortmess:append { W = true, I = true, c = true }
 vim.opt.sidescrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.smartindent = false
@@ -93,11 +93,11 @@ vim.opt.wrap = true
 ----------------------------------------------
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.spellfile = cache_dir .. "spell/en.uft-8.add"
+vim.opt.spellfile = cache_dir .. "spell/en.utf-8.add"
 vim.opt_global.spell = true
 
 -- persistent undo between file reloads
-if vim.fn.has("persistent_undo") then
+if vim.fn.has "persistent_undo" then
   vim.opt.undofile = true
   vim.opt.undodir = cache_dir .. "undo/"
 end
