@@ -17,7 +17,7 @@ return {
         { "mode", separator = { left = "" }, right_padding = 2 },
       },
       lualine_b = { "branch", "diff", "diagnostics" },
-      lualine_c = { "filename" },
+      lualine_c = { { "filename", path = 1 } },
       lualine_x = {
         {
           require("lazy.status").updates,
