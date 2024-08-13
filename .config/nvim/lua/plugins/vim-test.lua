@@ -1,5 +1,5 @@
 return {
-  "janko-m/vim-test",
+  "vim-test/vim-test",
   keys = require("config.keymaps").vim_test_mappings(),
   dependencies = {
     {
