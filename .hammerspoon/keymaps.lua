@@ -15,4 +15,4 @@ hs.hotkey.bind({ "command" }, "/", open_app("WezTerm", "/Applications/WezTerm.ap
 hs.hotkey.bind({ "control" }, "n", open_app("Arc", "/Applications/Notion Calendar.app"))
 hs.hotkey.bind({ "control" }, "4", open_app("Arc", "/Applications/Arc.app"))
 hs.hotkey.bind({ "control" }, "5", open_app("Dash", "/Applications/Dash.app"))
-hs.hotkey.bind({ "control" }, "6", open_app("Slack", "/Applications/TablePlus.app"))
+hs.hotkey.bind({ "control" }, "6", open_app("Slack", "/Applications/DataGrip.app"))
