@@ -4,7 +4,6 @@ vim.g.maplocalleader = " "
 vim.loader.enable()
 
 local modules = {
-  "config.launch",
   "config.globals",
   "config.options",
   "config.keymaps",
