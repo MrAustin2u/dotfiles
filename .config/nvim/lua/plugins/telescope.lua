@@ -7,7 +7,10 @@ return {
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make", lazy = true },
     "nvim-telescope/telescope-file-browser.nvim",
   },
-  keys = require("config.keymaps").telescope_mappings(),
+  keys = function()
+    local builtin = require "telescope.builtin"
+    require("config.keymaps").telescope_mappings(builtin)
+  end,
   opts = function()
     return {
       defaults = {
@@ -33,16 +36,10 @@ return {
     }
   end,
   config = function(_, opts)
-    local builtin = require "telescope.builtin"
     require("telescope").setup(opts)
-    require("telescope").load_extension "fzf"
-    require("telescope").load_extension "file_browser"
+    pcall(require("telescope").load_extension, "fzf")
+    pcall(require("telescope").load_extension, "file_browser")
     vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "none" })
     vim.api.nvim_set_hl(0, "TelescopeBorder", { bg = "none" })
-
-    vim.keymap.set("n", "<leader>sc", function()
-      local word = vim.fn.expand "<cWORD>"
-      builtin.grep_string { search = word }
-    end, { noremap = true })
   end,
 }

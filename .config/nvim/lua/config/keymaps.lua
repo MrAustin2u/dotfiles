@@ -279,32 +279,48 @@ M.vim_test_mappings = function()
   nmap { "<leader>tl", ":TestLast<CR>", { desc = "[T]est [L]ast" } }
 end
 
-M.telescope_mappings = function()
-  nmap { "<leader>,", "<cmd>Telescope buffers show_all_buffers=true<cr>", { desc = "Switch Buffer" } }
-  nmap { "<leader>/", TELESCOPE.telescope "live_grep", { desc = "Grep (root dir)" } }
-  nmap { "<leader>:", "<cmd>Telescope command_history<cr>", { desc = "Command History" } }
-  nmap { "<leader><space>", TELESCOPE.telescope "files", { desc = "Find Files (root dir)" } }
-  -- find
-  nmap { "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Buffers" } }
-  nmap { "<leader>ff", TELESCOPE.telescope("files", { cwd = false }), { desc = "Find Files (root dir)" } }
-  nmap { "<leader>fF", TELESCOPE.telescope "files", { desc = "Find Files (cwd)" } }
-  nmap { "<leader>fr", "<cmd>Telescope oldfiles<cr>", { desc = "Recent" } }
-  nmap { "<leader>fR", TELESCOPE.telescope("oldfiles", { cwd = vim.loop.cwd() }), { desc = "Recent (cwd)" } }
-  -- git
-  nmap { "<leader>gc", "<cmd>Telescope git_commits<CR>", { desc = "commits" } }
-  nmap { "<leader>gs", "<cmd>Telescope git_status<CR>", { desc = "status" } }
-  -- search
-  nmap { "<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", { desc = "Buffer" } }
-  nmap { "<leader>sc", "<cmd>Telescope command_history<cr>", { desc = "Command History" } }
-  nmap { "<leader>sC", "<cmd>Telescope commands<cr>", { desc = "Commands" } }
-  nmap { "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", { desc = "Document diagnostics" } }
-  nmap { "<leader>sg", "<cmd>Telescope live_grep<cr>", { desc = "Grep" } }
-  nmap { "<leader>sh", "<cmd>Telescope help_tags<cr>", { desc = "Help Pages" } }
-  nmap { "<leader>sk", "<cmd>Telescope keymaps<cr>", { desc = "Key Maps" } }
-  nmap { "<leader>sw", TELESCOPE.telescope("grep_string", { word_match = "-w" }), { desc = "Word (root dir)" } }
-  nmap { "<leader>sW", TELESCOPE.telescope("grep_string", { cwd = false, word_match = "-w" }), { desc = "Word (cwd)" } }
-  vmap { "<leader>sw", TELESCOPE.telescope "grep_string", { desc = "Selection (root dir)" } }
-  vmap { "<leader>sW", TELESCOPE.telescope("grep_string", { cwd = false }), { desc = "Selection (cwd)" } }
+M.telescope_mappings = function(builtin)
+  nmap { "<leader>sb", require("telescope").extensions.file_browser.file_browser, { desc = "[S]earch File [B]rowser" } }
+  nmap { "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" } }
+  nmap { "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" } }
+  nmap { "<leader>sf", builtin.git_files, { desc = "[S]earch [F]iles" } }
+  nmap { "<leader>sF", builtin.find_files, { desc = "[S]earch [F]iles" } }
+  nmap { "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" } }
+  nmap { "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" } }
+  nmap { "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" } }
+  nmap { "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" } }
+  nmap { "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' } }
+  nmap { "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" } }
+
+  nmap {
+    "<leader>/",
+    function()
+      builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown {
+        winblend = 10,
+        previewer = false,
+      })
+    end,
+    { desc = "[/] Fuzzily search in current buffer" },
+  }
+
+  nmap {
+    "<leader>s/",
+    function()
+      builtin.live_grep {
+        grep_open_files = true,
+        prompt_title = "Live Grep in Open Files",
+      }
+    end,
+    { desc = "[S]earch [/] in Open Files" },
+  }
+
+  nmap {
+    "<leader>sn",
+    function()
+      builtin.find_files { cwd = vim.fn.stdpath "config" }
+    end,
+    { desc = "[S]earch [N]eovim files" },
+  }
 end
 
 M.git_conflict_mappings = function()
