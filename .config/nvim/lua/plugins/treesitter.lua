@@ -18,7 +18,6 @@ return {
     "IndianBoy42/tree-sitter-just",
   },
   opts = {
-    autotag = { enable = true },
     endwise = { enable = true },
     ensure_installed = {
       "bash",
