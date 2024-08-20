@@ -2,11 +2,11 @@ return {
   "rcarriga/nvim-notify",
   dependencies = {
     "stevearc/dressing.nvim",
+    "nvim-telescope/telescope.nvim",
   },
   opts = {
-    stages = "static",
     background_colour = "#000000",
-    timeout = 3000,
+    timeout = 1500,
     max_height = function()
       return math.floor(vim.o.lines * 0.75)
     end,
@@ -24,6 +24,13 @@ return {
         require("notify").dismiss { silent = true, pending = true }
       end,
       desc = "Dismiss all Notifications",
+    },
+    {
+      "<leader>sn",
+      function()
+        require("telescope").extensions.notify.notify()
+      end,
+      desc = "Notification history",
     },
   },
   init = function()
