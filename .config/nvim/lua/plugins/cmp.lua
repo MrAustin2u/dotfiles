@@ -1,80 +1,78 @@
 return {
   "hrsh7th/nvim-cmp",
-  keys = {
-    {
-      "<Tab>",
-      "vsnip#jumpable(1)  ? '<Plug>(vsnip-jump-next)'      : '<Tab>'",
-      expr = true,
-      remap = true,
-      replace_keycodes = false,
-      mode = { "i", "s" },
-    },
-    {
-      "<S-Tab>",
-      "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'",
-      expr = true,
-      remap = true,
-      replace_keycodes = false,
-      mode = { "i", "s" },
-    },
-  },
-  version = false, -- last release is way too old
   event = "InsertEnter",
   dependencies = {
-    "andersevenrud/cmp-tmux",
-    "hrsh7th/cmp-buffer",
+    {
+      "L3MON4D3/LuaSnip",
+      build = (function()
+        if vim.fn.has "win32" == 1 or vim.fn.executable "make" == 0 then
+          return
+        end
+        return "make install_jsregexp"
+      end)(),
+      dependencies = {
+        {
+          "rafamadriz/friendly-snippets",
+          config = function()
+            require("luasnip.loaders.from_vscode").lazy_load()
+          end,
+        },
+      },
+    },
+    "saadparwaiz1/cmp_luasnip",
     "hrsh7th/cmp-nvim-lsp",
     "hrsh7th/cmp-nvim-lsp-signature-help",
-    "hrsh7th/cmp-nvim-lua",
+    "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
-    "hrsh7th/cmp-vsnip",
-    "hrsh7th/vim-vsnip",
     "onsails/lspkind.nvim",
   },
-  opts = function()
+  config = function()
     local cmp = require "cmp"
-    local lspkind = require "lspkind"
     local defaults = require "cmp.config.default"()
-    local auto_select = true
+    local luasnip = require "luasnip"
+    local lspkind = require "lspkind"
+    luasnip.config.setup {}
 
-    vim.g.vsnip_snippet_dir = "~/.config/nvim/snippets"
-    vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
-    vim.api.nvim_set_hl(0, "CmpItemKindSupermaven", { fg = "#6CC644" })
-
-    return {
+    cmp.setup {
+      sorting = defaults.sorting,
       window = {
         completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
       },
       snippet = {
         expand = function(args)
-          vim.fn["vsnip#anonymous"](args.body)
+          luasnip.lsp_expand(args.body)
         end,
       },
-      completion = {
-        completeopt = "menu,menuone,noinsert" .. (auto_select and "" or ",noselect"),
-      },
-      preselect = auto_select and cmp.PreselectMode.Item or cmp.PreselectMode.None,
-      mapping = {
-        ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+      completion = { completeopt = "menu,menuone,noinsert" },
+      mapping = cmp.mapping.preset.insert {
+        ["<C-b>"] = cmp.mapping.scroll_docs(-4),
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
-        ["<C-Space>"] = cmp.mapping.complete(),
-        ["<C-y>"] = cmp.mapping.close(),
-        ["<C-c>"] = cmp.mapping.abort(),
-        ["<CR>"] = cmp.mapping.confirm { select = false },
-        ["<Tab>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
-        ["<S-Tab>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
-        ["<C-n>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
-        ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
+        ["<CR>"] = cmp.mapping.confirm { select = true },
+        ["<Tab>"] = cmp.mapping.select_next_item(),
+        ["<S-Tab>"] = cmp.mapping.select_prev_item(),
+        ["<C-Space>"] = cmp.mapping.complete {},
+        ["<C-l>"] = cmp.mapping(function()
+          if luasnip.expand_or_locally_jumpable() then
+            luasnip.expand_or_jump()
+          end
+        end, { "i", "s" }),
+        ["<C-h>"] = cmp.mapping(function()
+          if luasnip.locally_jumpable(-1) then
+            luasnip.jump(-1)
+          end
+        end, { "i", "s" }),
       },
       sources = {
         { name = "supermaven" },
+        {
+          name = "lazydev",
+          group_index = 0,
+        },
         { name = "nvim_lsp" },
         { name = "nvim_lsp_signature_help" },
-        { name = "nvim_lua" },
-        { name = "vsnip" },
+        { name = "luasnip" },
         { name = "path" },
-        { name = "tmux" },
         {
           name = "buffer",
           option = {
@@ -102,7 +100,6 @@ return {
           end,
         },
       },
-      sorting = defaults.sorting,
     }
   end,
 }
