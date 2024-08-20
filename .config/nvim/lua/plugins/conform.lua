@@ -24,7 +24,6 @@ return {
       json = prettier,
       typescript = prettier,
       typescriptreact = prettier,
-      elixir = { "mix", timeout_ms = 2000 },
       sh = { "shfmt" },
     },
     -- Set default options

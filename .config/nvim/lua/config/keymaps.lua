@@ -230,22 +230,46 @@ M.lsp_diagnostic_mappings = function()
   nmap { "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", { desc = "Set loclist to LSP diagnostics" } }
 end
 
-M.lsp_mappings = function()
-  local opts = { buffer = 0 }
-  local builtin = require "telescope.builtin"
+M.lsp_mappings = function(buf)
+  nmap { "K", "<cmd>Lspsaga hover_doc ++quiet<CR>", { desc = "LSP: Hover", buffer = buf } }
+  nmap { "<leader>ca", "<cmd>Lspsaga code_action<CR>", { desc = "LSP: [C]ode [A]ction", buffer = buf } }
+  nmap { "<leader>rn", "<cmd>Lspsaga rename<CR>", { desc = "LSP: [R]e[n]ame", buffer = buf } }
+  nmap { "gd", require("telescope.builtin").lsp_definitions, { desc = "LSP: [G]oto [D]efinition", buffer = buf } }
+  nmap { "gr", require("telescope.builtin").lsp_references, { desc = "LSP: [G]oto [R]eferences", buffer = buf } }
+  nmap { "gI", require("telescope.builtin").lsp_implementations, { desc = "LSP: [G]oto [I]mplementation", buffer = buf } }
+  nmap {
+    "<leader>D",
+    require("telescope.builtin").lsp_type_definitions,
+    { desc = "LSP: Type [D]efinition", buffer = buf },
+  }
+  nmap {
+    "<leader>ds",
+    require("telescope.builtin").lsp_document_symbols,
+    { desc = "LSP: [D]ocument [S]ymbols", buffer = buf },
+  }
+  nmap {
+    "<leader>ws",
+    require("telescope.builtin").lsp_dynamic_workspace_symbols,
+    { desc = "LSP: [W]orkspace [S]ymbols", buffer = buf },
+  }
+  nmap { "gD", vim.lsp.buf.declaration, { desc = "LSP: [G]oto [D]eclaration", buffer = buf } }
+  nmap {
+    "<leader>th",
+    function()
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
+    end,
+    { desc = "LSP: [T]oggle Inlay [H]ints", buffer = buf },
+  }
+end
 
-  vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
-  nmap { "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts }
-  nmap { "gd", builtin.lsp_definitions, opts }
-  nmap { "K", "<cmd>Lspsaga hover_doc ++quiet<CR>", opts }
-  nmap { "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts }
-  nmap { "gr", builtin.lsp_references, opts }
-  nmap { "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts }
-  nmap { "fs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts }
-  nmap { "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts }
-  nmap { "<leader>bf", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts }
-  nmap { "<leader>ca", "<cmd>Lspsaga code_action<CR>", opts }
-  nmap { "<leader>rn", "<cmd>Lspsaga rename<CR>", opts }
+M.lsp_inlay_hints_mappings = function(buf)
+  nmap {
+    "<leader>th",
+    function()
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
+    end,
+    { desc = "LSP: [T]oggle Inlay [H]ints", buffer = buf },
+  }
 end
 
 M.vim_test_mappings = function()

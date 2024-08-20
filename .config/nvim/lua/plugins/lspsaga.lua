@@ -14,8 +14,14 @@ return {
     symbol_in_winbar = {
       enable = true,
     },
+    implement = {
+      enable = false,
+    },
     outline = {
       win_width = 50,
+    },
+    lightbulb = {
+      enable = false,
     },
     rename = {
       project_max_width = 1.0,

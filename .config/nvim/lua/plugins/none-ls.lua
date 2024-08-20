@@ -10,7 +10,6 @@ return {
     null_ls.setup {
       sources = {
         -- code actions
-        null_ls.builtins.code_actions.gitsigns,
         -- linters
         require "none-ls.diagnostics.eslint_d",
         null_ls.builtins.diagnostics.actionlint,
