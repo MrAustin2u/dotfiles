@@ -6,7 +6,7 @@ return {
       "benmills/vimux",
       config = function()
         vim.g["VimuxOrientation"] = "h"
-        vim.g["VimuxHeight"] = "35"
+        vim.g["VimuxHeight"] = "35%"
       end,
     },
   },
