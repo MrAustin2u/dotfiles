@@ -1,7 +1,19 @@
 return {
   "folke/noice.nvim",
   event = "VeryLazy",
+  dependencies = {
+    "MunifTanjim/nui.nvim",
+    "rcarriga/nvim-notify",
+  },
   opts = {
+    messages = {
+      enabled = true,
+      view = "mini",
+      view_error = "notify",
+      view_warn = "notify",
+      view_history = "messages",
+      view_search = "virtualtext",
+    },
     lsp = {
       progress = {
         enabled = false,
@@ -25,20 +37,8 @@ return {
             { find = "; before #%d+" },
           },
         },
-        view = "notify",
+        view = "mini",
       },
-      -- {
-      --   filter = {
-      --     event = "lsp",
-      --     kind = "progress",
-      --     cond = function(message)
-      --       local title = vim.tbl_get(message.opts, "progress", "title")
-      --       -- skip noisy messages
-      --       return title == "code_action"
-      --     end,
-      --   },
-      --   opts = { skip = true },
-      -- },
       {
         filter = {
           event = "notify",
@@ -50,9 +50,9 @@ return {
     presets = {
       bottom_search = true,
       command_palette = true,
-      inc_rename = true,
+      inc_rename = false,
       long_message_to_split = true,
-      lsp_doc_border = false,
+      lsp_doc_border = true,
     },
   },
 }
