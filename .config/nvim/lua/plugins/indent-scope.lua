@@ -4,6 +4,12 @@ return {
   opts = {
     symbol = "│",
     options = { try_as_border = true },
+    draw = {
+      -- disable animation, remove to re-enable
+      animation = function()
+        return 0
+      end,
+    },
   },
   init = function()
     vim.api.nvim_create_autocmd("FileType", {
