@@ -1,0 +1,122 @@
+[user]
+	email = austin.ashley.r@gmail.com
+	name = Ashley Austin
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOt6qKh83qsnKwj6/YecFOTe2u1vVwcirA1xp555iUuA
+
+[github]
+	user = MrAustin2u
+
+[color]
+  ui = true
+
+[branch]
+  autosetuprebase = always
+
+[push]
+  default = tracking
+	autoSetupRemote = true
+
+[pull]
+  rebase = true
+
+[fetch]
+  prune = true
+
+[rebase]
+  autosquash = true
+
+[commit]
+  template = ~/.config/git/commit-template
+	gpgsign = true
+
+[merge]
+  ; ff = only
+  summary = true
+	tool = nvimdiff
+
+[alias]
+st = status -s
+  ht = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(magenta)%h%C(reset) %C(green)(%ar)%C(reset) %C(red)%d%C(reset) %C(white)%s%C(reset) - %C(blue)%an%C(reset)'
+
+  # Git Commit, Add all and Push — in one step.
+  cap = "!f() { git commit -m \"$@\"; }; f"
+  new = "!f() { git cap \"📦 new: $@\"; }; f"
+  deps = "!f() { git cap \"🚚 deps: $@\"; }; f"
+  imp = "!f() { git cap \"👌 improve: $@\"; }; f"
+  up = "!f() { git cap \"✍🏻 update: $@\"; }; f"
+  fix = "!f() { git cap \"🐞 fix: $@\"; }; f"
+  rlz = "!f() { git cap \"🚀 release: $@\"; }; f"
+  tst = "!f() { git cap \"🤖 test: $@\"; }; f"
+  brk = "!f() { git cap \"‼️ BREAKING CHANGES: $2\"; }; f"
+  rem = "!f() { git cap \"🗑  remove: $@\"; }; f"
+  ref = "!f() { git cap \"♻️  refactor: $@\"; }; f"
+  int = "!f() { git cap \"🎉 initial commit: $@\"; }; f"
+  wip = "!f() { git cap \"⚠️  WIP: $@\"; }; f"
+
+	l = log
+	ls = log -p -S
+	lg = log -p -G
+
+  unstage = restore --staged
+  f = fetch
+
+  s = switch
+  sc = switch -c
+
+  cc = commit
+  ca = commit --amend
+
+	amend-to = "!f() { SHA=$1; git commit --fixup \"$SHA\" && git rebase --interactive --autosquash \"$SHA^\"; }; f"
+  untrack = "!f() { git rm --cached $@; }; f"
+  edit = !$EDITOR $(git status --short | awk '$1 ~ /^M|A|U/ {print $2}' )
+
+  dft = difftool
+  dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff $@; }; f"
+  review = diff --staged
+
+[core]
+	excludesfile = /Users/aaustin/.gitignore
+	autocrlf = input
+	editor = nvim +16 +startinsert
+
+[init]
+  defaultBranch = main
+
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[gpg]
+	format = ssh
+
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+
+[credential]
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
+
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+
+[diff]
+  tool = difftastic
+
+[difftool]
+  prompt = false
+
+[difftool "difftastic"]
+  cmd = difft "$LOCAL" "$REMOTE"
+
+[pager]
+  difftool = true

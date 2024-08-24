@@ -1,0 +1,10 @@
+.elixir_ls
+.vscode
+.DS_Store
+.cfg
+.iex.exs
+.node-version
+**node_modules
+packer_compiled.lua
+.env
+.envrc
