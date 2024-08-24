@@ -3,6 +3,7 @@ return {
   lazy = false,
   priority = 1000,
   opts = {
+    plugins = { markdown = true },
     tokyonight_dark_float = false,
     on_highlights = function(hl, c)
       hl.CursorLineNr = {
@@ -27,6 +28,7 @@ return {
       "vista_kind",
       "terminal",
       "spectre_panel",
+      "grug_far",
       "startuptime",
       "Outline",
     },
