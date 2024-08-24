@@ -1,0 +1,5 @@
+--smart-case
+
+# Add my 'web' type.
+--type-add
+frontend:*.{html,css,js,jsx}*
