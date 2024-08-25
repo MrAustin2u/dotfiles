@@ -15,7 +15,7 @@ return {
       enable = true,
     },
     implement = {
-      enable = false,
+      enable = true,
     },
     outline = {
       win_width = 50,
