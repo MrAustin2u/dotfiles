@@ -40,7 +40,7 @@
 
   # Git Commit, Add all and Push — in one step.
   cap = "!f() { git commit -m \"$@\"; }; f"
-  new = "!f() { git cap \"📦 new: $@\"; }; f"
+  feat = "!f() { git cap \"📦 feat: $@\"; }; f"
   deps = "!f() { git cap \"🚚 deps: $@\"; }; f"
   imp = "!f() { git cap \"👌 improve: $@\"; }; f"
   up = "!f() { git cap \"✍🏻 update: $@\"; }; f"
