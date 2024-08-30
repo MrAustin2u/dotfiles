@@ -52,6 +52,7 @@
   ref = "!f() { git cap \"♻️  refactor: $@\"; }; f"
   int = "!f() { git cap \"🎉 initial commit: $@\"; }; f"
   wip = "!f() { git cap \"⚠️  WIP: $@\"; }; f"
+  chore = "!f() { git cap \"🧹 chore: $@\"; }; f"
 
 	l = log
 	ls = log -p -S
