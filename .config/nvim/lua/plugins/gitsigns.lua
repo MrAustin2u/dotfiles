@@ -47,13 +47,27 @@ return {
           vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
         end
 
-      -- stylua: ignore start
-      map({ "n", "v" }, "<leader>gh", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
-      map("n", "<leader>gR", gs.reset_buffer, "Reset Buffer")
-      map("n", "]h", gs.next_hunk, "Next Hunk")
-      map("n", "[h", gs.next_hunk, "Previous Hunk")
-      map("n", "<leader>gl", gs.toggle_current_line_blame, "Blame Line")
-      map("n", "<leader>gL", function() gs.blame_line({ full = true }) end, "Blame Line")
+        -- stylua: ignore start
+        map({ "n", "v" }, "<leader>gh", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
+        map("n", "<leader>gR", gs.reset_buffer, "Reset Buffer")
+        map("n", "]h", function()
+            if vim.wo.diff then
+              vim.cmd.normal({ ']h', bang = true })
+            else
+              gs.nav_hunk('next')
+            end
+          end,
+          "Next Hunk")
+        map("n", "[h", function()
+            if vim.wo.diff then
+              vim.cmd.normal({ '[h', bang = true })
+            else
+              gs.nav_hunk('prev')
+            end
+          end,
+          "Previous Hunk")
+        map("n", "<leader>gl", gs.toggle_current_line_blame, "Blame Line")
+        map("n", "<leader>gL", function() gs.blame_line({ full = true }) end, "Blame Line")
       end,
     }
   end,
