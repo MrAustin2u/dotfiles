@@ -151,8 +151,6 @@ vim.keymap.set("n", "<Leader>s,", function()
   vim.cmd [[%s/^\(.*\)$/\1,/]]
 end, { silent = true })
 
--- LSP Restart
-nmap { "<leader>lr", "<cmd>LspRestart<CR>", { desc = "LSP restart" } }
 -- ================================
 
 M.attempt_mappings = function(attempt)
