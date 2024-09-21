@@ -1,5 +1,4 @@
 local M = {}
-local TELESCOPE = require "config.utils.telescope"
 local TOGGLE = require "config.utils.toggle"
 local UTILS = require "config.utils"
 
@@ -281,8 +280,8 @@ M.telescope_mappings = function(builtin)
   nmap { "<leader>sb", require("telescope").extensions.file_browser.file_browser, { desc = "[S]earch File [B]rowser" } }
   nmap { "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" } }
   nmap { "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" } }
-  nmap { "<leader>sf", builtin.git_files, { desc = "[S]earch [F]iles" } }
-  nmap { "<leader>sF", builtin.find_files, { desc = "[S]earch [F]iles" } }
+  nmap { "<leader>ff", builtin.git_files, { desc = "[F]ind Git [F]iles" } }
+  nmap { "<leader>fF", builtin.find_files, { desc = "[F]ind [F]iles" } }
   nmap { "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" } }
   nmap { "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" } }
   nmap { "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" } }
@@ -412,5 +411,71 @@ M.todo_comments_mappings = {
   { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo" },
   { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
 }
+
+M.neo_test_mappings = function()
+  nmap {
+    "<leader>tt",
+    function()
+      require("neotest").run.run(vim.fn.expand "%")
+    end,
+    { desc = "[T]est Run File" },
+  }
+  nmap {
+    "<leader>tT",
+    function()
+      require("neotest").run.run(vim.uv.cwd())
+    end,
+    { desc = "[T]est Run All [T]est Files" },
+  }
+  nmap {
+    "<leader>tr",
+    function()
+      require("neotest").run.run()
+    end,
+    { desc = "[T]est [R]un Nearest" },
+  }
+  nmap {
+    "<leader>tl",
+    function()
+      require("neotest").run.run_last()
+    end,
+    { desc = "[T]est Run [L]ast" },
+  }
+  nmap {
+    "<leader>ts",
+    function()
+      require("neotest").summary.toggle()
+    end,
+    { desc = "[T]est Toggle [S]ummary" },
+  }
+  nmap {
+    "<leader>to",
+    function()
+      require("neotest").output.open { enter = true, auto_close = true }
+    end,
+    { desc = "[T]est Show [O]utput" },
+  }
+  nmap {
+    "<leader>tO",
+    function()
+      require("neotest").output_panel.toggle()
+    end,
+    { desc = "[T]est Toggle [O]utput Panel" },
+  }
+  nmap {
+    "<leader>tS",
+    function()
+      require("neotest").run.stop()
+    end,
+    { desc = "[T]est [S]top" },
+  }
+  nmap {
+    "<leader>tw",
+    function()
+      require("neotest").watch.toggle(vim.fn.expand "%")
+    end,
+    { desc = "[T]est Toggle [W]atch" },
+  }
+end
 
 return M
