@@ -75,6 +75,8 @@
   dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff $@; }; f"
   review = diff --staged
 
+  sa = "!f() { git stash apply stash@{$@}; }; f"
+
 [core]
 	excludesfile = /Users/aaustin/.gitignore
 	autocrlf = input
