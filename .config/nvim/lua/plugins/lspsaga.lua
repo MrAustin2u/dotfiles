@@ -2,7 +2,7 @@ return {
   "glepnir/lspsaga.nvim",
   keys = function()
     return {
-      { ",to", "<cmd>Lspsaga term_toggle<CR>", mode = { "n", "t" } },
+      { "<C-_>", "<cmd>Lspsaga term_toggle<CR>", mode = { "n", "t" } },
       { ",so", "<cmd>Lspsaga outline<CR>", mode = { "n", "t" } },
     }
   end,

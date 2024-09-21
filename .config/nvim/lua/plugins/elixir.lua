@@ -1,12 +1,9 @@
-local LSPHELPERS = require "plugins.lsp.helpers"
-
+-- elixir lsp support
+---@type LazySpec
 return {
   "elixir-tools/elixir-tools.nvim",
   version = "*",
   ft = { "elixir", "heex", "eelixir" },
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-  },
   config = function()
     local elixir = require "elixir"
     local elixirls = require "elixir.elixirls"
@@ -27,7 +24,7 @@ return {
         },
         on_attach = function(client, bufnr)
           require("config.keymaps").elixir_mappings()
-          LSPHELPERS.on_attach(client, bufnr)
+          require("plugins.mason.lsp").on_attach(client, bufnr)
         end,
       },
       credo = { enable = true },
@@ -39,9 +36,12 @@ return {
         },
         on_attach = function(client, bufnr)
           require("config.keymaps").elixir_mappings()
-          LSPHELPERS.on_attach(client, bufnr)
+          require("plugins.mason.lsp").on_attach(client, bufnr)
         end,
       },
     }
   end,
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+  },
 }
