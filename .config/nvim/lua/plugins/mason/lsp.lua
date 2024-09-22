@@ -14,15 +14,15 @@ end
 
 local M = {}
 
-M.on_attach = function(client, bufnr)
-  LSP.on_supports_method("textDocument/inlayHint", function(_client, buffer)
+M.on_attach = function(_client, bufnr)
+  LSP.on_supports_method("textDocument/inlayHint", function(_, buffer)
     if vim.api.nvim_buf_is_valid(buffer) and vim.bo[buffer].buftype == "" then
       vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
     end
   end)
 
   if vim.lsp.codelens then
-    LSP.on_supports_method("textDocument/codeLens", function(_client, buffer)
+    LSP.on_supports_method("textDocument/codeLens", function(_c, buffer)
       vim.lsp.codelens.refresh()
       vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
         buffer = buffer,

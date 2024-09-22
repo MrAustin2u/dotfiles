@@ -26,8 +26,47 @@ return {
     -- required for jsonls and yamlls
     { "b0o/schemastore.nvim", lazy = true },
   },
-  config = function()
+  opts = {
+    ensure_installed = {
+      -- Formatters and Linters
+      "black",
+      "codespell",
+      "prettier",
+      "prettierd",
+      "shfmt",
+      "stylua",
+      "yamllint",
+      "actionlint",
+      "ansible-lint",
+
+      -- LSPs
+      "bash-language-server",
+      "clang-format",
+      "css-lsp",
+      "dockerfile-language-server",
+      "eslint-lsp",
+      "goimports",
+      "golangci-lint",
+      "golangci-lint-langserver",
+      "gomodifytags",
+      "gopls",
+      "html-lsp",
+      "json-lsp",
+      "lua-language-server",
+      "prosemd-lsp",
+      "python-lsp-server",
+      "rust-analyzer",
+      "sqlls",
+      "tailwindcss-language-server",
+      "terraform-ls",
+      "vim-language-server",
+      "vtsls",
+      "yaml-language-server",
+      "zls",
+    },
+  },
+  config = function(_self, opts)
     require("plugins.mason.lsp").setup()
-    require("plugins.mason.setup").setup()
+    require("plugins.mason.setup").setup(opts)
   end,
 }
