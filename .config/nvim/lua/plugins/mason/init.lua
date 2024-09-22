@@ -31,6 +31,7 @@ return {
       -- Formatters and Linters
       "black",
       "codespell",
+      "eslint_d",
       "prettier",
       "prettierd",
       "shfmt",
