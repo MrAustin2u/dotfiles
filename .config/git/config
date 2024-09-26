@@ -35,6 +35,8 @@
 	tool = nvimdiff
 
 [alias]
+  cb = "!f() { git checkout -b \"$@\"; }; f"
+
   st = status -s
   ht = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(magenta)%h%C(reset) %C(green)(%ar)%C(reset) %C(red)%d%C(reset) %C(white)%s%C(reset) - %C(blue)%an%C(reset)'
 
