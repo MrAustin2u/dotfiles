@@ -24,7 +24,7 @@ return {
     "hrsh7th/cmp-nvim-lsp",
 
     -- required for jsonls and yamlls
-    { "b0o/schemastore.nvim", lazy = true },
+    { "b0o/schemastore.nvim", lazy = true, version = false },
   },
   opts = {
     ensure_installed = {

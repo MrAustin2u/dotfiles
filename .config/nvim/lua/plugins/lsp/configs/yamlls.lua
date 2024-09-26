@@ -25,6 +25,14 @@ return {
         redhat = { telemetry = { enabled = false } },
 
         yaml = {
+          completion = true,
+          hover = true,
+          keyOrdering = false,
+          schemas = schemas,
+          validate = true,
+          format = {
+            enabled = false,
+          },
           schemaStore = {
             -- Must disable built-in schemaStore support using the SchemaStore
             -- plugin and its advanced options like `ignore`.
@@ -32,11 +40,6 @@ return {
             -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
             url = "",
           },
-          schemas = schemas,
-          format = { enabled = false },
-          validate = true,
-          completion = true,
-          hover = true,
         },
       },
 
