@@ -6,7 +6,7 @@ return {
     "nvim-tree/nvim-web-devicons",
   },
   opts = {
-    file_types = { "markdown", "norg", "rmd", "org", "livemd" },
+    file_types = { "markdown", "norg", "rmd", "org", "livemd", "plantuml" },
     code = {
       sign = false,
       width = "block",
