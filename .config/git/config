@@ -41,6 +41,7 @@
   ht = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(magenta)%h%C(reset) %C(green)(%ar)%C(reset) %C(red)%d%C(reset) %C(white)%s%C(reset) - %C(blue)%an%C(reset)'
 
   # Git Commit, Add all and Push — in one step.
+  build = "!f() { git cap \"👷 build: $@\"; }; f"
   cap = "!f() { git commit -m \"$@\"; }; f"
   feat = "!f() { git cap \"📦 feat: $@\"; }; f"
   deps = "!f() { git cap \"🚚 deps: $@\"; }; f"
@@ -78,6 +79,7 @@
   review = diff --staged
 
   sa = "!f() { git stash apply stash@{$@}; }; f"
+  rbi = "!f() { git rebase -i HEAD~$@; }; f"
 
 [core]
 	excludesfile = /Users/aaustin/.gitignore
