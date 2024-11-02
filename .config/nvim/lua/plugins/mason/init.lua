@@ -45,7 +45,6 @@ return {
       "clang-format",
       "css-lsp",
       "dockerfile-language-server",
-      "eslint-lsp",
       "goimports",
       "golangci-lint",
       "golangci-lint-langserver",
