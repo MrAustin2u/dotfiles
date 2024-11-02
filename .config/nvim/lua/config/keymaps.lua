@@ -257,6 +257,13 @@ M.lsp_mappings = function(buf)
     end,
     { desc = "LSP: [T]oggle Inlay [H]ints", buffer = buf },
   }
+  nmap {
+    "<leader>fm",
+    function()
+      vim.lsp.buf.format { async = true }
+    end,
+    { desc = "LSP: [f]or[m]at", buffer = buf },
+  }
 end
 
 M.lsp_inlay_hints_mappings = function(buf)
