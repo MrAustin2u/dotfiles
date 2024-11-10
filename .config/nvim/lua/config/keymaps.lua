@@ -42,9 +42,6 @@ vim.keymap.set("n", "<space>wq", ":wq <CR>", { silent = true, desc = "Save and Q
 -- command
 vim.keymap.set("n", ";", ":")
 
--- Sort
-vim.keymap.set("v", "ts", ":sort<CR>", { desc = "Text sort" })
-
 -- save file
 vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 
@@ -578,4 +575,15 @@ M.snacks_mappings = {
     desc = "Prev Reference",
   },
 }
+
+M.sort_mappings = {
+  { "go", ":Sort<CR>", mode = "v", desc = "(go) Order (sort lines/line params)" },
+  { "goi'", "vi':Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n [']" },
+  { "goi(", "vi(:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n (" },
+  { "goi[", "vi[:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n [" },
+  { "goip", "vip:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n [p]aragraph" },
+  { "goi{", "vi{:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n {" },
+  { 'goi"', 'vi":Sort<CR>', mode = "n", desc = '(go) [O]rder [i]n ["]' },
+}
+
 return M
