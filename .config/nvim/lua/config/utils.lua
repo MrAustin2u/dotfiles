@@ -34,14 +34,14 @@ function M.notify(msg, opts)
     )
   end
   if opts.stacktrace then
-    msg = msg .. M.pretty_trace({ level = opts.stacklevel or 2 })
+    msg = msg .. M.pretty_trace { level = opts.stacklevel or 2 }
   end
   local lang = opts.lang or "markdown"
   local n = opts.once and vim.notify_once or vim.notify
   n(msg, opts.level or vim.log.levels.INFO, {
     on_open = function(win)
       local ok = pcall(function()
-        vim.treesitter.language.add("markdown")
+        vim.treesitter.language.add "markdown"
       end)
       if not ok then
         pcall(require, "nvim-treesitter")
@@ -101,7 +101,7 @@ M.opts = function(name)
     return {}
   end
 
-  local Plugin = require("lazy.core.plugin")
+  local Plugin = require "lazy.core.plugin"
 
   return Plugin.values(plugin, "opts", false)
 end
@@ -119,14 +119,14 @@ M.get_root = function()
   local roots = {}
 
   if path then
-    for _, client in pairs(vim.lsp.get_active_clients({ bufnr = 0 })) do
+    for _, client in pairs(vim.lsp.get_active_clients { bufnr = 0 }) do
       local workspace = client.config.workspace_folders
       local paths = workspace
           and vim.tbl_map(function(ws)
             return vim.uri_to_fname(ws.uri)
           end, workspace)
-          or client.config.root_dir and { client.config.root_dir }
-          or {}
+        or client.config.root_dir and { client.config.root_dir }
+        or {}
       for _, p in ipairs(paths) do
         local r = vim.loop.fs_realpath(p)
         if path:find(r, 1, true) then
@@ -174,37 +174,6 @@ M.deprecate = function(old, new)
   M.warn(("`%s` is deprecated. Please use `%s` instead"):format(old, new), { title = "LazyVim" })
 end
 
-local terminals = {}
-
--- Opens a floating terminal (interactive by default)
-M.float_term = function(cmd, opts)
-  opts = vim.tbl_deep_extend("force", {
-    ft = "lazyterm",
-    size = { width = 0.9, height = 0.9 },
-  }, opts or {}, { persistent = true })
-  ---@cast opts LazyCmdOptions|{interactive?:boolean, esc_esc?:false}
-
-  local termkey = vim.inspect({ cmd = cmd or "shell", cwd = opts.cwd, env = opts.env })
-
-  if terminals[termkey] and terminals[termkey]:buf_valid() then
-    terminals[termkey]:toggle()
-  else
-    terminals[termkey] = require("lazy.util").float_term(cmd, opts)
-    local buf = terminals[termkey].buf
-    vim.b[buf].lazyterm_cmd = cmd
-    if opts.esc_esc == false then
-      vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
-    end
-    vim.api.nvim_create_autocmd("BufEnter", {
-      buffer = buf,
-      callback = function()
-        vim.cmd.startinsert()
-      end,
-    })
-  end
-  return terminals[termkey]
-end
-
 M.merge_maps = function(map1, map2)
   local mergedMap = {}
 
@@ -222,7 +191,7 @@ M.merge_maps = function(map1, map2)
 end
 
 M.on_load = function(name, fn)
-  local Config = require("lazy.core.config")
+  local Config = require "lazy.core.config"
   if Config.plugins[name] and Config.plugins[name]._.loaded then
     fn(name)
   else
@@ -258,7 +227,7 @@ end
 M.on_rename = function(from, to)
   local clients = M.get_clients()
   for _, client in ipairs(clients) do
-    if client:supports_method("workspace/willRenameFiles") then
+    if client:supports_method "workspace/willRenameFiles" then
       local resp = client.request_sync("workspace/willRenameFiles", {
         files = {
           {

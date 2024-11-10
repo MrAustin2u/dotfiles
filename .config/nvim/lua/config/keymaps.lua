@@ -64,25 +64,11 @@ vim.keymap.set(
 vim.keymap.set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
 
 -- toggle options
-vim.keymap.set("n", "<leader>us", function()
-  TOGGLE.option "spell"
-end, { desc = "Toggle Spelling" })
-
 vim.keymap.set("n", "<leader>uw", function()
   TOGGLE.option "wrap"
 end, { desc = "Toggle Word Wrap" })
 
-vim.keymap.set("n", "<leader>ul", function()
-  TOGGLE.option("relativenumber", true)
-  TOGGLE.option "number"
-end, { desc = "Toggle Line Numbers" })
-
 vim.keymap.set("n", "<leader>ud", TOGGLE.diagnostics, { desc = "Toggle Diagnostics" })
-local conceallevel = vim.o.conceallevel > 0 and vim.o.conceallevel or 3
-
-vim.keymap.set("n", "<leader>uc", function()
-  TOGGLE.option("conceallevel", false, { 0, conceallevel })
-end, { desc = "Toggle Conceal" })
 
 -- ================================
 -- # Copy, Paste, Movements, Etc..
@@ -126,8 +112,6 @@ vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and 
 
 -- Buffers
 vim.keymap.set("n", "<space>ba", ":%bdelete|edit#|bdelete# <CR>", { silent = true, desc = "Buffer Delete All" })
--- vim.keymap.set("n", "<Tab>", ":bnext <CR>", { silent = true, desc = "Next Buffer" })
--- vim.keymap.set("n", "<S-Tab>", ":bprev <CR>", { silent = true, desc = "Previous Buffer" })
 
 -- Splits
 vim.keymap.set("n", "<space>vs", ":vs<CR>")
@@ -485,4 +469,113 @@ M.neo_test_mappings = function()
   }
 end
 
+M.snacks_mappings = {
+  { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
+  { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
+  {
+    "<leader>nd",
+    function()
+      Snacks.notifier.hide()
+    end,
+    desc = "Notification Dismiss",
+  },
+  {
+    "<leader>un",
+    function()
+      Snacks.notifier.hide()
+    end,
+    desc = "Dismiss All Notifications",
+  },
+  {
+    "<leader>bd",
+    function()
+      Snacks.bufdelete()
+    end,
+    desc = "Delete Buffer",
+  },
+  {
+    "<leader>bD",
+    function()
+      Snacks.bufdelete { force = true }
+    end,
+    desc = "Delete Buffer (Force)",
+  },
+  {
+    "<leader>bo",
+    function()
+      Snacks.bufdelete.other()
+    end,
+    desc = "Delete Other Buffers",
+  },
+  {
+    "<leader>bO",
+    function()
+      Snacks.bufdelete.other { force = true }
+    end,
+    desc = "Delete Other Buffers (Force)",
+  },
+  {
+    "<leader>gg",
+    function()
+      Snacks.lazygit()
+    end,
+    desc = "Lazygit",
+  },
+  {
+    "<leader>bl",
+    function()
+      Snacks.git.blame_line()
+    end,
+    desc = "Git Blame Line",
+  },
+  {
+    "<leader>gB",
+    function()
+      Snacks.gitbrowse()
+    end,
+    desc = "Git Browse",
+  },
+  {
+    "<leader>gf",
+    function()
+      Snacks.lazygit.log_file()
+    end,
+    desc = "Lazygit Current File History",
+  },
+  {
+    "<leader>gl",
+    function()
+      Snacks.lazygit.log()
+    end,
+    desc = "Lazygit Log (cwd)",
+  },
+  {
+    "<leader>rf",
+    function()
+      Snacks.rename.rename_file()
+    end,
+    desc = "Rename File",
+  },
+  {
+    "<c-/>",
+    function()
+      Snacks.terminal()
+    end,
+    desc = "Toggle Terminal",
+  },
+  {
+    "]r",
+    function()
+      Snacks.words.jump(vim.v.count1)
+    end,
+    desc = "Next Reference",
+  },
+  {
+    "[r",
+    function()
+      Snacks.words.jump(-vim.v.count1)
+    end,
+    desc = "Prev Reference",
+  },
+}
 return M

@@ -4,10 +4,6 @@ return {
   dependencies = {
     "kyazdani42/nvim-web-devicons",
   },
-  keys = {
-    { "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true, desc = "Prev Buffer" } },
-    { "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Buffer" } },
-  },
   config = function()
     local hlgroups = require "cokeline.hlgroups"
     local green = vim.g.terminal_color_2

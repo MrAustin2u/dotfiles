@@ -7,7 +7,6 @@ local modules = {
   "config.globals",
   "config.options",
   "config.keymaps",
-  "config.autocmds",
 }
 
 for _, module in ipairs(modules) do
