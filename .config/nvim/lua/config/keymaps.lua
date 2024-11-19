@@ -32,6 +32,17 @@ local vmap = function(tbl)
   vim.keymap.set("v", tbl[1], tbl[2], opts)
 end
 
+--- returns a function that calls the specified telescope builtin
+local telescope = function(fun, opts)
+  if opts == nil then
+    opts = {}
+  end
+
+  return function()
+    require("telescope.builtin")[fun](opts)
+  end
+end
+
 -- ================================
 -- # Misc
 -- ================================
@@ -264,49 +275,55 @@ M.vim_test_mappings = function()
   nmap { "<leader>tl", ":TestLast<CR>", { desc = "[T]est [L]ast" } }
 end
 
-M.telescope_mappings = function(builtin)
-  nmap { "<leader>sb", require("telescope").extensions.file_browser.file_browser, { desc = "[S]earch File [B]rowser" } }
-  nmap { "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" } }
-  nmap { "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" } }
-  nmap { "<leader>ff", builtin.git_files, { desc = "[F]ind Git [F]iles" } }
-  nmap { "<leader>fF", builtin.find_files, { desc = "[F]ind [F]iles" } }
-  nmap { "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" } }
-  nmap { "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" } }
-  nmap { "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" } }
-  nmap { "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" } }
-  nmap { "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' } }
-  nmap { "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" } }
+M.telescope_mappings = {
+  -- muscle memory
+  { "<C-p>", telescope "find_files", default_opts },
+  { "<C-b>", telescope "buffers", default_opts },
 
-  nmap {
-    "<leader>/",
-    function()
-      builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown {
-        winblend = 10,
-        previewer = false,
-      })
-    end,
-    { desc = "[/] Fuzzily search in current buffer" },
-  }
+  -- Compatible with hydra setup
+  { "<leader>f/", telescope "current_buffer_fuzzy_find", desc = "Buffer fuzzy find" },
+  { "<leader>f:", telescope "commands", desc = "Command search" },
+  { "<leader>f;", telescope "command_history", desc = "Command History" },
+  { "<leader>f?", telescope "search_history", desc = "Search History" },
+  { "<leader>ff", telescope "find_files", desc = "[F]ind [F]iles" },
+  { "<leader>fg", telescope "live_grep", desc = "[F]ind w/ [G]rep" },
+  { "<leader>fh", telescope "help_tags", desc = "[F]ind [H]elp" },
+  { "<leader>fk", telescope "keymaps", desc = "[F]ind [K]eymaps" },
+  { "<leader>fo", telescope "oldfiles", desc = "[F]ind [o]ld files" },
+  { "<leader>fO", telescope "vim_options", desc = "[F]ind [O]ptions" },
+  { "<leader>fr", "<cmd>Telescope frecency workspace=CWD<CR>", desc = "[F][R]ecency" },
+  { "<leader>fd", require("plugins.telescope.setup").find_dotfiles, desc = "[F]ind [D]otfiles" },
+  { "<leader>fs", telescope "git_status", desc = "[F]ind (Git) [S]tatus" },
+  { "<leader>fw", telescope "grep_string", desc = "[F]ind [W]ord" },
 
-  nmap {
-    "<leader>s/",
-    function()
-      builtin.live_grep {
-        grep_open_files = true,
-        prompt_title = "Live Grep in Open Files",
-      }
-    end,
-    { desc = "[S]earch [/] in Open Files" },
-  }
+  --  Extensions
+  { "<leader>fb", "<cmd>Telescope file_browser path=%:p:h select_buffer=true<cr>", desc = "[F]ile [B]rowser" },
 
-  nmap {
-    "<leader>sn",
-    function()
-      builtin.find_files { cwd = vim.fn.stdpath "config" }
-    end,
-    { desc = "[S]earch [N]eovim files" },
-  }
-end
+  { "<leader>lg", telescope "live_grep", desc = "[L]ive [G]rep" },
+  { "<leader>bb", telescope "buffers", desc = "Find Buffers" },
+
+  -- better spell suggestions
+  { "z=", telescope "spell_suggest", desc = "Spelling Suggestions" },
+
+  -- Git
+  -- bc = buffer commits (like gitv!)
+  { "<leader>bc", telescope "git_bcommits", desc = "[B]uffer [C]ommits" },
+
+  -- LSP
+  -- ds = document symbols
+  { "<leader>ds", telescope "lsp_document_symbols", desc = "[D]ocument [S]ymbols" },
+
+  { "<leader>cc", "<cmd>Telescope conventional_commits<cr>", desc = "[C]onventional [C]ommits" },
+
+  -- search unicode symbols 
+  { "<leader>fu", "<cmd>Telescope symbols<cr>", desc = "[F]ind [U]nicode" },
+  {
+    "<C-q>",
+    "<cmd>Telescope symbols<cr>",
+    mode = "i",
+    desc = "[F]ind [U]nicode",
+  },
+}
 
 M.git_conflict_mappings = function()
   vim.keymap.set("n", "co", "<Plug>(git-conflict-ours)")
@@ -469,6 +486,21 @@ end
 M.snacks_mappings = {
   { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
   { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
+  {
+    "]]",
+    function()
+      Snacks.words.jump(vim.v.count1)
+    end,
+    desc = "Next Reference",
+    mode = { "n", "t" },
+  },
+  {
+    "[[",
+    function()
+      Snacks.words.jump(-vim.v.count1)
+    end,
+    desc = "Prev Reference",
+  },
   {
     "<leader>nd",
     function()

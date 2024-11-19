@@ -243,4 +243,19 @@ M.on_rename = function(from, to)
   end
 end
 
+-- Returns a list of border characters
+---@param name 'double' | 'none' | 'rounded' | 'shadow' | 'single'
+---@return table<string>
+function M.get_border_chars(name)
+  local border_chars = {
+    double = { '═', '║', '═', '║', '╔', '╗', '╝', '╚' },
+    none = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
+    rounded = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+    shadow = { '▀', '█', '▄', '█', '█', '█', '█', '█' },
+    single = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+  }
+
+  return border_chars[name]
+end
+
 return M
