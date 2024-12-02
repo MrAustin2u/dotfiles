@@ -10,6 +10,7 @@ return {
         -- snippets!
         "rafamadriz/friendly-snippets",
       },
+      build = "make install_jsregexp",
     },
     -- LSP driven completions
     "hrsh7th/cmp-nvim-lsp",
@@ -112,8 +113,8 @@ return {
       formatting = {
         fields = { "kind", "abbr", "menu" },
         format = lspkind.cmp_format {
-          mode = "symbol_text", -- show only symbol annotations
-          maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+          mode = "symbol_text",  -- show only symbol annotations
+          maxwidth = 50,         -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
           ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
 
           preset = "codicons",
@@ -216,7 +217,7 @@ return {
     cmp.setup.filetype("lua", {
       sources = cmp.config.sources({
         { name = "supermaven" },
-        { name = "lazydev", group_index = 0 },
+        { name = "lazydev",   group_index = 0 },
         { name = "nvim_lua" },
         { name = "nvim_lsp" },
         { name = "luasnip" },
@@ -320,6 +321,13 @@ return {
       sources = cmp.config.sources {
         { name = "cmdline" },
         { name = "path" },
+      },
+    })
+
+    cmp.setup.filetype("sql", {
+      sources = {
+        { name = "vim-dadbod-completed-words" },
+        { name = "buffer" },
       },
     })
 
