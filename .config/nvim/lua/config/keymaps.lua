@@ -618,4 +618,12 @@ M.sort_mappings = {
   { 'goi"', 'vi":Sort<CR>', mode = "n", desc = '(go) [O]rder [i]n ["]' },
 }
 
+M.tabby_mappings = {
+  { "<leader>ta", ":$tabnew<CR>", mode = "n", desc = "[T]ab new", noremap = true },
+  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "[T]ab [c]lose", noremap = true },
+  { "<leader>to", ":tabonly<CR>", mode = "n", desc = "[T]ab [o]nly", noremap = true },
+  { "<leader>tl", ":tabn<CR>", mode = "n", desc = "[T]ab [n]ext", noremap = true },
+  { "<leader>th", ":tabp<CR>", mode = "n", desc = "[T]ab [p]revious", noremap = true },
+}
+
 return M
