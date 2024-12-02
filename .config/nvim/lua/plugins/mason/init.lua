@@ -52,6 +52,7 @@ return {
       "gopls",
       "html-lsp",
       "json-lsp",
+      "lexical",
       "lua-language-server",
       "prosemd-lsp",
       "python-lsp-server",

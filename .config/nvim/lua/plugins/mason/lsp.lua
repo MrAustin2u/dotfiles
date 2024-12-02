@@ -14,7 +14,20 @@ end
 
 local M = {}
 
-M.on_attach = function(_client, bufnr)
+M.on_attach = function(client, bufnr)
+  if client.supports_method "textDocument/formatting" then
+    local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
+
+    vim.api.nvim_clear_autocmds { group = format_on_save_group, buffer = bufnr }
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = format_on_save_group,
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.format { bufnr = bufnr }
+      end,
+    })
+  end
+
   LSP.on_supports_method("textDocument/inlayHint", function(_, buffer)
     if vim.api.nvim_buf_is_valid(buffer) and vim.bo[buffer].buftype == "" then
       vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
