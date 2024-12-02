@@ -15,8 +15,7 @@ return {
     vim.api.nvim_create_autocmd("FileType", {
       pattern = {
         "help",
-        "alpha",
-        "dashboard",
+        "snacks_dashboard",
         "neo-tree",
         "Trouble",
         "lazy",

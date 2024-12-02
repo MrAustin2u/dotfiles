@@ -15,8 +15,7 @@ return {
       exclude = {
         buftypes = { "NvimTree", "TelescopePrompt" },
         filetypes = {
-          "alpha",
-          "dashboard",
+          "snacks_dashboard",
           "lazy",
           "lazyterm",
           "lspinfo",

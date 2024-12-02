@@ -6,7 +6,7 @@ return {
       disabled_filetypes = {
         "TelescopePrompt",
         "TelescopeResults",
-        statusline = { "dashboard", "alpha", "starter" },
+        statusline = { "snacks_dashboard", "starter" },
       },
       component_separators = "|",
       section_separators = { left = "", right = "" },
