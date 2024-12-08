@@ -1,0 +1,112 @@
+# brew bundle
+alias brewb="$HOME/dotfiles/.config/brew brew bundle"
+
+# Just
+alias jy="just yoink $1"
+alias jyr="just yoink-release $1"
+
+# BLVD Repos
+alias nerds="cd ~/code/projects/nerds-website"
+
+# Sketchbar
+alias skbrestart="brew services restart sketchybar"
+
+# Better ls
+alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time  --all"
+
+# Localstack
+alias sls="docker-compose up -d localstack"
+
+# Localstack EventBridge [BLVD]
+alias plseb="./scripts/provision_localstack_eventbridge"
+
+# Localstack S3 [BLVD]
+alias plss3="./scripts/provision_localstack_s3"
+
+# Just
+alias .j="just --justfile ~/.user.justfile --working-directory ."
+
+# Docker
+alias colimastart="brew services restart colima"
+alias laws="docker run --network localstack --rm -it amazon/aws-cli --endpoint-url=http://localstack:4566"
+
+# bat
+alias cat="bat"
+
+# Pretty print the path
+alias path="echo $PATH | tr -s ":" "\n""
+
+# Vim
+alias vim="nvim"
+alias vi="nvim"
+alias vimdiff="nvim -d"
+alias legacyvim="command vim"
+
+# Typos
+alias quit="exit"
+alias cd..="cd"
+alias fap="gap"
+
+# BLVD Repos
+alias sched="cd ~/BLVD/sched/"
+alias dashboard="cd ~/BLVD/Dashboard/"
+alias migrations="cd ~/BLVD/PlatformMigrations/"
+alias booking="cd ~/BLVD/Booking/"
+alias vault="cd ~/BLVD/vault/"
+alias spa="npm run ng serve proposal-app"
+alias prunemktgprs="git branch | grep -E 'MKTG' | xargs git branch -D"
+
+# BLVD DB
+alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
+
+# Git
+alias gpod="git pull origin develop"
+alias gbr="git rev-parse --abbrev-ref HEAD"
+alias gbrn="git branch -m"
+alias fixup="git commit --amend --no-edit"
+alias gan="git add -N"
+alias gap="git add -p"
+alias gc="git commit -m"
+alias gco="git checkout"
+alias gcob="git checkout -B"
+alias gfpd="git fetch && git pull origin develop"
+alias gfpm="git fetch && git pull origin master"
+alias gpfwl="git push --force-with-lease"
+alias gl="git log"
+alias glog="fgshow"
+alias gpfl="git push --force-with-lease origin"
+alias gr="git restore ."
+alias gs="git status"
+alias lg="lazygit"
+alias stash="git stash save --include-untracked"
+alias pruneaaustinprs="git branch | grep -E 'aaustin' | xargs git branch -D"
+
+# Elixir
+alias md="mix dialyzer"
+alias mps="mix phx.server"
+alias mem="mix ecto.migrate"
+alias ism="EVENT_BUS=eventbridge iex -S mix phx.server"
+alias mr="mix reset"
+alias mdg="mix deps.get"
+alias mdca="mix deps.clean --all"
+alias mf="mix format"
+alias killbeam="pgrep -f beam | xargs kill -9"
+alias vaultserve="PORT=5000 iex -S mix phx.server"
+
+# Yarn
+alias yrs="yarn run serve"
+alias yrp="yarn run publish"
+
+# quick config
+alias aliasesconfig="nvim ~/dotfiles/.aliases"
+alias dotfiles="cd ~/dotfiles"
+alias muxconfig="nvim ~/dotfiles/.config/tmux/tmux.conf"
+alias yabaiconfig="nvim ~/dotfiles/.config/yabai/yabairc"
+alias skhdconfig="nvim ~/dotfiles/.config/skhd/skhdrc"
+alias sketchybarconfig="nvim ~/dotfiles/.config/sketchybar/sketchybarrc"
+alias kittyconfig="nvim ~/dotfiles/.config/kitty/kitty.conf"
+alias toolversions="nvim ~dotfiles/.tool-versions"
+
+alias luamake=/Users/aaustin/dotfiles/.config/nvim/lua-language-server/3rd/luamake/luamake
+
+[ -f ~/.aliases.local ] && source ~/.aliases.local
