@@ -113,15 +113,99 @@ httpless() {
     http --pretty=all --print=hb "$@" | less -R;
 }
 
-nvims() {
- items=("default" "kickstart" "LazyVim" "NvChad" "AstroNvim")
- config=$(printf "%s\n" "${items[@]}" | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0)
+work() {
+  # Set Session Name
+  SESSION="BLVD"
+  SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
 
- if [[ -z $config ]]; then
-   echo "Nothing selected"
- elif [[ $config == "default" ]]; then
-  config=""
- fi
+  # Only create tmux session if it doesn't already exist
+  if [ "$SESSIONEXISTS" = "" ]
+  then
+      # Start New Session with our name
+      tmux new-session -d -s $SESSION
 
- NVIM_APPNAME="$config" nvim $@
+      # start servers
+      tmux rename-window -t 1 'Servers'
+      tmux send-keys -t 1 "clear && sched" Enter "ism" Enter &
+      tmux split-window -h
+      tmux send-keys -t 2 "clear && dashboard" Enter "yrs" Enter &
+
+      #Sched
+      tmux new-window
+      tmux rename-window "Sched"
+      tmux send-keys -t 1 "clear && sched" Enter &
+
+       # Dashboard
+      tmux new-window
+      tmux rename-window "Dashboard"
+      tmux send-keys -t 1 "clear && dashboard" Enter &
+
+      #Dotfiles
+      tmux new-window
+      tmux rename-window "Nvim Config"
+      tmux send-keys -t 1 "clear && cd ~/dotfiles && vim" Enter &
+
+      #Ngrok
+      tmux new-window
+      tmux rename-window "Ngrok"
+      tmux send-keys -t 1 "ngrok http --region=us --domain=aaustin-blvd.ngrok.io 4000" Enter &
+
+      tmux select-window -t "Servers"
+  fi
+
+  # Attach Session, on the Main window
+  tmux attach-session -t $SESSION
+}
+
+# nerds() {
+#   # Set Session Name
+#   SESSION="NERDS"
+#   SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
+#
+#   # Only create tmux session if it doesn't already exist
+#   if [ "$SESSIONEXISTS" = "" ]
+#   then
+#       # Start New Session with our name
+#       tmux new-session -d -s $SESSION
+#
+#       # start NERDS local servers
+#       tmux rename-window -t 1 'NERDS servers'
+#       tmux send-keys -t 1 "clear && nerds" Enter "pnpm dev" Enter &
+#       tmux split-window -h -p 50
+#       tmux send-keys -t 2 "clear && nerds" Enter "pnpm db:studio" Enter &
+#
+#       #NERDS website code
+#       tmux new-window
+#       tmux rename-window "NERDS website"
+#       tmux send-keys -t 1 "clear && nerds" Enter &
+#
+#       tmux select-window -t "NERDS servers"
+#   fi
+#
+#   # Attach Session, on the Main window
+#   tmux attach-session -t $SESSION
+# }
+
+slb() {
+  # Set Session Name
+  SESSION="BLVD"
+  SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
+
+  # Only create tmux session if it doesn't already exist
+  if [ "$SESSIONEXISTS" = "" ]
+    mix escript.install hex livebook
+    livebook server
+  then
+  fi
+}
+
+# Push local branch to BLVD dev env
+jpb() {
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  DEPLOYMENT_ENV="$1"
+  if [[ -n $* ]]
+    echo "Pushing $CURRENT_BRANCH to $*!"
+  then
+    git push -f origin $CURRENT_BRANCH:$*
+  fi
 }
