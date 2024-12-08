@@ -9,7 +9,7 @@ local function open_app(appName, appPath)
   end
 end
 
-hs.hotkey.bind({ "command" }, "/", open_app("WezTerm", "/Applications/WezTerm.app"))
+hs.hotkey.bind({ "command" }, ".", open_app("WezTerm", "/Applications/WezTerm.app"))
 -- Ctrl + 1,2,3 is used to switch to different desktops
 hs.hotkey.bind({ "control" }, "n", open_app("Arc", "/Applications/Notion Calendar.app"))
 hs.hotkey.bind({ "control" }, "4", open_app("Arc", "/Applications/Arc.app"))
