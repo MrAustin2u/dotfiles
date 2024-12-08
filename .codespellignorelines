@@ -1,0 +1,10 @@
+set classify+=' ::*.cljs,,*.edn::'
+# fo [FUZZY PATTERN] - Open the selected file with the default editor
+fo() {
+" unambiguous beginning using :! (e.g. :!Te instead of :!Terminal or :!Te<tab>).
+nmap { '<leader>ml', "<cmd>s/\\v(.)(nore){-}map (.{-}) (.*)/\\1map { '\\3', '\\4' }/<cr>" }
+  ^^^^^ _o_: old files        _w_: file bro[w]ser    ^
+# Mnemonic [V]ersion [M]anager [I]nstall
+  { 'gR', '<cmd>Trouble lsp_references<cr>', desc = '[G]o to [R]eferences (Trouble)' },
+  nmap { '<leader>nd', notify.dismiss, { desc = '[N]otification [D]ismiss' } }
+  { '<leader>bc', telescope 'git_bcommits', desc = '[B]uffer [C]ommits' },
