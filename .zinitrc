@@ -1,0 +1,65 @@
+# Load a few important annexes, without Turbo
+# (this is currently required for annexes)
+zinit light-mode for \
+  zdharma-continuum/zinit-annex-as-monitor \
+  zdharma-continuum/zinit-annex-bin-gem-node \
+  zdharma-continuum/zinit-annex-patch-dl \
+  zdharma-continuum/zinit-annex-rust \
+  zdharma-continuum/zinit-annex-man
+
+zinit light zsh-users/zsh-autosuggestions
+zinit light zdharma-continuum/fast-syntax-highlighting
+zinit light zsh-users/zsh-completions
+
+# Load OMZ Git library
+zinit snippet OMZ::lib/git.zsh
+
+# Install OMZ git aliases
+zinit snippet OMZ::plugins/git/git.plugin.zsh
+
+# Install OMZ elixir mix completions
+zinit ice as"completion"
+zinit snippet OMZ::plugins/mix-fast/mix-fast.plugin.zsh
+
+# Replace zsh's default completion selection menu with fzf!
+zinit light Aloxaf/fzf-tab
+
+# reminders for aliases if whole command is typed
+zinit light djui/alias-tips
+
+# kubernetes aliases
+zinit ice lucid wait has'kubectl'
+zinit light ahmetb/kubectl-aliases
+
+# vim mode in zsh
+zinit ice depth=1
+zinit light jeffreytse/zsh-vi-mode
+
+# make fzf available
+zinit for \
+    from'gh-r'  \
+    sbin'fzf'   \
+  junegunn/fzf
+
+# integrate fzf keybindings and completions
+zinit for \
+    https://github.com/junegunn/fzf/raw/master/shell/{'completion','key-bindings'}.zsh
+
+# cht.sh
+zinit wait"2a" lucid \
+  id-as"cht.sh" \
+  as"program" \
+  for https://cht.sh/:cht.sh
+  # has'rlwrap' \
+
+zinit wait"2b" lucid \
+  id-as"cht-completion" \
+  has'rlwrap' \
+  mv"cht* -> _cht" \
+  as"completion" \
+  for https://cheat.sh/:zsh
+
+
+# PRETTYPING
+zinit ice lucid wait="" as="program" pick="prettyping" atload="alias pping=prettyping"
+zinit load denilsonsa/prettyping
