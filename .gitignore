@@ -10,3 +10,5 @@ deps/
 node_modules
 nvim/.config/nvim/plugin/
 tmux/.config/tmux/plugins/
+.colima/_lima
+.colima/ssh_config
