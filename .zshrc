@@ -19,6 +19,14 @@ export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_CONFIG_HOME="${HOME}/.config"
 
+# =====================================================
+# load zinit
+# =====================================================
+
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+source "${ZINIT_HOME}/zinit.zsh"
 
 # =====================================================
 # these must be here because otherwise asdf will get pushed after brew (files
@@ -42,6 +50,12 @@ for f in ${XDG_CONFIG_HOME}/zsh/*; do
 done
 
 # =====================================================
+# load dotfiles scripts
+# =====================================================
+
+export PATH="$HOME/dotfiles/.bin:$PATH"
+
+# =====================================================
 # preferred editor
 # =====================================================
 
@@ -58,6 +72,8 @@ fi
 # =====================================================
 # load and source
 # =====================================================
+
+[[ -f ~/.zinitrc ]] && source ~/.zinitrc
 
 # alias
 [[ -f ~/.aliases ]] && source ~/.aliases
