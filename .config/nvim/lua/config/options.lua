@@ -53,6 +53,7 @@ vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
 vim.opt.ch = 0 -- Command line height
+vim.opt.cursorline = true
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
 vim.opt.foldenable = false
@@ -65,7 +66,7 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.opt.matchtime = 1
 vim.opt.mouse = "a"
 vim.opt.number = true
-vim.opt.relativenumber = false
+vim.opt.relativenumber = true
 vim.opt.pumblend = 20
 vim.opt.pumheight = 10
 vim.opt.scrolloff = 8
