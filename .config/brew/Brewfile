@@ -6,7 +6,9 @@ tap "hashicorp/tap"
 tap "homebrew/bundle"
 tap "homebrew/services"
 tap "localstack/tap"
+tap "nikitabobko/tap"
 
+cask "aerospace"
 brew "aria2", link: false
 brew "asdf"
 brew "autoconf"
