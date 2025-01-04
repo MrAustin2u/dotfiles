@@ -66,8 +66,6 @@ return {
             end
           end,
           "Previous Hunk")
-        map("n", "<leader>gl", gs.toggle_current_line_blame, "Blame Line")
-        map("n", "<leader>gL", function() gs.blame_line({ full = true }) end, "Blame Line")
       end,
     }
   end,

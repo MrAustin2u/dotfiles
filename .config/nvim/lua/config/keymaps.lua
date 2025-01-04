@@ -118,9 +118,6 @@ end, { desc = "Copy relative path" })
 vim.keymap.set({ "n", "x" }, "gw", "*N", { desc = "Search word under cursor" })
 vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
 
--- Buffers
-vim.keymap.set("n", "<space>ba", ":%bdelete|edit#|bdelete# <CR>", { silent = true, desc = "Buffer Delete All" })
-
 -- Splits
 vim.keymap.set("n", "<space>vs", ":vs<CR>")
 vim.keymap.set("n", "<space>hs", ":split<CR>")
@@ -518,26 +515,12 @@ M.snacks_mappings = {
   {
     "<leader>bd",
     function()
-      Snacks.bufdelete()
-    end,
-    desc = "Delete Buffer",
-  },
-  {
-    "<leader>bD",
-    function()
       Snacks.bufdelete { force = true }
     end,
     desc = "Delete Buffer (Force)",
   },
   {
     "<leader>bo",
-    function()
-      Snacks.bufdelete.other()
-    end,
-    desc = "Delete Other Buffers",
-  },
-  {
-    "<leader>bO",
     function()
       Snacks.bufdelete.other { force = true }
     end,
@@ -563,6 +546,7 @@ M.snacks_mappings = {
       Snacks.gitbrowse()
     end,
     desc = "Git Browse",
+    mode = { "n", "v" },
   },
   {
     "<leader>gf",
@@ -593,18 +577,32 @@ M.snacks_mappings = {
     desc = "Toggle Terminal",
   },
   {
-    "]r",
+    "]]",
     function()
       Snacks.words.jump(vim.v.count1)
     end,
     desc = "Next Reference",
   },
   {
-    "[r",
+    "[[",
     function()
       Snacks.words.jump(-vim.v.count1)
     end,
     desc = "Prev Reference",
+  },
+  {
+    "<leader>.",
+    function()
+      Snacks.scratch()
+    end,
+    desc = "Toggle Scratch Buffer",
+  },
+  {
+    "<leader>S",
+    function()
+      Snacks.scratch.select()
+    end,
+    desc = "Select Scratch Buffer",
   },
 }
 
