@@ -49,11 +49,7 @@ end
 
 -- Add completion and documentation capabilities for cmp completion
 M.create_capabilities = function()
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  if pcall(require, "cmp_nvim_lsp") then
-    capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-  end
-  return capabilities
+  return require("blink.cmp").get_lsp_capabilities()
 end
 
 M.setup_diagnostics = function()

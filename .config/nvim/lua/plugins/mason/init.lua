@@ -4,7 +4,7 @@ return {
   keys = function()
     return {
       { "<leader>lr", "<cmd>LspRestart<CR>", desc = "Restart LSP" },
-      { "<leader>li", "<cmd>LspInfo<CR>", desc = "LSP Info" },
+      { "<leader>li", "<cmd>LspInfo<CR>",    desc = "LSP Info" },
     }
   end,
   build = ":MasonUpdate",
@@ -20,8 +20,7 @@ return {
     -- Collection of configurations for the built-in LSP client
     "neovim/nvim-lspconfig",
 
-    -- required for setting up capabilities for cmp
-    "hrsh7th/cmp-nvim-lsp",
+    "saghen/blink.cmp",
 
     -- required for jsonls and yamlls
     { "b0o/schemastore.nvim", lazy = true, version = false },
