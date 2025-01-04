@@ -42,6 +42,7 @@ return {
 
       -- LSPs
       "bash-language-server",
+      -- "biome",
       "clang-format",
       "css-lsp",
       "dockerfile-language-server",
