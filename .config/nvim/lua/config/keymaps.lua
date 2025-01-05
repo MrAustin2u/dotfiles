@@ -217,41 +217,69 @@ M.lsp_diagnostic_mappings = function()
 end
 
 M.lsp_mappings = function(buf)
-  nmap { "K", "<cmd>Lspsaga hover_doc ++quiet<CR>", { desc = "LSP: Hover", buffer = buf } }
-  nmap { "<leader>ca", "<cmd>Lspsaga code_action<CR>", { desc = "LSP: [C]ode [A]ction", buffer = buf } }
-  nmap { "<leader>rn", "<cmd>Lspsaga rename<CR>", { desc = "LSP: [R]e[n]ame", buffer = buf } }
-  nmap { "gd", require("telescope.builtin").lsp_definitions, { desc = "LSP: [G]oto [D]efinition", buffer = buf } }
-  nmap { "gr", require("telescope.builtin").lsp_references, { desc = "LSP: [G]oto [R]eferences", buffer = buf } }
-  nmap { "gI", require("telescope.builtin").lsp_implementations, { desc = "LSP: [G]oto [I]mplementation", buffer = buf } }
+  nmap {
+    "K",
+    "<cmd>Lspsaga hover_doc ++quiet<CR>",
+    { desc = "LSP: Hover", noremap = true, silent = true, buffer = buf },
+  }
+  nmap {
+    "<leader>ca",
+    "<cmd>Lspsaga code_action<CR>",
+    { desc = "LSP: [C]ode [A]ction", noremap = true, silent = true, buffer = buf },
+  }
+  nmap {
+    "<leader>rn",
+    "<cmd>Lspsaga rename<CR>",
+    { desc = "LSP: [R]e[n]ame", noremap = true, silent = true, buffer = buf },
+  }
+  nmap {
+    "gd",
+    require("telescope.builtin").lsp_definitions,
+    { desc = "LSP: [G]oto [D]efinition", noremap = true, silent = true, buffer = buf },
+  }
+  nmap {
+    "gr",
+    require("telescope.builtin").lsp_references,
+    { desc = "LSP: [G]oto [R]eferences", noremap = true, silent = true, buffer = buf },
+  }
+  nmap {
+    "gI",
+    require("telescope.builtin").lsp_implementations,
+    { desc = "LSP: [G]oto [I]mplementation", noremap = true, silent = true, buffer = buf },
+  }
   nmap {
     "<leader>D",
     require("telescope.builtin").lsp_type_definitions,
-    { desc = "LSP: Type [D]efinition", buffer = buf },
+    { desc = "LSP: Type [D]efinition", noremap = true, silent = true, buffer = buf },
   }
   nmap {
     "<leader>ds",
     require("telescope.builtin").lsp_document_symbols,
-    { desc = "LSP: [D]ocument [S]ymbols", buffer = buf },
+    { desc = "LSP: [D]ocument [S]ymbols", noremap = true, silent = true, buffer = buf },
   }
   nmap {
     "<leader>ws",
     require("telescope.builtin").lsp_dynamic_workspace_symbols,
-    { desc = "LSP: [W]orkspace [S]ymbols", buffer = buf },
+    { desc = "LSP: [W]orkspace [S]ymbols", noremap = true, silent = true, buffer = buf },
   }
-  nmap { "gD", vim.lsp.buf.declaration, { desc = "LSP: [G]oto [D]eclaration", buffer = buf } }
+  nmap {
+    "gD",
+    vim.lsp.buf.declaration,
+    { desc = "LSP: [G]oto [D]eclaration", noremap = true, silent = true, buffer = buf },
+  }
   nmap {
     "<leader>th",
     function()
       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
     end,
-    { desc = "LSP: [T]oggle Inlay [H]ints", buffer = buf },
+    { desc = "LSP: [T]oggle Inlay [H]ints", noremap = true, silent = true, buffer = buf },
   }
   nmap {
     "<leader>fm",
     function()
       vim.lsp.buf.format { async = true }
     end,
-    { desc = "LSP: [f]or[m]at", buffer = buf },
+    { desc = "LSP: [f]or[m]at", noremap = true, silent = true, buffer = buf },
   }
 end
 
@@ -261,7 +289,7 @@ M.lsp_inlay_hints_mappings = function(buf)
     function()
       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
     end,
-    { desc = "LSP: [T]oggle Inlay [H]ints", buffer = buf },
+    { desc = "LSP: [T]oggle Inlay [H]ints", noremap = true, silent = true, buffer = buf },
   }
 end
 
