@@ -156,7 +156,7 @@ return {
             },
             lsp = {
               min_keyword_length = 2, -- Number of characters to trigger porvider
-              score_offset = 0,       -- Boost/penalize the score of the items
+              score_offset = 0, -- Boost/penalize the score of the items
             },
             path = {
               min_keyword_length = 0,
@@ -178,7 +178,7 @@ return {
       keys = function()
         return {
           { "<C-_>", "<cmd>Lspsaga term_toggle<CR>", mode = { "n", "t" } },
-          { ",so",   "<cmd>Lspsaga outline<CR>",     mode = { "n", "t" } },
+          { ",so", "<cmd>Lspsaga outline<CR>", mode = { "n", "t" } },
         }
       end,
       dependencies = {
