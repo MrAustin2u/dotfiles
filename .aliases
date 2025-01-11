@@ -106,6 +106,7 @@ alias skhdconfig="nvim ~/dotfiles/.config/skhd/skhdrc"
 alias sketchybarconfig="nvim ~/dotfiles/.config/sketchybar/sketchybarrc"
 alias kittyconfig="nvim ~/dotfiles/.config/kitty/kitty.conf"
 alias toolversions="nvim ~/dotfiles/.tool-versions"
+alias ngrokconfig="nvim ~/dotfiles/.config/ngrok/ngrok.yml"
 
 alias luamake=/Users/aaustin/dotfiles/.config/nvim/lua-language-server/3rd/luamake/luamake
 
