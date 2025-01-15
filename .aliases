@@ -55,6 +55,7 @@ alias booking="cd ~/BLVD/Booking/"
 alias vault="cd ~/BLVD/vault/"
 alias spa="npm run ng serve proposal-app"
 alias prunemktgprs="git branch | grep -E 'MKTG' | xargs git branch -D"
+alias cxp="cd ~/BLVD/client-portal/"
 
 # BLVD DB
 alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
