@@ -51,7 +51,11 @@ disabled = true
 disabled = true
 
 [git_status]
-disabled = true
+ahead = '⇡${count}'
+behind = '⇣${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+staged = '[++\($count\)](green)'
+up_to_date = '✓'
 
 [docker_context]
 disabled = true
