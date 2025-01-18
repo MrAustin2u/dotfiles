@@ -1,0 +1,4 @@
+theme: tokyo-night
+keymap:
+  send-request: ctrl+enter
+new-request: alt+N

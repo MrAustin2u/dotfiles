@@ -1,3 +1,6 @@
+# Postings
+alias telgopostings="posting --collection postings/telgorithm"
+
 # brew bundle
 alias brewb="$HOME/dotfiles/.config/brew brew bundle"
 
