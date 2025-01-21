@@ -10,11 +10,24 @@ return {
   cmd = { "ObsidianNew", "ObsidianOpen", "ObsidianToday", "ObsidianYesterday", "ObsidianTomorrow", "ObsidianSearch" },
   opts = {
     dir = vault_dir,
+    workspaces = {
+      {
+        name = "personal",
+        path = vim.fs.joinpath(vault_dir, "personal"),
+      },
+      {
+        name = "work",
+        path = vim.fs.joinpath(vault_dir, "work"),
+      },
+    },
     daily_notes = {
       folder = "dailies",
     },
     completion = {
       nvim_cmp = false,
+    },
+    ui = {
+      enable = false,
     },
     note_id_func = function(title)
       -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
@@ -30,6 +43,11 @@ return {
         return tostring(os.time()) .. "-" .. suffix
       end
     end,
+    templates = {
+      folder = "templates",
+      date_format = "%a %Y-%m-%d",
+      time_format = "%H:%M %P",
+    },
   },
   keys = {
     {
