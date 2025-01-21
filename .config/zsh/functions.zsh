@@ -148,7 +148,7 @@ work() {
       #Ngrok
       tmux new-window
       tmux rename-window "Ngrok"
-      tmux send-keys -t 1 "ngrok http --region=us --domain=aaustin-blvd.ngrok.io 4000" Enter &
+      tmux send-keys -t 1 "ngrok http --domain=aaustin-blvd.ngrok.io 4000" Enter &
 
       tmux select-window -t "Servers"
   fi
