@@ -6,8 +6,17 @@ return {
     "nvim-lua/plenary.nvim",
   },
   version = "*",
-  ft = "markdown",
-  cmd = { "ObsidianNew", "ObsidianOpen", "ObsidianToday", "ObsidianYesterday", "ObsidianTomorrow", "ObsidianSearch" },
+  ft = { "markdown", "livemd" },
+  cmd = {
+    "ObsidianNew",
+    "ObsidianOpen",
+    "ObsidianOpen",
+    "ObsidianSearch",
+    "ObsidianToday",
+    "ObsidianTomorrow",
+    "ObsidianWorkspace",
+    "ObsidianYesterday",
+  },
   opts = {
     dir = vault_dir,
     workspaces = {
@@ -18,6 +27,14 @@ return {
       {
         name = "work",
         path = vim.fs.joinpath(vault_dir, "work"),
+      },
+      {
+        name = "blvd_sched_elixir_scripts",
+        path = vim.fs.joinpath(vault_dir, "work/elixir_scripts"),
+      },
+      {
+        name = "blvd_standup",
+        path = vim.fs.joinpath(vault_dir, "work/standup"),
       },
     },
     daily_notes = {
@@ -45,7 +62,7 @@ return {
     end,
     templates = {
       folder = "templates",
-      date_format = "%a %Y-%m-%d",
+      date_format = "%Y-%m-%d",
       time_format = "%H:%M %P",
     },
   },
@@ -56,6 +73,21 @@ return {
         require("telescope").extensions.file_browser.file_browser { path = vault_dir }
       end,
       desc = "Open Obsidian vault",
+    },
+    {
+      "<space>ow",
+      "<cmd>ObsidianWorkspace<cr>",
+      desc = "Switch Obsidian workspace",
+    },
+    {
+      "<space>on",
+      "<cmd>ObsidianNew<cr>",
+      desc = "New Obsidian note",
+    },
+    {
+      "<space>ot",
+      "<cmd>ObsidianNewFromTemplate<cr>",
+      desc = "New Obsidian note from template",
     },
   },
 }
