@@ -215,7 +215,6 @@ return {
         "dockerls",
         "erlangls",
         "gopls",
-        "grammarly",
         "graphql",
         "html",
         "lexical",
@@ -464,11 +463,6 @@ return {
         end
 
         lspconfig.ts_ls.setup(opts)
-      end,
-
-      ["grammarly"] = function()
-        opts.init_options = { clientId = "client_BaDkMgx4X19X9UxxYRCXZo" }
-        lspconfig.grammarly.setup(opts)
       end,
     }
   end,
