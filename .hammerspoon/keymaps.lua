@@ -16,3 +16,4 @@ hs.hotkey.bind({ "command" }, "5", open_app("Firefox", "/Applications/Firefox.ap
 hs.hotkey.bind({ "command" }, "6", open_app("Dash", "/Applications/Dash.app"))
 hs.hotkey.bind({ "command" }, "7", open_app("Slack", "/Applications/Slack.app"))
 hs.hotkey.bind({ "command" }, "8", open_app("DataGrip", "/Applications/DataGrip.app"))
+hs.hotkey.bind({ "command" }, "0", open_app("Obsidian", "/Applications/Obsidian.app"))
