@@ -165,6 +165,9 @@ run = ['move-node-to-workspace 1']
 if.app-name-regex-substring = 'Dash'
 run = ['move-node-to-workspace 1']
 [[on-window-detected]]
+if.app-name-regex-substring = 'Obsidian'
+run = ['move-node-to-workspace 1']
+[[on-window-detected]]
 if.app-id = 'company.thebrowser.Browser'
 run = ['move-node-to-workspace 2']
 [[on-window-detected]]
