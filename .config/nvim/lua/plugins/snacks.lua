@@ -27,6 +27,15 @@ return {
       -- this is what makes the scope look like an arrow
       chunk = { enabled = true },
     },
+    picker = {
+      win = {
+        input = {
+          keys = {
+            ["<c-a>"] = false,
+          },
+        },
+      },
+    },
     dashboard = {
       enabled = true,
       preset = {

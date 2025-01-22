@@ -509,6 +509,35 @@ M.neo_test_mappings = function()
 end
 
 M.snacks_mappings = {
+  -- picker
+  {
+    "<leader>,",
+    function()
+      Snacks.picker.buffers()
+    end,
+    desc = "Buffers",
+  },
+  {
+    "<leader>/",
+    function()
+      Snacks.picker.grep()
+    end,
+    desc = "Grep",
+  },
+  {
+    "<leader>:",
+    function()
+      Snacks.picker.command_history()
+    end,
+    desc = "Command History",
+  },
+  {
+    "<leader>pp",
+    function()
+      Snacks.picker.registers()
+    end,
+    desc = "Registers",
+  },
   { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
   { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
   {
