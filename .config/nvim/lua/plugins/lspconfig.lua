@@ -156,7 +156,7 @@ return {
             },
             lsp = {
               min_keyword_length = 2, -- Number of characters to trigger porvider
-              score_offset = 0, -- Boost/penalize the score of the items
+              score_offset = 0,       -- Boost/penalize the score of the items
             },
             path = {
               min_keyword_length = 0,
@@ -178,7 +178,7 @@ return {
       keys = function()
         return {
           { "<C-_>", "<cmd>Lspsaga term_toggle<CR>", mode = { "n", "t" } },
-          { ",so", "<cmd>Lspsaga outline<CR>", mode = { "n", "t" } },
+          { ",so",   "<cmd>Lspsaga outline<CR>",     mode = { "n", "t" } },
         }
       end,
       dependencies = {
@@ -208,12 +208,11 @@ return {
     },
   },
   config = function()
-    require("mason").setup()
+    require("mason").setup {}
     require("mason-lspconfig").setup {
       ensure_installed = {
         "cssls",
         "dockerls",
-        "erlangls",
         "gopls",
         "graphql",
         "html",
@@ -286,19 +285,6 @@ return {
         require("lspconfig")[server_name].setup {}
       end,
 
-      ["elixirls"] = function()
-        opts.settings = {
-          elixirLS = {
-            fetchDeps = false,
-            dialyzerEnabled = true,
-            dialyzerFormat = "dialyxir_short",
-            suggestSpecs = true,
-          },
-        }
-
-        lspconfig.elixirls.setup(opts)
-      end,
-
       ["gopls"] = function()
         opts.settings = {
           gopls = {
@@ -355,6 +341,9 @@ return {
           default_config = {
             filetypes = { "elixir", "eelixir", "heex" },
             cmd = { "$HOME/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
+            root_dir = function(fname)
+              return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.cwd()
+            end,
             settings = {},
           },
         }
