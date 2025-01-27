@@ -233,16 +233,6 @@ M.lsp_mappings = function(buf)
     { desc = "LSP: [R]e[n]ame", noremap = true, silent = true, buffer = buf },
   }
   nmap {
-    "gd",
-    require("telescope.builtin").lsp_definitions,
-    { desc = "LSP: [G]oto [D]efinition", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "gr",
-    require("telescope.builtin").lsp_references,
-    { desc = "LSP: [G]oto [R]eferences", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
     "gI",
     require("telescope.builtin").lsp_implementations,
     { desc = "LSP: [G]oto [I]mplementation", noremap = true, silent = true, buffer = buf },
@@ -301,53 +291,18 @@ M.vim_test_mappings = function()
 end
 
 M.telescope_mappings = {
-  -- muscle memory
-  { "<C-p>", telescope "find_files", default_opts },
-  { "<C-b>", telescope "buffers", default_opts },
-
-  -- Compatible with hydra setup
-  { "<leader>f/", telescope "current_buffer_fuzzy_find", desc = "Buffer fuzzy find" },
-  { "<leader>f:", telescope "commands", desc = "Command search" },
-  { "<leader>f;", telescope "command_history", desc = "Command History" },
-  { "<leader>f?", telescope "search_history", desc = "Search History" },
-  { "<leader>ff", telescope "find_files", desc = "[F]ind [F]iles" },
-  { "<leader>fg", telescope "live_grep", desc = "[F]ind w/ [G]rep" },
-  { "<leader>fh", telescope "help_tags", desc = "[F]ind [H]elp" },
-  { "<leader>fk", telescope "keymaps", desc = "[F]ind [K]eymaps" },
-  { "<leader>fo", telescope "oldfiles", desc = "[F]ind [o]ld files" },
-  { "<leader>fO", telescope "vim_options", desc = "[F]ind [O]ptions" },
-  { "<leader>fr", "<cmd>Telescope frecency workspace=CWD<CR>", desc = "[F][R]ecency" },
-  { "<leader>fd", require("plugins.telescope.setup").find_dotfiles, desc = "[F]ind [D]otfiles" },
-  { "<leader>fs", telescope "git_status", desc = "[F]ind (Git) [S]tatus" },
-  { "<leader>fw", telescope "grep_string", desc = "[F]ind [W]ord" },
+  { "<leader>f?", telescope "search_history",   desc = "Search History" },
+  { "<leader>fh", telescope "help_tags",        desc = "[F]ind [H]elp" },
+  { "<leader>fO", telescope "vim_options",      desc = "[F]ind [O]ptions" },
 
   --  Extensions
-  { "<leader>fb", "<cmd>Telescope file_browser path=%:p:h select_buffer=true<cr>", desc = "[F]ile [B]rowser" },
-
-  { "<leader>lg", telescope "live_grep", desc = "[L]ive [G]rep" },
-  { "<leader>bb", telescope "buffers", desc = "Find Buffers" },
+  { "<leader>bb", telescope "buffers",          desc = "Find Buffers" },
 
   -- better spell suggestions
-  { "z=", telescope "spell_suggest", desc = "Spelling Suggestions" },
-
-  -- Git
-  -- bc = buffer commits (like gitv!)
-  { "<leader>bc", telescope "git_bcommits", desc = "[B]uffer [C]ommits" },
-
-  -- LSP
-  -- ds = document symbols
-  { "<leader>ds", telescope "lsp_document_symbols", desc = "[D]ocument [S]ymbols" },
-
-  { "<leader>cc", "<cmd>Telescope conventional_commits<cr>", desc = "[C]onventional [C]ommits" },
+  { "z=",         telescope "spell_suggest",    desc = "Spelling Suggestions" },
 
   -- search unicode symbols 
   { "<leader>fu", "<cmd>Telescope symbols<cr>", desc = "[F]ind [U]nicode" },
-  {
-    "<C-q>",
-    "<cmd>Telescope symbols<cr>",
-    mode = "i",
-    desc = "[F]ind [U]nicode",
-  },
 }
 
 M.git_conflict_mappings = function()
@@ -438,7 +393,7 @@ M.todo_comments_mappings = {
     end,
     desc = "Previous todo comment",
   },
-  { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo" },
+  { "<leader>st", "<cmd>TodoTelescope<cr>",                         desc = "Todo" },
   { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
 }
 
@@ -509,14 +464,9 @@ M.neo_test_mappings = function()
 end
 
 M.snacks_mappings = {
-  -- picker
-  {
-    "<leader>,",
-    function()
-      Snacks.picker.buffers()
-    end,
-    desc = "Buffers",
-  },
+  --------------
+  -- Grep
+  --------------
   {
     "<leader>/",
     function()
@@ -525,11 +475,94 @@ M.snacks_mappings = {
     desc = "Grep",
   },
   {
-    "<leader>:",
+    "<leader>sw",
+    function()
+      Snacks.picker.grep_word()
+    end,
+    desc = "Visual selection or word",
+    mode = { "n", "x" },
+  },
+  --------------
+  -- Terminal
+  --------------
+  {
+    "<c-/>",
+    function()
+      Snacks.terminal()
+    end,
+    desc = "Toggle Terminal",
+  },
+
+  --------------
+  -- Find
+  --------------
+  {
+    "<leader>fr",
+    function()
+      Snacks.picker.recent()
+    end,
+    desc = "Recent",
+  },
+  {
+    "<leader>ff",
+    function()
+      Snacks.picker.files()
+    end,
+    desc = "Find Files",
+  },
+  {
+    "<leader>fg",
+    function()
+      Snacks.picker.git_files()
+    end,
+    desc = "Find Files (git-files)",
+  },
+
+  --------------
+  -- Search
+  --------------
+  {
+    "<leader>sm",
+    function()
+      Snacks.picker.marks()
+    end,
+    desc = "Marks",
+  },
+  {
+    "<leader>sk",
+    function()
+      Snacks.picker.keymaps()
+    end,
+    desc = "Keymaps",
+  },
+  {
+    "<leader>sc",
     function()
       Snacks.picker.command_history()
     end,
     desc = "Command History",
+  },
+  {
+    "<leader>sC",
+    function()
+      Snacks.picker.commands()
+    end,
+    desc = "Commands",
+  },
+  {
+    "<leader>sb",
+    function()
+      Snacks.picker.lines()
+    end,
+    desc = "Buffer Lines",
+  },
+  {
+    "<leader>sw",
+    function()
+      Snacks.picker.grep_word()
+    end,
+    desc = "Visual selection or word",
+    mode = { "n", "x" },
   },
   {
     "<leader>pp",
@@ -538,50 +571,49 @@ M.snacks_mappings = {
     end,
     desc = "Registers",
   },
-  { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
-  { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
+
+  --------------
+  -- LSP
+  --------------
+
   {
-    "]]",
+    "gd",
     function()
-      Snacks.words.jump(vim.v.count1)
+      Snacks.picker.lsp_definitions()
     end,
-    desc = "Next Reference",
-    mode = { "n", "t" },
+    desc = "Goto Definition",
   },
   {
-    "[[",
+    "gr",
     function()
-      Snacks.words.jump(-vim.v.count1)
+      Snacks.picker.lsp_references()
     end,
-    desc = "Prev Reference",
+    nowait = true,
+    desc = "References",
   },
   {
-    "<leader>nd",
+    "gI",
     function()
-      Snacks.notifier.hide()
+      Snacks.picker.lsp_implementations()
     end,
-    desc = "Notification Dismiss",
+    desc = "Goto Implementation",
+  },
+
+  -- Git
+
+  {
+    "<leader>gc",
+    function()
+      Snacks.picker.git_log()
+    end,
+    desc = "Git Log",
   },
   {
-    "<leader>un",
+    "<leader>gs",
     function()
-      Snacks.notifier.hide()
+      Snacks.picker.git_status()
     end,
-    desc = "Dismiss All Notifications",
-  },
-  {
-    "<leader>bd",
-    function()
-      Snacks.bufdelete { force = true }
-    end,
-    desc = "Delete Buffer (Force)",
-  },
-  {
-    "<leader>bo",
-    function()
-      Snacks.bufdelete.other { force = true }
-    end,
-    desc = "Delete Other Buffers (Force)",
+    desc = "Git Status",
   },
   {
     "<leader>gg",
@@ -619,20 +651,39 @@ M.snacks_mappings = {
     end,
     desc = "Lazygit Log (cwd)",
   },
+
+  --------------
+  -- Buffer
+  --------------
+
+  { "<Tab>",   "<cmd>bnext<CR>", desc = "Next buffer" },
+  { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
   {
-    "<leader>rf",
+    "<leader>,",
     function()
-      Snacks.rename.rename_file()
+      Snacks.picker.buffers()
     end,
-    desc = "Rename File",
+    desc = "Buffers",
   },
   {
-    "<c-/>",
+    "<leader>bd",
     function()
-      Snacks.terminal()
+      Snacks.bufdelete { force = true }
     end,
-    desc = "Toggle Terminal",
+    desc = "Delete Buffer (Force)",
   },
+  {
+    "<leader>bo",
+    function()
+      Snacks.bufdelete.other { force = true }
+    end,
+    desc = "Delete Other Buffers (Force)",
+  },
+
+  --------------
+  -- Words
+  --------------
+
   {
     "]]",
     function()
@@ -647,6 +698,42 @@ M.snacks_mappings = {
     end,
     desc = "Prev Reference",
   },
+
+  --------------
+  -- Notification
+  --------------
+
+  {
+    "<leader>nd",
+    function()
+      Snacks.notifier.hide()
+    end,
+    desc = "Notification Dismiss",
+  },
+  {
+    "<leader>un",
+    function()
+      Snacks.notifier.hide()
+    end,
+    desc = "Dismiss All Notifications",
+  },
+
+  --------------
+  -- File
+  --------------
+
+  {
+    "<leader>rf",
+    function()
+      Snacks.rename.rename_file()
+    end,
+    desc = "Rename File",
+  },
+
+  --------------
+  -- Scratch
+  --------------
+
   {
     "<leader>.",
     function()
@@ -664,21 +751,21 @@ M.snacks_mappings = {
 }
 
 M.sort_mappings = {
-  { "go", ":Sort<CR>", mode = "v", desc = "(go) Order (sort lines/line params)" },
-  { "goi'", "vi':Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n [']" },
-  { "goi(", "vi(:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n (" },
-  { "goi[", "vi[:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n [" },
-  { "goip", "vip:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n [p]aragraph" },
-  { "goi{", "vi{:Sort<CR>", mode = "n", desc = "(go) [O]rder [i]n {" },
-  { 'goi"', 'vi":Sort<CR>', mode = "n", desc = '(go) [O]rder [i]n ["]' },
+  { "go",   ":Sort<CR>",    mode = "v", desc = "Order (sort lines/line params)" },
+  { "goi'", "vi':Sort<CR>", mode = "n", desc = "Order in [']" },
+  { "goi(", "vi(:Sort<CR>", mode = "n", desc = "Order in (" },
+  { "goi[", "vi[:Sort<CR>", mode = "n", desc = "Order in [" },
+  { "goip", "vip:Sort<CR>", mode = "n", desc = "Order in [p]aragraph" },
+  { "goi{", "vi{:Sort<CR>", mode = "n", desc = "Order in {" },
+  { 'goi"', 'vi":Sort<CR>', mode = "n", desc = 'Order in ["]' },
 }
 
 M.tabby_mappings = {
-  { "<leader>ta", ":$tabnew<CR>", mode = "n", desc = "[T]ab new", noremap = true },
-  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "[T]ab [c]lose", noremap = true },
-  { "<leader>to", ":tabonly<CR>", mode = "n", desc = "[T]ab [o]nly", noremap = true },
-  { "<leader>tl", ":tabn<CR>", mode = "n", desc = "[T]ab [n]ext", noremap = true },
-  { "<leader>th", ":tabp<CR>", mode = "n", desc = "[T]ab [p]revious", noremap = true },
+  { "<leader>ta", ":$tabnew<CR>",  mode = "n", desc = "Tab new",      noremap = true },
+  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose",  noremap = true },
+  { "<leader>to", ":tabonly<CR>",  mode = "n", desc = "Tab only",     noremap = true },
+  { "<leader>tl", ":tabn<CR>",     mode = "n", desc = "Tab next",     noremap = true },
+  { "<leader>th", ":tabp<CR>",     mode = "n", desc = "Tab previous", noremap = true },
 }
 
 return M
