@@ -126,29 +126,29 @@ work() {
 
       # start servers
       tmux rename-window -t 1 'Servers'
-      tmux send-keys -t 1 "clear && sched" Enter "ism" Enter &
+      tmux send-keys -t 0 "clear && sched" Enter "ism" Enter &
       tmux split-window -h
-      tmux send-keys -t 2 "clear && dashboard" Enter "yrs" Enter &
+      tmux send-keys -t 1 "clear && dashboard" Enter "yrs" Enter &
 
       #Sched
       tmux new-window
       tmux rename-window "Sched"
-      tmux send-keys -t 1 "clear && sched" Enter &
+      tmux send-keys -t 0 "clear && sched" Enter &
 
        # Dashboard
       tmux new-window
       tmux rename-window "Dashboard"
-      tmux send-keys -t 1 "clear && dashboard" Enter &
+      tmux send-keys -t 0 "clear && dashboard" Enter &
 
       #Dotfiles
       tmux new-window
       tmux rename-window "Nvim Config"
-      tmux send-keys -t 1 "clear && cd ~/dotfiles && vim" Enter &
+      tmux send-keys -t 0 "clear && cd ~/dotfiles && vim" Enter &
 
       #Ngrok
       tmux new-window
       tmux rename-window "Ngrok"
-      tmux send-keys -t 1 "ngrok http --domain=aaustin-blvd.ngrok.io 4000" Enter &
+      tmux send-keys -t 0 "ngrok http 4000 --url aaustin-blvd.ngrok.io" Enter &
 
       tmux select-window -t "Servers"
   fi
