@@ -174,20 +174,44 @@ M.deprecate = function(old, new)
   M.warn(("`%s` is deprecated. Please use `%s` instead"):format(old, new), { title = "LazyVim" })
 end
 
-M.merge_maps = function(map1, map2)
-  local mergedMap = {}
-
-  -- Copy all key-value pairs from map1 to mergedMap
-  for key, value in pairs(map1) do
-    mergedMap[key] = value
+---@param t table
+function M.is_list(t)
+  local i = 0
+  ---@diagnostic disable-next-line: no-unknown
+  for _ in pairs(t) do
+    i = i + 1
+    if t[i] == nil then
+      return false
+    end
   end
+  return true
+end
 
-  -- Copy all key-value pairs from map2 to mergedMap
-  for key, value in pairs(map2) do
-    mergedMap[key] = value
+local function can_merge(v)
+  return type(v) == "table" and (vim.tbl_isempty(v) or not M.is_list(v))
+end
+
+---@generic T
+---@param ... T
+---@return T
+function M.merge(...)
+  local ret = select(1, ...)
+  if ret == vim.NIL then
+    ret = nil
   end
-
-  return mergedMap
+  for i = 2, select("#", ...) do
+    local value = select(i, ...)
+    if can_merge(ret) and can_merge(value) then
+      for k, v in pairs(value) do
+        ret[k] = M.merge(ret[k], v)
+      end
+    elseif value == vim.NIL then
+      ret = nil
+    elseif value ~= nil then
+      ret = value
+    end
+  end
+  return ret
 end
 
 M.on_load = function(name, fn)

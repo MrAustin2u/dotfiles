@@ -23,12 +23,12 @@ local UTILS = require "config.utils"
 local default_opts = { noremap = true, silent = true }
 
 local nmap = function(tbl)
-  local opts = tbl[3] and UTILS.merge_maps(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and UTILS.merge(default_opts, tbl[3]) or default_opts
   vim.keymap.set("n", tbl[1], tbl[2], opts)
 end
 
 local vmap = function(tbl)
-  local opts = tbl[3] and UTILS.merge_maps(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and UTILS.merge(default_opts, tbl[3]) or default_opts
   vim.keymap.set("v", tbl[1], tbl[2], opts)
 end
 
@@ -143,32 +143,32 @@ end, { silent = true })
 
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
-  nmap { "<leader>an", attempt.new_select, UTILS.merge_maps(default_opts, { desc = "New Attempt" }) }
+  nmap { "<leader>an", attempt.new_select, UTILS.merge(default_opts, { desc = "New Attempt" }) }
   -- run current attempt buffer
-  nmap { "<leader>ar", attempt.run, UTILS.merge_maps(default_opts, { desc = "Run Attempt" }) }
+  nmap { "<leader>ar", attempt.run, UTILS.merge(default_opts, { desc = "Run Attempt" }) }
   -- delete attempt from current buffer
-  nmap { "<leader>ad", attempt.delete_buf, UTILS.merge_maps(default_opts, { desc = "Delete Attempt" }) }
+  nmap { "<leader>ad", attempt.delete_buf, UTILS.merge(default_opts, { desc = "Delete Attempt" }) }
   -- rename attempt from current buffer
-  nmap { "<leader>ac", attempt.rename_buf, UTILS.merge_maps(default_opts, { desc = "Rename Attempt" }) }
+  nmap { "<leader>ac", attempt.rename_buf, UTILS.merge(default_opts, { desc = "Rename Attempt" }) }
   -- open one of the existing scratch buffers
-  nmap { "<leader>al", attempt.open_select, UTILS.merge_maps(default_opts, { desc = "Select Attempt" }) }
+  nmap { "<leader>al", attempt.open_select, UTILS.merge(default_opts, { desc = "Select Attempt" }) }
 end
 
 M.elixir_mappings = function()
   nmap {
     "<space>fp",
     ":ElixirFromPipe<cr>",
-    UTILS.merge_maps(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
+    UTILS.merge(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
   }
   nmap {
     "<space>tp",
     ":ElixirToPipe<cr>",
-    UTILS.merge_maps(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
+    UTILS.merge(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
   }
   vmap {
     "<space>em",
     ":ElixirExpandMacro<cr>",
-    UTILS.merge_maps(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
+    UTILS.merge(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
   }
 end
 
