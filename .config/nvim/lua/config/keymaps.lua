@@ -1,6 +1,4 @@
 local M = {}
-local TOGGLE = require "config.utils.toggle"
-local UTILS = require "config.utils"
 
 --[[
 ╭────────────────────────────────────────────────────────────────────────────╮
@@ -23,12 +21,12 @@ local UTILS = require "config.utils"
 local default_opts = { noremap = true, silent = true }
 
 local nmap = function(tbl)
-  local opts = tbl[3] and UTILS.merge(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and aa.merge(default_opts, tbl[3]) or default_opts
   vim.keymap.set("n", tbl[1], tbl[2], opts)
 end
 
 local vmap = function(tbl)
-  local opts = tbl[3] and UTILS.merge(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and aa.merge(default_opts, tbl[3]) or default_opts
   vim.keymap.set("v", tbl[1], tbl[2], opts)
 end
 
@@ -67,16 +65,6 @@ vim.keymap.set(
   ':w<CR>:source %<CR>:lua vim.notify("File sourced!")<CR>',
   { desc = "[SO]urce file", silent = true }
 )
-
--- new file
-vim.keymap.set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
-
--- toggle options
-vim.keymap.set("n", "<leader>uw", function()
-  TOGGLE.option "wrap"
-end, { desc = "Toggle Word Wrap" })
-
-vim.keymap.set("n", "<leader>ud", TOGGLE.diagnostics, { desc = "Toggle Diagnostics" })
 
 -- ================================
 -- # Copy, Paste, Movements, Etc..
@@ -143,32 +131,32 @@ end, { silent = true })
 
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
-  nmap { "<leader>an", attempt.new_select, UTILS.merge(default_opts, { desc = "New Attempt" }) }
+  nmap { "<leader>an", attempt.new_select, aa.merge(default_opts, { desc = "New Attempt" }) }
   -- run current attempt buffer
-  nmap { "<leader>ar", attempt.run, UTILS.merge(default_opts, { desc = "Run Attempt" }) }
+  nmap { "<leader>ar", attempt.run, aa.merge(default_opts, { desc = "Run Attempt" }) }
   -- delete attempt from current buffer
-  nmap { "<leader>ad", attempt.delete_buf, UTILS.merge(default_opts, { desc = "Delete Attempt" }) }
+  nmap { "<leader>ad", attempt.delete_buf, aa.merge(default_opts, { desc = "Delete Attempt" }) }
   -- rename attempt from current buffer
-  nmap { "<leader>ac", attempt.rename_buf, UTILS.merge(default_opts, { desc = "Rename Attempt" }) }
+  nmap { "<leader>ac", attempt.rename_buf, aa.merge(default_opts, { desc = "Rename Attempt" }) }
   -- open one of the existing scratch buffers
-  nmap { "<leader>al", attempt.open_select, UTILS.merge(default_opts, { desc = "Select Attempt" }) }
+  nmap { "<leader>al", attempt.open_select, aa.merge(default_opts, { desc = "Select Attempt" }) }
 end
 
 M.elixir_mappings = function()
   nmap {
     "<space>fp",
     ":ElixirFromPipe<cr>",
-    UTILS.merge(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
+    aa.merge(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
   }
   nmap {
     "<space>tp",
     ":ElixirToPipe<cr>",
-    UTILS.merge(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
+    aa.merge(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
   }
   vmap {
     "<space>em",
     ":ElixirExpandMacro<cr>",
-    UTILS.merge(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
+    aa.merge(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
   }
 end
 
@@ -228,34 +216,14 @@ M.lsp_mappings = function(buf)
     { desc = "LSP: [C]ode [A]ction", noremap = true, silent = true, buffer = buf },
   }
   nmap {
-    "<leader>rn",
-    "<cmd>Lspsaga rename<CR>",
-    { desc = "LSP: [R]e[n]ame", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "gI",
-    require("telescope.builtin").lsp_implementations,
-    { desc = "LSP: [G]oto [I]mplementation", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "<leader>D",
-    require("telescope.builtin").lsp_type_definitions,
-    { desc = "LSP: Type [D]efinition", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
     "<leader>ds",
     require("telescope.builtin").lsp_document_symbols,
-    { desc = "LSP: [D]ocument [S]ymbols", noremap = true, silent = true, buffer = buf },
+    { desc = "LSP: Document Symbols", noremap = true, silent = true, buffer = buf },
   }
   nmap {
     "<leader>ws",
     require("telescope.builtin").lsp_dynamic_workspace_symbols,
-    { desc = "LSP: [W]orkspace [S]ymbols", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "gD",
-    vim.lsp.buf.declaration,
-    { desc = "LSP: [G]oto [D]eclaration", noremap = true, silent = true, buffer = buf },
+    { desc = "LSP: Workspace Symbols", noremap = true, silent = true, buffer = buf },
   }
   nmap {
     "<leader>th",
@@ -380,21 +348,19 @@ end
 
 M.todo_comments_mappings = {
   {
-    "]t",
+    "<leader>st",
     function()
-      require("todo-comments").jump_next()
+      Snacks.picker.todo_comments()
     end,
-    desc = "Next todo comment",
+    desc = "Todo",
   },
   {
-    "[t",
+    "<leader>sT",
     function()
-      require("todo-comments").jump_prev()
+      Snacks.picker.todo_comments { keywords = { "TODO", "FIX", "FIXME" } }
     end,
-    desc = "Previous todo comment",
+    desc = "Todo/Fix/Fixme",
   },
-  { "<leader>st", "<cmd>TodoTelescope<cr>",                         desc = "Todo" },
-  { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
 }
 
 M.neo_test_mappings = function()
@@ -438,14 +404,14 @@ M.neo_test_mappings = function()
     function()
       require("neotest").output.open { enter = true, auto_close = true }
     end,
-    { desc = "[T]est Show [O]utput" },
+    { desc = "[T]est Show Output" },
   }
   nmap {
     "<leader>tO",
     function()
       require("neotest").output_panel.toggle()
     end,
-    { desc = "[T]est Toggle [O]utput Panel" },
+    { desc = "[T]est Toggle Output Panel" },
   }
   nmap {
     "<leader>tS",
@@ -572,33 +538,6 @@ M.snacks_mappings = {
     desc = "Registers",
   },
 
-  --------------
-  -- LSP
-  --------------
-
-  {
-    "gd",
-    function()
-      Snacks.picker.lsp_definitions()
-    end,
-    desc = "Goto Definition",
-  },
-  {
-    "gr",
-    function()
-      Snacks.picker.lsp_references()
-    end,
-    nowait = true,
-    desc = "References",
-  },
-  {
-    "gI",
-    function()
-      Snacks.picker.lsp_implementations()
-    end,
-    desc = "Goto Implementation",
-  },
-
   -- Git
 
   {
@@ -716,18 +655,6 @@ M.snacks_mappings = {
       Snacks.notifier.hide()
     end,
     desc = "Dismiss All Notifications",
-  },
-
-  --------------
-  -- File
-  --------------
-
-  {
-    "<leader>rf",
-    function()
-      Snacks.rename.rename_file()
-    end,
-    desc = "Rename File",
   },
 
   --------------

@@ -1,3 +1,5 @@
+_G.aa = require "config.util"
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -13,10 +15,31 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     os.exit(1)
   end
 end
+
 vim.opt.rtp:prepend(lazypath)
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+
+-- Add support for the LazyFile event
+local Event = require "lazy.core.handler.event"
+
+Event.mappings.LazyFile = { id = "LazyFile", event = { "BufReadPost", "BufNewFile", "BufWritePre" } }
+Event.mappings["User LazyFile"] = Event.mappings.LazyFile
+
+-- require new configuration
+local modules = {
+  -- "config.types",
+  "config.options",
+  "config.autocmds",
+  "config.util",
+  "config.keymaps",
+}
+
+for _, module in ipairs(modules) do
+  local ok, err = pcall(require, module)
+  if not ok then
+    error("Error loading " .. module .. "\n\n" .. err)
+  end
+end
 
 -- Setup lazy.nvim
 require("lazy").setup {

@@ -52,11 +52,12 @@ vim.opt.diffopt:append "algorithm:patience"
 vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0           -- Command line height
+vim.opt.ch = 0 -- Command line height
 vim.opt.cursorline = true
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
 vim.opt.foldenable = false
+vim.opt.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
 vim.opt.guifont = "MonoLisa Nerd Font Mono:h15"
 vim.opt.hidden = true
 vim.opt.hlsearch = false
@@ -81,6 +82,7 @@ vim.opt.softtabstop = 2
 vim.opt.spelllang = "en"
 vim.opt.splitright = true
 vim.opt.splitkeep = "screen"
+vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
 vim.opt.tabstop = 2
 vim.opt.termguicolors = true
 vim.opt.timeout = true

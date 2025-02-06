@@ -1,5 +1,3 @@
-local icons = require "config.icons"
-
 return {
   "lewis6991/gitsigns.nvim",
   event = { "BufReadPre", "BufNewFile" },
@@ -7,22 +5,22 @@ return {
     require("gitsigns").setup {
       signs = {
         add = {
-          text = icons.ui.BoldLineLeft,
+          text = aa.icons.ui.BoldLineLeft,
         },
         change = {
-          text = icons.ui.BoldLineDashedMiddle,
+          text = aa.icons.ui.BoldLineDashedMiddle,
         },
         delete = {
-          text = icons.ui.TriangleMediumArrowRight,
+          text = aa.icons.ui.TriangleMediumArrowRight,
         },
         topdelete = {
-          text = icons.ui.TriangleMediumArrowRight,
+          text = aa.icons.ui.TriangleMediumArrowRight,
         },
         changedelete = {
-          text = icons.ui.BoldLineLeft,
+          text = aa.icons.ui.BoldLineLeft,
         },
         untracked = {
-          text = icons.ui.BoldLineLeft,
+          text = aa.icons.ui.BoldLineLeft,
         },
       },
       watch_gitdir = {

@@ -18,7 +18,6 @@ return {
       javascript = prettier,
       javascriptreact = prettier,
       markdown = prettier,
-      go = { "gofmt", "goimports" },
       sql = { "pg_format" },
       yaml = prettier,
       json = prettier,

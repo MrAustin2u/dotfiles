@@ -1,5 +1,3 @@
-local UTILS = require "config.utils"
-
 return {
   "nvim-neo-tree/neo-tree.nvim",
   branch = "v3.x",
@@ -13,7 +11,7 @@ return {
     {
       "<leader>fe",
       function()
-        require("neo-tree.command").execute { toggle = true, dir = UTILS.get_root() }
+        require("neo-tree.command").execute { toggle = true, dir = aa.get_root() }
       end,
       desc = "Explorer NeoTree (root dir)",
     },
@@ -74,7 +72,7 @@ return {
   },
   config = function(_, opts)
     local function on_move(data)
-      UTILS.on_rename(data.source, data.destination)
+      aa.on_rename(data.source, data.destination)
     end
 
     local events = require "neo-tree.events"
