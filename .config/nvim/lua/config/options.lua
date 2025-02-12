@@ -31,6 +31,8 @@ vim.g.markdown_fenced_languages = {
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+vim.g.autoformat = true
+
 vim.cmd.syntax "off"
 vim.opt.backupdir = cache_dir .. "backup/"
 vim.opt.bg = "dark"
@@ -52,11 +54,14 @@ vim.opt.diffopt:append "algorithm:patience"
 vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0 -- Command line height
+vim.opt.ch = 0           -- Command line height
 vim.opt.cursorline = true
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
 vim.opt.foldenable = false
+vim.opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()"
+vim.opt.foldmethod = "expr"
+vim.opt.foldtext = ""
 vim.opt.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
 vim.opt.guifont = "MonoLisa Nerd Font Mono:h15"
 vim.opt.hidden = true
@@ -67,21 +72,22 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.opt.matchtime = 1
 vim.opt.mouse = "a"
 vim.opt.number = true
-vim.opt.relativenumber = true
 vim.opt.pumblend = 20
 vim.opt.pumheight = 10
+vim.opt.relativenumber = true
 vim.opt.scrolloff = 8
 vim.opt.shiftwidth = 2
+vim.opt.shortmess:append { W = true, I = true, c = true }
 vim.opt.showcmd = true
 vim.opt.showmatch = true
-vim.opt.shortmess:append { W = true, I = true, c = true }
 vim.opt.sidescrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.smartindent = false
+vim.opt.smoothscroll = true
 vim.opt.softtabstop = 2
 vim.opt.spelllang = "en"
-vim.opt.splitright = true
 vim.opt.splitkeep = "screen"
+vim.opt.splitright = true
 vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
 vim.opt.tabstop = 2
 vim.opt.termguicolors = true
