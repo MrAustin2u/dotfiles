@@ -19,9 +19,11 @@ return {
         ["tsconfig.json"] = { glyph = "", hl = "MiniIconsAzure" },
         ["tsconfig.build.json"] = { glyph = "", hl = "MiniIconsAzure" },
         ["yarn.lock"] = { glyph = "", hl = "MiniIconsBlue" },
+        [".go-version"] = { glyph = "", hl = "MiniIconsBlue" },
       },
       filetype = {
         dotenv = { glyph = "", hl = "MiniIconsYellow" },
+        gotmpl = { glyph = "󰟓", hl = "MiniIconsGrey" },
       },
     },
     init = function()
