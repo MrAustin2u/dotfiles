@@ -46,6 +46,8 @@ return {
         end
 
         -- stylua: ignore start
+        map("n", "<leader>ghb", function() gs.blame_line({ full = true }) end, "Blame Line")
+        map({ 'n', 'v' }, '<leader>hs', ":Gitsigns stage_hunk<CR>", "Stage Hunk")
         map({ "n", "v" }, "<leader>gh", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
         map("n", "<leader>gR", gs.reset_buffer, "Reset Buffer")
         map("n", "]h", function()
