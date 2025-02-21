@@ -19,7 +19,7 @@ function M.get()
     { "gI",         function() Snacks.picker.lsp_implementations() end,  desc = "Goto Implementation" },
     { "gy",         function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
     { "gD",         function() Snacks.picker.lsp_declarations() end,     desc = "Goto Declaration" },
-    { "K",          "<cmd>Lspsaga hover_doc ++quiet<CR>",                desc = "Hover" },
+    { "K",          function() return vim.lsp.buf.hover() end,           desc = "Hover" },
     { "gK",         function() return vim.lsp.buf.signature_help() end,  desc = "Signature Help",             has = "signatureHelp" },
     { "<c-k>",      function() return vim.lsp.buf.signature_help() end,  mode = "i",                          desc = "Signature Help", has = "signatureHelp" },
     { "<leader>ca", vim.lsp.buf.code_action,                             desc = "Code Action",                mode = { "n", "v" },     has = "codeAction" },
@@ -27,7 +27,7 @@ function M.get()
     { "<leader>cC", vim.lsp.codelens.refresh,                            desc = "Refresh & Display Codelens", mode = { "n" },          has = "codeLens" },
     { "<leader>cR", function() Snacks.rename.rename_file() end,          desc = "Rename File",                mode = { "n" },          has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
     { "<leader>cr", "<cmd>Lspsaga rename<CR>",                           desc = "Rename",                     has = "rename" },
-    { "<leader>cA", aa.lsp.action.source,                           desc = "Source Action",              has = "codeAction" },
+    { "<leader>cA", aa.lsp.action.source,                                desc = "Source Action",              has = "codeAction" },
     {
       "]]",
       function() Snacks.words.jump(vim.v.count1) end,
