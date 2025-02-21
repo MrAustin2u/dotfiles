@@ -19,20 +19,38 @@ return {
       { "<c-space>", desc = "Increment Selection" },
       { "<bs>", desc = "Decrement Selection", mode = "x" },
     },
-    opts_extend = { "ensure_installed" },
     ---@type TSConfig
     ---@diagnostic disable-next-line: missing-fields
     opts = {
+      -- Install parsers synchronously (only applied to `ensure_installed`)
+      sync_install = false,
+      -- Automatically install missing parsers when entering buffer
+      -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+      auto_install = true,
       highlight = { enable = true },
       indent = { enable = true },
       ensure_installed = {
         "bash",
         "c",
         "diff",
+        "eex",
+        "elixir",
+        "git_config",
+        "git_rebase",
+        "gitattributes",
+        "gitcommit",
+        "gitignore",
+        "go",
+        "gomod",
+        "gosum",
+        "gowork",
+        "hcl",
+        "heex",
         "html",
         "javascript",
         "jsdoc",
         "json",
+        "json5",
         "jsonc",
         "lua",
         "luadoc",
@@ -43,6 +61,7 @@ return {
         "python",
         "query",
         "regex",
+        "terraform",
         "toml",
         "tsx",
         "typescript",
