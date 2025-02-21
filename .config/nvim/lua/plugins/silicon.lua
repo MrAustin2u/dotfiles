@@ -1,13 +1,20 @@
 return {
-  "MrAustin2u/silicon.lua",
-  dependencies = { "nvim-lua/plenary.nvim" },
-  opts = {
-    font = "MonoLisa",
-    theme = "tokyonight_moon",
-    bgColor = "#636da6",
+  "krivahtoo/silicon.nvim",
+  build = "./install.sh build",
+  cmd = "Silicon",
+  keys = {
+    { "<leader>ss", ":Silicon!<cr>", mode = "v", desc = "Screenshot a code snippet" },
+    { "<leader>sc", ":Silicon<cr>", mode = "v", desc = "Screenshot a code snippet into the clipboard" },
   },
-  config = function(_, opts)
-    require("silicon").setup(opts)
-    require("config.keymaps").silicon_mappings()
+  config = function()
+    require("silicon").setup {
+      font = "MonoLisa",
+      theme = "tokyonight_moon",
+      background = "#636da6",
+      output = {
+        path = "/Users/aaustin/Pictures/Screenshots",
+        format = "silicon_[year][month][day]_[hour][minute][second].png",
+      },
+    }
   end,
 }
