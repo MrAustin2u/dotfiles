@@ -151,12 +151,6 @@ main() {
       script="#($current_dir/network.sh)"
     fi
 
-    if [ $plugin = "network-bandwidth" ]; then
-      IFS=' ' read -r -a colors <<<$(get_tmux_option "@network-bandwidth-colors" "terminal_black blue")
-      tmux set-option -g status-right-length 250
-      script="#($current_dir/network_bandwidth.sh)"
-    fi
-
     if [ $plugin = "weather" ]; then
       # wait unit $datafile exists just to avoid errors
       # this should almost never need to wait unless something unexpected occurs
