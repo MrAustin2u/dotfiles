@@ -3,7 +3,7 @@ return {
   keys = function()
     return {
       { "<C-_>", "<cmd>Lspsaga term_toggle<CR>", mode = { "n", "t" } },
-      { ",so", "<cmd>Lspsaga outline<CR>", mode = { "n", "t" } },
+      { ",so",   "<cmd>Lspsaga outline<CR>",     mode = { "n", "t" } },
     }
   end,
   dependencies = {
@@ -12,7 +12,7 @@ return {
   },
   opts = {
     symbol_in_winbar = {
-      enable = true,
+      enable = false,
     },
     implement = {
       enable = true,
