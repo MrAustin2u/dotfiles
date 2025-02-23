@@ -23,6 +23,16 @@ setmetatable(M, {
   end,
 })
 
+function M.contains(tbl, item)
+  for x in pairs(tbl) do
+    if x == item then
+      return true
+    end
+  end
+
+  return false
+end
+
 function M.is_win()
   return vim.uv.os_uname().sysname:find "Windows" ~= nil
 end

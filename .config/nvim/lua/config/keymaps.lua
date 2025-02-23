@@ -20,6 +20,11 @@ local M = {}
 --
 local default_opts = { noremap = true, silent = true }
 
+local map = function(tbl)
+  local opts = tbl[4] and aa.merge(default_opts, tbl[4]) or default_opts
+  vim.keymap.set(tbl[1], tbl[2], tbl[3], opts)
+end
+
 local nmap = function(tbl)
   local opts = tbl[3] and aa.merge(default_opts, tbl[3]) or default_opts
   vim.keymap.set("n", tbl[1], tbl[2], opts)
@@ -185,6 +190,63 @@ M.lint_mappings = function(lint)
   }
 end
 
+M.lsp_mappings = function(buf)
+  nmap {
+    "gd",
+    function()
+      Snacks.picker.lsp_definitions()
+    end,
+    { buffer = true, desc = "Go to Declaration" },
+  }
+
+  nmap {
+    "gr",
+    function()
+      Snacks.picker.lsp_references()
+    end,
+    { desc = "Go to References", nowait = true },
+  }
+
+  nmap {
+    "gI",
+    function()
+      Snacks.picker.lsp_implementations()
+    end,
+    { desc = "Go to Implementation", buffer = true },
+  }
+  nmap {
+    "<leader>D",
+    function()
+      Snacks.picker.lsp_type_definitions()
+    end,
+    { desc = "Go to Type Definition", buffer = true },
+  }
+  nmap {
+    "gD",
+    function()
+      Snacks.picker.lsp_declarations()
+    end,
+    { desc = "Goto Declaration", buffer = true },
+  }
+  map { { "n", "v" }, "<leader>ca", "<cmd>Lspsaga code_action<CR>", { buffer = true, desc = "[C]ode [A]ction" } }
+  nmap { "K", vim.lsp.buf.hover, { buffer = true, desc = "LSP Hover Doc" } }
+  nmap { "<leader>rn", vim.lsp.buf.rename, { buffer = true, desc = "[R]e[n]ame Symbol Under Cursor" } }
+  nmap {
+    "<leader>th",
+    function()
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { buffer = true })
+    end,
+    { desc = "LSP: [T]oggle Inlay [H]ints", noremap = true, silent = true, buffer = true },
+  }
+  nmap {
+    "<leader>fm",
+    function()
+      vim.lsp.buf.format { async = true }
+    end,
+    { desc = "LSP: [f]or[m]at", noremap = true, silent = true, buffer = true },
+  }
+end
+
 M.lsp_diagnostic_mappings = function()
   local function diagnostic_goto(next, severity)
     local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
@@ -194,8 +256,8 @@ M.lsp_diagnostic_mappings = function()
     end
   end
 
-  nmap { "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", { desc = "Next Diagnostic" } }
-  nmap { "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", { desc = "Prev Diagnostic" } }
+  nmap { "]d", diagnostic_goto(true), { desc = "Next Diagnostic" } }
+  nmap { "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" } }
   nmap { "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" } }
   nmap { "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" } }
   nmap { "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" } }
@@ -204,70 +266,33 @@ M.lsp_diagnostic_mappings = function()
   nmap { "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", { desc = "Set loclist to LSP diagnostics" } }
 end
 
-M.lsp_mappings = function(buf)
-  nmap {
-    "K",
-    "<cmd>Lspsaga hover_doc ++quiet<CR>",
-    { desc = "LSP: Hover", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "<leader>ca",
-    "<cmd>Lspsaga code_action<CR>",
-    { desc = "LSP: [C]ode [A]ction", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "<leader>ds",
-    require("telescope.builtin").lsp_document_symbols,
-    { desc = "LSP: Document Symbols", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "<leader>ws",
-    require("telescope.builtin").lsp_dynamic_workspace_symbols,
-    { desc = "LSP: Workspace Symbols", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "<leader>th",
-    function()
-      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
-    end,
-    { desc = "LSP: [T]oggle Inlay [H]ints", noremap = true, silent = true, buffer = buf },
-  }
-  nmap {
-    "<leader>fm",
-    function()
-      vim.lsp.buf.format { async = true }
-    end,
-    { desc = "LSP: [f]or[m]at", noremap = true, silent = true, buffer = buf },
-  }
-end
-
-M.lsp_inlay_hints_mappings = function(buf)
-  nmap {
-    "<leader>th",
-    function()
-      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
-    end,
-    { desc = "LSP: [T]oggle Inlay [H]ints", noremap = true, silent = true, buffer = buf },
-  }
-end
+-- M.lsp_inlay_hints_mappings = function(buf)
+--   nmap {
+--     "<leader>th",
+--     function()
+--       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
+--     end,
+--     { desc = "LSP: [T]oggle Inlay [H]ints", noremap = true, silent = true, buffer = buf },
+--   }
+-- end
 
 M.vim_test_mappings = function()
-  nmap { "<leader>tn", ":TestNearest<CR>", { desc = "[T]est [N]earest" } }
-  nmap { "<leader>tf", ":TestFile<CR>", { desc = "[T]est [F]ile" } }
-  nmap { "<leader>ts", ":TestSuite<CR>", { desc = "[T]est [S]uite" } }
-  nmap { "<leader>tl", ":TestLast<CR>", { desc = "[T]est [L]ast" } }
+  nmap { "<leader>tn", ":TestNearest<CR>", { desc = "Test Nearest" } }
+  nmap { "<leader>tf", ":TestFile<CR>", { desc = "Test File" } }
+  nmap { "<leader>ts", ":TestSuite<CR>", { desc = "Test Suite" } }
+  nmap { "<leader>tl", ":TestLast<CR>", { desc = "Test Last" } }
 end
 
 M.telescope_mappings = {
-  { "<leader>f?", telescope "search_history",   desc = "Search History" },
-  { "<leader>fh", telescope "help_tags",        desc = "[F]ind [H]elp" },
-  { "<leader>fO", telescope "vim_options",      desc = "[F]ind [O]ptions" },
+  { "<leader>f?", telescope "search_history", desc = "Search History" },
+  { "<leader>fh", telescope "help_tags", desc = "[F]ind [H]elp" },
+  { "<leader>fO", telescope "vim_options", desc = "[F]ind [O]ptions" },
 
   --  Extensions
-  { "<leader>bb", telescope "buffers",          desc = "Find Buffers" },
+  { "<leader>bb", telescope "buffers", desc = "Find Buffers" },
 
   -- better spell suggestions
-  { "z=",         telescope "spell_suggest",    desc = "Spelling Suggestions" },
+  { "z=", telescope "spell_suggest", desc = "Spelling Suggestions" },
 
   -- search unicode symbols 
   { "<leader>fu", "<cmd>Telescope symbols<cr>", desc = "[F]ind [U]nicode" },
@@ -595,7 +620,7 @@ M.snacks_mappings = {
   -- Buffer
   --------------
 
-  { "<Tab>",   "<cmd>bnext<CR>", desc = "Next buffer" },
+  { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
   { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
   {
     "<leader>,",
@@ -678,7 +703,7 @@ M.snacks_mappings = {
 }
 
 M.sort_mappings = {
-  { "go",   ":Sort<CR>",    mode = "v", desc = "Order (sort lines/line params)" },
+  { "go", ":Sort<CR>", mode = "v", desc = "Order (sort lines/line params)" },
   { "goi'", "vi':Sort<CR>", mode = "n", desc = "Order in [']" },
   { "goi(", "vi(:Sort<CR>", mode = "n", desc = "Order in (" },
   { "goi[", "vi[:Sort<CR>", mode = "n", desc = "Order in [" },
@@ -688,11 +713,11 @@ M.sort_mappings = {
 }
 
 M.tabby_mappings = {
-  { "<leader>ta", ":$tabnew<CR>",  mode = "n", desc = "Tab new",      noremap = true },
-  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose",  noremap = true },
-  { "<leader>to", ":tabonly<CR>",  mode = "n", desc = "Tab only",     noremap = true },
-  { "<leader>tl", ":tabn<CR>",     mode = "n", desc = "Tab next",     noremap = true },
-  { "<leader>th", ":tabp<CR>",     mode = "n", desc = "Tab previous", noremap = true },
+  { "<leader>ta", ":$tabnew<CR>", mode = "n", desc = "Tab new", noremap = true },
+  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose", noremap = true },
+  { "<leader>to", ":tabonly<CR>", mode = "n", desc = "Tab only", noremap = true },
+  { "<leader>tl", ":tabn<CR>", mode = "n", desc = "Tab next", noremap = true },
+  { "<leader>th", ":tabp<CR>", mode = "n", desc = "Tab previous", noremap = true },
 }
 
 return M
