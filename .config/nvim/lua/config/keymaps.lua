@@ -481,7 +481,7 @@ M.snacks_mappings = {
   {
     "<leader>sw",
     function()
-      Snacks.picker.grep_word()
+      Snacks.picker.grep_word { hidden = true }
     end,
     desc = "Visual selection or word",
     mode = { "n", "x" },
