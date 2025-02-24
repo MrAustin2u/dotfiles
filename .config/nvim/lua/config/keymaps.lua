@@ -472,7 +472,9 @@ M.snacks_mappings = {
   {
     "<leader>/",
     function()
-      Snacks.picker.grep()
+      Snacks.picker.grep {
+        hidden = true,
+      }
     end,
     desc = "Grep",
   },
