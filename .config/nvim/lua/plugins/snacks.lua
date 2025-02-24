@@ -11,6 +11,7 @@ return {
     lazygit = { enabled = true },
     words = { enabled = true },
     terminal = { enabled = true },
+    bigfile = { enabled = true },
     bufdelete = { enabled = true },
     explorer = { enabled = true },
     rename = { enabled = true },
