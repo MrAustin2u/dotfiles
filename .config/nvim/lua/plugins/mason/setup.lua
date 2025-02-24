@@ -20,29 +20,21 @@ M.setup = function()
   local root_pattern = lspconfig.util.root_pattern
 
   local package_list = {
-    --
-    -- Null LS
-    --
-
     "actionlint",
     "ansible-lint",
-    -- python formatter
+    -- Python formatter
     "black",
     "codespell",
-    -- Prettier
+    -- Formatters (js, ts, tsx, etc.)
     "prettier",
     "prettierd",
+    "biome",
     -- SHELL
     "shfmt",
     -- LUA
     "stylua",
     -- YAML
     "yamllint",
-
-    --
-    -- LSPs
-    --
-
     "ansible-language-server",
     "bash-language-server",
     "clang-format",
@@ -53,6 +45,7 @@ M.setup = function()
     "dockerfile-language-server",
     "elm-language-server",
     "eslint-lsp",
+    "eslint_d",
     "go-debug-adapter",
     "goimports",
     "golangci-lint",
@@ -223,7 +216,14 @@ M.setup = function()
     -- Elixir
     lexical = function()
       lspconfig.lexical.setup {
-        cmd = { "/Users/aaustin/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
+        default_config = {
+          filetypes = { "elixir", "eelixir", "heex" },
+          cmd = { "/Users/aaustin/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
+          root_dir = function(fname)
+            return root_pattern("mix.exs", ".git")(fname) or vim.loop.cwd()
+          end,
+          settings = {},
+        },
       }
     end,
 
