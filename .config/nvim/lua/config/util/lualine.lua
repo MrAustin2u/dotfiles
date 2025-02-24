@@ -25,7 +25,7 @@ end
 ---@param name string
 ---@param icon? string
 function M.cmp_source(name, icon)
-  icon = icon or aa.icons.kind[name:sub(1, 1):upper() .. name:sub(2)]
+  icon = icon or aa.icons.kinds[name:sub(1, 1):upper() .. name:sub(2)]
   local started = false
   return M.status(icon, function()
     if not package.loaded["cmp"] then

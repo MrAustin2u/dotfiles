@@ -102,7 +102,7 @@ return {
                 ellipsis = false,
                 text = function(ctx)
                   if ctx.kind == "Copilot" then
-                    return aa.icons.kind.Copilot .. " "
+                    return aa.icons.kinds.Copilot .. " "
                   end
 
                   local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
@@ -175,7 +175,7 @@ return {
           },
           lsp = {
             min_keyword_length = 1, -- Number of characters to trigger provider
-            score_offset = 0, -- Boost/penalize the score of the items
+            score_offset = 0,       -- Boost/penalize the score of the items
           },
           path = {
             min_keyword_length = 0,
@@ -192,7 +192,7 @@ return {
     "saghen/blink.cmp",
     opts = function(_, opts)
       opts.appearance = opts.appearance or {}
-      opts.appearance.kind_icons = vim.tbl_extend("force", opts.appearance.kind_icons or {}, aa.icons.kind)
+      opts.appearance.kind_icons = vim.tbl_extend("force", opts.appearance.kind_icons or {}, aa.icons.kinds)
     end,
   },
 }

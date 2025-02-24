@@ -9,7 +9,7 @@ M.dap = {
   LogPoint = ".>",
 }
 
-M.kind = {
+M.kinds = {
   Array = " ",
   Boolean = "󰨙 ",
   Class = " ",
