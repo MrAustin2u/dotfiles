@@ -455,6 +455,17 @@ M.neo_test_mappings = function()
 end
 
 M.snacks_mappings = {
+  {
+    "<leader>e",
+    function()
+      Snacks.explorer.open {
+        auto_close = true,
+        layout = { layout = { position = "right" } },
+        include = { ".*" },
+      }
+    end,
+    desc = "Open explorer",
+  },
   --------------
   -- Grep
   --------------

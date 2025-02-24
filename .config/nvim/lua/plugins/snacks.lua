@@ -12,6 +12,7 @@ return {
     words = { enabled = true },
     terminal = { enabled = true },
     bufdelete = { enabled = true },
+    explorer = { enabled = true },
     rename = { enabled = true },
     scope = { enabled = true },
     scratch = { enabled = true },
