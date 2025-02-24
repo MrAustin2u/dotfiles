@@ -101,10 +101,10 @@ return {
               kind_icon = {
                 text = function(item)
                   if item.kind == "Copilot" then
-                    return "" .. " "
+                    return aa.icons.kind.Copilot .. " "
                   end
 
-                  local kind = require("lspkind").symbol_map[item.kind] or ""
+                  local kind = aa.icons.kind[item.kind] or ""
                   return kind .. " "
                 end,
                 highlight = "CmpItemKind",
@@ -141,6 +141,7 @@ return {
           "lsp",
           "path",
           "snippets",
+          "luasnip",
         },
         providers = {
           buffer = {
@@ -185,5 +186,13 @@ return {
         },
       },
     },
+  },
+  -- add icons
+  {
+    "saghen/blink.cmp",
+    opts = function(_, opts)
+      opts.appearance = opts.appearance or {}
+      opts.appearance.kind_icons = vim.tbl_extend("force", opts.appearance.kind_icons or {}, aa.icons.kind)
+    end,
   },
 }
