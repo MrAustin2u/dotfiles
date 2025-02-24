@@ -7,6 +7,8 @@ return {
     "saghen/blink.cmp",
     event = "InsertEnter",
     dependencies = {
+      { "L3MON4D3/LuaSnip", version = "v2.*" },
+      "echasnovski/mini.icons",
       "rafamadriz/friendly-snippets",
       "onsails/lspkind.nvim",
       "giuxtaposition/blink-cmp-copilot",
@@ -24,11 +26,11 @@ return {
     },
     opts = {
       snippets = {
-        expand = function(snippet, _)
-          return aa.cmp.expand(snippet)
-        end,
+        preset = "luasnip",
+        -- expand = function(snippet, _)
+        --   return aa.cmp.expand(snippet)
+        -- end,
       },
-      -- keymap = { preset = "default" },
       keymap = {
         ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
         ["<C-e>"] = { "hide", "fallback" },
@@ -82,7 +84,6 @@ return {
 
         menu = {
           border = "rounded",
-
           cmdline_position = function()
             if vim.g.ui_cmdline_pos ~= nil then
               local pos = vim.g.ui_cmdline_pos -- (1, 0)-indexed
@@ -91,7 +92,6 @@ return {
             local height = (vim.o.cmdheight == 0) and 1 or vim.o.cmdheight
             return { vim.o.lines - height, 0 }
           end,
-
           draw = {
             columns = {
               { "kind_icon", "label", gap = 1 },
@@ -99,25 +99,29 @@ return {
             },
             components = {
               kind_icon = {
-                text = function(item)
-                  if item.kind == "Copilot" then
+                ellipsis = false,
+                text = function(ctx)
+                  if ctx.kind == "Copilot" then
                     return aa.icons.kind.Copilot .. " "
                   end
 
-                  local kind = aa.icons.kind[item.kind] or ""
-                  return kind .. " "
+                  local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
+                  return kind_icon
                 end,
-                highlight = "CmpItemKind",
+                highlight = function(ctx)
+                  local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
+                  return hl
+                end,
               },
               label = {
-                text = function(item)
-                  return item.label
+                text = function(ctx)
+                  return ctx.label
                 end,
                 highlight = "CmpItemAbbr",
               },
               kind = {
-                text = function(item)
-                  return item.kind
+                text = function(ctx)
+                  return ctx.kind
                 end,
                 highlight = "CmpItemKind",
               },
@@ -134,13 +138,13 @@ return {
       -- opts_extend = { "sources.default" },
       sources = {
         default = {
-          "buffer",
-          "copilot",
-          "dadbod",
-          "lazydev",
           "lsp",
           "path",
           "snippets",
+          "buffer",
+          "copilot",
+          "lazydev",
+          "dadbod",
         },
         providers = {
           buffer = {
@@ -171,16 +175,13 @@ return {
           },
           lsp = {
             min_keyword_length = 1, -- Number of characters to trigger provider
-            score_offset = 0,       -- Boost/penalize the score of the items
+            score_offset = 0, -- Boost/penalize the score of the items
           },
           path = {
             min_keyword_length = 0,
           },
           snippets = {
             min_keyword_length = 1,
-            opts = {
-              search_paths = { "~/.config/nvim/lua/snippets" },
-            },
           },
         },
       },
