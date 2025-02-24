@@ -190,13 +190,13 @@ M.lint_mappings = function(lint)
   }
 end
 
-M.lsp_mappings = function(buf)
+M.lsp_mappings = function()
   nmap {
     "gd",
     function()
       Snacks.picker.lsp_definitions()
     end,
-    { buffer = true, desc = "Go to Declaration" },
+    { buffer = true, desc = "Go to Definition" },
   }
 
   nmap {
@@ -508,7 +508,7 @@ M.snacks_mappings = {
   {
     "<leader>ff",
     function()
-      Snacks.picker.files()
+      Snacks.picker.files { hidden = true }
     end,
     desc = "Find Files",
   },
