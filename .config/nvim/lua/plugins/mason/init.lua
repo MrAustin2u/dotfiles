@@ -14,7 +14,7 @@ return {
     "neovim/nvim-lspconfig",
 
     -- required for setting up capabilities for cmp
-    "hrsh7th/cmp-nvim-lsp",
+    "saghen/blink.cmp",
 
     -- required for jsonls and yamlls
     { "b0o/schemastore.nvim", lazy = true },

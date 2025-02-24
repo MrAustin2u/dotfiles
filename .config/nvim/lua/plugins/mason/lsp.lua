@@ -1,12 +1,10 @@
 local lspconfig_present, lspconfig = pcall(require, "lspconfig")
 local navic_present, navic = pcall(require, "nvim-navic")
-local cmp_present, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-local blink_present, blink = pcall(require, "blink.cmp")
+local cmp_present, blink = pcall(require, "blink.cmp")
 
 local deps = {
   lspconfig_present,
   navic_present,
-  blink_present,
   cmp_present,
 }
 
@@ -38,9 +36,9 @@ M.on_attach = function(client, bufnr)
     -- inlay hints
     aa.lsp.on_supports_method("textDocument/inlayHint", function(client, buffer)
       if
-        vim.api.nvim_buf_is_valid(buffer)
-        and vim.bo[buffer].buftype == ""
-        and not vim.tbl_contains({ "vue" }, vim.bo[buffer].filetype)
+          vim.api.nvim_buf_is_valid(buffer)
+          and vim.bo[buffer].buftype == ""
+          and not vim.tbl_contains({ "vue" }, vim.bo[buffer].filetype)
       then
         vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
       end
@@ -85,67 +83,14 @@ end
 
 -- Add completion and documentation capabilities for cmp completion
 M.create_capabilities = function()
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-
-  -- this is a fix for nvim 10 - it appears that cmp_nvim_lsp was overwriting
-  -- the capabilities.textDocument which caused errors in json-lsp
-  capabilities.textDocument.completion = {
-    dynamicRegistration = false,
-    completionItem = {
-      snippetSupport = true,
-      commitCharactersSupport = true,
-      deprecatedSupport = true,
-      preselectSupport = true,
-      tagSupport = {
-        valueSet = {
-          1, -- Deprecated
-        },
-      },
-      insertReplaceSupport = true,
-      resolveSupport = {
-        properties = {
-          "documentation",
-          "detail",
-          "additionalTextEdits",
-          "sortText",
-          "filterText",
-          "insertText",
-          "textEdit",
-          "insertTextFormat",
-          "insertTextMode",
-        },
-      },
-      insertTextModeSupport = {
-        valueSet = {
-          1, -- asIs
-          2, -- adjustIndentation
-        },
-      },
-      labelDetailsSupport = true,
-    },
-    contextSupport = true,
-    insertTextMode = 1,
-    completionList = {
-      itemDefaults = {
-        "commitCharacters",
-        "editRange",
-        "insertTextFormat",
-        "insertTextMode",
-        "data",
-      },
-    },
-  }
-
-  local updated_capabilities = vim.tbl_deep_extend(
+  local capabilities = vim.tbl_deep_extend(
     "force",
     {},
     vim.lsp.protocol.make_client_capabilities(),
-    cmp_present and cmp_nvim_lsp.default_capabilities() or {},
-    blink_present and blink.get_lsp_capabilities() or {},
-    capabilities or {}
+    cmp_present and blink.get_lsp_capabilities() or {}
   )
 
-  return updated_capabilities
+  return capabilities
 end
 
 M.setup_diagnostics = function()
