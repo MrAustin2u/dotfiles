@@ -33,6 +33,7 @@
   ; ff = only
   summary = true
 	tool = nvimdiff
+  conflictstyle = diff3
 
 [alias]
   cb = "!f() { git checkout -b \"$@\"; }; f"
