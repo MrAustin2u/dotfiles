@@ -12,13 +12,13 @@ after-login-command = []
 # sketchbar has a built-in detection of already running process,
 # so it won't be run twice on AeroSpace restart
 after-startup-command = [
-    'exec-and-forget /opt/homebrew/opt/sketchybar/bin/sketchybar',
+  'exec-and-forget /opt/homebrew/opt/sketchybar/bin/sketchybar',
 ]
 exec-on-workspace-change = [
-    '/bin/bash',
-    '-c',
-    '/opt/homebrew/opt/sketchybar/bin/sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
-    'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0'
+  '/bin/bash',
+  '-c',
+  '/opt/homebrew/opt/sketchybar/bin/sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
+  'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0',
 ]
 
 # Start AeroSpace at login
@@ -67,11 +67,11 @@ preset = 'qwerty'
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitorr
 [gaps]
 inner.horizontal = 18
-inner.vertical =   18
-outer.left =       18
-outer.bottom =     18
-outer.top = [{ monitor."VP3268a" = 40 }, {monitor."LG" = 40}, 24]
-outer.right =      18
+inner.vertical = 18
+outer.left = 18
+outer.bottom = 18
+outer.top = [{ monitor."VP3268a" = 40 }, { monitor."LG" = 40 }, 24]
+outer.right = 18
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -194,6 +194,10 @@ if.app-id = 'com.apple.Notes'
 run = ['layout floating']
 
 [[on-window-detected]]
+if.app-name-regex-substring = '1Password'
+run = ['layout floating']
+
+[[on-window-detected]]
 if.app-id = 'company.thebrowser.Browser'
 run = ['move-node-to-workspace 2']
 
@@ -223,6 +227,6 @@ esc = ['reload-config', 'mode main']
 r = ['flatten-workspace-tree', 'mode main']
 
 [workspace-to-monitor-force-assignment]
-    1 = 1                               # Monitor sequence number from left to right. 1-based indexing
-    2 = ['secondary', 'LG']             # You can specify multiple patterns.
-    3 = 'VP3268a-4K'                       # The first matching pattern will be used
+1 = 1                   # Monitor sequence number from left to right. 1-based indexing
+2 = ['secondary', 'LG'] # You can specify multiple patterns.
+3 = 'VP3268a-4K'        # The first matching pattern will be used
