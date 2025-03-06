@@ -1,6 +1,6 @@
 [tools]
 awscli = "2.6.3"
-elixir = "1.17.3-otp-26"
+elixir = "1.18.2-otp-27"
 erlang = "26.2.5.4"
 gleam = "1.4.1"
 go = "1.22.0"
@@ -17,6 +17,7 @@ terraform = "1.9.8"
 typos = "1.22.3"
 usage = "latest"
 yarn = "1.22.5"
+zoxide = "latest"
 
 [settings]
 experimental = true
