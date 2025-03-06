@@ -84,6 +84,7 @@ alias gs="git status"
 alias lg="lazygit"
 alias stash="git stash save --include-untracked"
 alias pruneaaustinprs="git branch | grep -E 'aaustin' | xargs git branch -D"
+alias gcod="git checkout develop"
 
 # Elixir
 alias md="mix dialyzer"
