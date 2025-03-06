@@ -42,6 +42,10 @@ export PATH="/opt/homebrew/bin:$PATH"
 # =====================================================
 # load all config files
 # =====================================================
+# mise global/local runtime version manager - must happen before all other tools
+# are loaded since they may depend on it
+
+eval "$(mise activate zsh)"
 
 for f in ${XDG_CONFIG_HOME}/zsh/*; do
   source $f
