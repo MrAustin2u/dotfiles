@@ -92,7 +92,6 @@ brew "withgraphite/tap/graphite"
 brew "xq"
 brew "xz"
 brew "zlib"
-brew "zoxide"
 
 cask "aerospace"
 cask "font-sketchybar-app-font"
