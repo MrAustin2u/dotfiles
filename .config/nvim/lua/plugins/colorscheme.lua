@@ -59,6 +59,17 @@ return {
       tokyonight_dark_float = false,
       dim_inactive = true,
       hide_inactive_statusline = true,
+      on_highlights = function(hl, c)
+        hl.DapBreakpoint = {
+          fg = c.red,
+        }
+        hl.DapLogPoint = {
+          fg = c.blue5,
+        }
+        hl.DapStopped = {
+          fg = c.green1,
+        }
+      end,
       sidebars = {
         "qf",
         "vista_kind",
@@ -73,10 +84,7 @@ return {
     },
     config = function(_, opts)
       require("tokyonight").setup(opts)
-
       vim.cmd [[colorscheme tokyonight-moon]]
-      vim.cmd [[hi TabLine guibg=NONE guifg=NONE]]
-      vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
     end,
   },
 }
