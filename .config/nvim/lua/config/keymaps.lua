@@ -184,24 +184,6 @@ M.attempt_mappings = function(attempt)
   nmap { "<leader>al", attempt.open_select, aa.merge(default_opts, { desc = "Select Attempt" }) }
 end
 
-M.elixir_mappings = function()
-  nmap {
-    "<space>fp",
-    ":ElixirFromPipe<cr>",
-    aa.merge(default_opts, { buffer = true, desc = "Elixir [f]rom [p]ipe" }),
-  }
-  nmap {
-    "<space>tp",
-    ":ElixirToPipe<cr>",
-    aa.merge(default_opts, { buffer = true, desc = "Elixir [t]o [p]ipe" }),
-  }
-  vmap {
-    "<space>em",
-    ":ElixirExpandMacro<cr>",
-    aa.merge(default_opts, { buffer = true, desc = "Elixir [e]xpand [m]acro" }),
-  }
-end
-
 M.formatting_mappings = function(conform)
   vim.keymap.set({ "n", "v" }, "<leader>mp", function()
     conform.format {
