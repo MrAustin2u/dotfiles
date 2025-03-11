@@ -3,42 +3,8 @@ return {
   priority = 1000,
   lazy = false,
   opts = {
-    notifier = {
-      enabled = true,
-      timeout = 3000,
-    },
-    git = { enabled = true },
-    lazygit = { enabled = true },
-    words = { enabled = true },
-    terminal = { enabled = true },
     bigfile = { enabled = true },
     bufdelete = { enabled = true },
-    explorer = { enabled = true },
-    rename = { enabled = true },
-    scope = { enabled = true },
-    scratch = { enabled = true },
-    statuscolumn = { enabled = false },
-    styles = {
-      notification = {
-        wo = { wrap = true }, -- Wrap notifications
-      },
-    },
-    indent = {
-      enabled = true,
-      animate = { enabled = false },
-      -- this is what makes the scope look like an arrow
-      chunk = { enabled = true },
-    },
-    picker = {
-      enabled = true,
-      win = {
-        input = {
-          keys = {
-            ["<c-a>"] = false,
-          },
-        },
-      },
-    },
     dashboard = {
       enabled = true,
       preset = {
@@ -73,6 +39,41 @@ return {
         { section = "startup" },
       },
     },
+    explorer = { enabled = true },
+    git = { enabled = true },
+    indent = {
+      enabled = true,
+      animate = { enabled = false },
+      -- this is what makes the scope look like an arrow
+      chunk = { enabled = true },
+    },
+    input = { enabled = true },
+    lazygit = { enabled = true },
+    notifier = {
+      enabled = true,
+      timeout = 3000,
+    },
+    picker = {
+      enabled = true,
+      win = {
+        input = {
+          keys = {
+            ["<c-a>"] = false,
+          },
+        },
+      },
+    },
+    rename = { enabled = true },
+    scope = { enabled = true },
+    scratch = { enabled = true },
+    statuscolumn = { enabled = false },
+    styles = {
+      notification = {
+        wo = { wrap = true }, -- Wrap notifications
+      },
+    },
+    terminal = { enabled = true },
+    words = { enabled = true },
   },
   keys = require("config.keymaps").snacks_mappings,
 }
