@@ -46,6 +46,43 @@ local telescope = function(fun, opts)
   end
 end
 
+local picker = function(fun, opts)
+  if opts == nil then
+    opts = {}
+  end
+
+  return function()
+    Snacks.picker[fun](opts)
+  end
+end
+
+local git_copy_file_url = function()
+  ---@diagnostic disable-next-line: missing-fields
+  Snacks.gitbrowse {
+    open = function(url)
+      -- gitbrowse doesn't support file link without lines, so I'm setting the
+      -- line range to 0-0 and stripping it before copying to sys clipboard
+      url = url:gsub("#L0%-L0$", "")
+      vim.fn.setreg("+", url)
+    end,
+    notify = false,
+    line_start = 0,
+    line_end = 0,
+  }
+  vim.notify("Copied " .. vim.fn.getreg "+", vim.log.levels.INFO)
+end
+
+local git_copy_line_url = function()
+  ---@diagnostic disable-next-line: missing-fields
+  Snacks.gitbrowse {
+    open = function(url)
+      vim.fn.setreg("+", url)
+    end,
+    notify = false,
+  }
+  vim.notify(vim.fn.getreg "+", vim.log.levels.INFO, { title = "Copied" })
+end
+
 -- ================================
 -- # Misc
 -- ================================
@@ -245,6 +282,11 @@ M.lsp_mappings = function()
     end,
     { desc = "LSP: [f]or[m]at", noremap = true, silent = true, buffer = true },
   }
+  nmap {
+    "<leader>cc",
+    picker("pick", require "plugins.snacks.conventional_commits_picker"),
+    { desc = "[C]onventional [C]ommits" },
+  }
 end
 
 M.lsp_diagnostic_mappings = function()
@@ -284,15 +326,15 @@ M.vim_test_mappings = function()
 end
 
 M.telescope_mappings = {
-  { "<leader>f?", telescope "search_history",   desc = "Search History" },
-  { "<leader>fh", telescope "help_tags",        desc = "[F]ind [H]elp" },
-  { "<leader>fO", telescope "vim_options",      desc = "[F]ind [O]ptions" },
+  { "<leader>f?", telescope "search_history", desc = "Search History" },
+  { "<leader>fh", telescope "help_tags", desc = "[F]ind [H]elp" },
+  { "<leader>fO", telescope "vim_options", desc = "[F]ind [O]ptions" },
 
   --  Extensions
-  { "<leader>bb", telescope "buffers",          desc = "Find Buffers" },
+  { "<leader>bb", telescope "buffers", desc = "Find Buffers" },
 
   -- better spell suggestions
-  { "z=",         telescope "spell_suggest",    desc = "Spelling Suggestions" },
+  { "z=", telescope "spell_suggest", desc = "Spelling Suggestions" },
 
   -- search unicode symbols 
   { "<leader>fu", "<cmd>Telescope symbols<cr>", desc = "[F]ind [U]nicode" },
@@ -614,6 +656,8 @@ M.snacks_mappings = {
     desc = "Git Browse",
     mode = { "n", "v" },
   },
+  { "<leader>gY", git_copy_file_url, mode = { "n", "x" }, desc = "Git Copy File URL" },
+  { "<leader>gy", git_copy_line_url, mode = { "n", "x" }, desc = "Git Copy Line(s) URL" },
   {
     "<leader>gf",
     function()
@@ -633,7 +677,7 @@ M.snacks_mappings = {
   -- Buffer
   --------------
 
-  { "<Tab>",   "<cmd>bnext<CR>", desc = "Next buffer" },
+  { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
   { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
   {
     "<leader>,",
@@ -716,7 +760,7 @@ M.snacks_mappings = {
 }
 
 M.sort_mappings = {
-  { "go",   ":Sort<CR>",    mode = "v", desc = "Order (sort lines/line params)" },
+  { "go", ":Sort<CR>", mode = "v", desc = "Order (sort lines/line params)" },
   { "goi'", "vi':Sort<CR>", mode = "n", desc = "Order in [']" },
   { "goi(", "vi(:Sort<CR>", mode = "n", desc = "Order in (" },
   { "goi[", "vi[:Sort<CR>", mode = "n", desc = "Order in [" },
@@ -726,11 +770,11 @@ M.sort_mappings = {
 }
 
 M.tabby_mappings = {
-  { "<leader>ta", ":$tabnew<CR>",  mode = "n", desc = "Tab new",      noremap = true },
-  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose",  noremap = true },
-  { "<leader>to", ":tabonly<CR>",  mode = "n", desc = "Tab only",     noremap = true },
-  { "<leader>tl", ":tabn<CR>",     mode = "n", desc = "Tab next",     noremap = true },
-  { "<leader>th", ":tabp<CR>",     mode = "n", desc = "Tab previous", noremap = true },
+  { "<leader>ta", ":$tabnew<CR>", mode = "n", desc = "Tab new", noremap = true },
+  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose", noremap = true },
+  { "<leader>to", ":tabonly<CR>", mode = "n", desc = "Tab only", noremap = true },
+  { "<leader>tl", ":tabn<CR>", mode = "n", desc = "Tab next", noremap = true },
+  { "<leader>th", ":tabp<CR>", mode = "n", desc = "Tab previous", noremap = true },
 }
 
 return M
