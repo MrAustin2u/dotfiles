@@ -71,6 +71,10 @@ return {
       notification = {
         wo = { wrap = true }, -- Wrap notifications
       },
+      scratch = {
+        width = 150,
+        height = 60,
+      },
     },
     terminal = { enabled = true },
     words = { enabled = true },
