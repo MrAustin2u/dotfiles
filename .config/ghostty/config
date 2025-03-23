@@ -3,9 +3,10 @@
 # Theme
 theme = tokyonight
 background-opacity = 0.6
+background-blur = true
 
 # Font
-font-family = MonoLisa Nerd Font Mono
+font-family = MonoLisa
 font-size = 14
 adjust-cell-height = 10
 
