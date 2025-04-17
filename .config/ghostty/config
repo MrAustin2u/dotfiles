@@ -25,9 +25,12 @@ keybind = super+shift+j=text:\x02\x2d
 keybind = super+shift+k=text:\x02\x2b
 keybind = super+shift+l=text:\x02\x3e
 keybind = super+k=text:\x63\x6C\x65\x61\x72\x0A
+keybind = ctrl+v=new_split:right
+keybind = ctrl+v=new_split:down
+keybind = super+t=new_tab
 
 # Window
-window-decoration = false
+window-decoration = true
 window-padding-x = 15
 window-padding-y = 15
 
