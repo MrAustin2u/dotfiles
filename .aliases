@@ -102,6 +102,9 @@ alias vaultserve="PORT=5000 iex -S mix phx.server"
 alias yrs="yarn run serve"
 alias yrp="yarn run publish"
 
+# BLVD - Dashboard
+alias yfs="yarn ts-node scripts/fetch-schema.ts && yarn run generate-types"
+
 # quick config
 alias aliasesconfig="nvim ~/dotfiles/.aliases"
 alias dotfiles="cd ~/dotfiles"
