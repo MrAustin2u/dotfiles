@@ -62,6 +62,38 @@ return {
           },
         },
       },
+      sources = {
+        pr_files = {
+          title = "PR Files",
+          format = "text",
+          finder = function(_opts, _ctx)
+            -- TODO: make branch name dynamic based on the repo settings
+            local output = vim.fn.systemlist "git diff --name-only origin/$(git rev-parse --abbrev-ref HEAD)"
+            return vim.tbl_map(function(file)
+              return {
+                text = file,
+                file = file,
+                value = file,
+              }
+            end, output)
+          end,
+        },
+        obsidian_vault = {
+          title = "Obsidian Vault",
+          format = "text",
+          finder = function(_opts, _ctx)
+            -- TODO: make branch name dynamic based on the repo settings
+            local output = vim.fn.systemlist "vim ~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Ashteka"
+            return vim.tbl_map(function(file)
+              return {
+                text = file,
+                file = file,
+                value = file,
+              }
+            end, output)
+          end,
+        },
+      },
     },
     rename = { enabled = true },
     scope = { enabled = true },

@@ -538,6 +538,7 @@ M.snacks_mappings = {
     end,
     desc = "Find Files",
   },
+  { "<leader>fp", picker "pr_files", desc = "[F]ind [P]R files" },
   {
     "<leader>fg",
     function()
