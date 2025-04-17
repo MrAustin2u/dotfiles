@@ -1,9 +1,5 @@
 return {
   {
-    "hrsh7th/nvim-cmp",
-    enabled = false,
-  },
-  {
     "saghen/blink.cmp",
     event = "InsertEnter",
     dependencies = {
@@ -11,7 +7,7 @@ return {
       "echasnovski/mini.icons",
       "rafamadriz/friendly-snippets",
       "onsails/lspkind.nvim",
-      "giuxtaposition/blink-cmp-copilot",
+      { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true }, -- Optional
       {
         "saghen/blink.compat",
         opts = {},
@@ -19,11 +15,6 @@ return {
       },
     },
     version = "*",
-    opts_extend = {
-      "sources.completion.enabled_providers",
-      "sources.compat",
-      "sources.default",
-    },
     opts = {
       snippets = {
         preset = "luasnip",
@@ -138,35 +129,35 @@ return {
       -- opts_extend = { "sources.default" },
       sources = {
         default = {
+          "supermaven",
           "lsp",
           "path",
           "snippets",
           "buffer",
-          "copilot",
           "lazydev",
+          "obsidian",
+          "obsidian_new",
+          "obsidian_tags",
           "dadbod",
         },
         providers = {
-          buffer = {
-            min_keyword_length = 5,
-            max_items = 5,
-          },
-          copilot = {
-            name = "copilot",
-            module = "blink-cmp-copilot",
-            score_offset = 100,
-            async = true,
-            transform_items = function(_, items)
-              local CompletionItemKind = require("blink.cmp.types").CompletionItemKind
-              local kind_idx = #CompletionItemKind + 1
-              CompletionItemKind[kind_idx] = "Copilot"
-              for _, item in ipairs(items) do
-                item.kind = kind_idx
+          supermaven = {
+            name = "supermaven",
+            module = "blink.compat.source",
+            score_offset = 1,
+            transform_items = function(ctx, items)
+              local kind = "Supermaven"
+              require("blink.cmp.types").CompletionItemKind[kind] = kind
+              for i, _ in ipairs(items) do
+                items[i].kind = kind
               end
               return items
             end,
           },
-          dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
+          buffer = {
+            min_keyword_length = 5,
+            max_items = 5,
+          },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
@@ -175,7 +166,7 @@ return {
           },
           lsp = {
             min_keyword_length = 1, -- Number of characters to trigger provider
-            score_offset = 0,       -- Boost/penalize the score of the items
+            score_offset = 0, -- Boost/penalize the score of the items
           },
           path = {
             min_keyword_length = 0,
@@ -183,8 +174,29 @@ return {
           snippets = {
             min_keyword_length = 1,
           },
+          obsidian = {
+            name = "obsidian",
+            module = "blink.compat.source",
+          },
+          obsidian_new = {
+            name = "obsidian_new",
+            module = "blink.compat.source",
+          },
+          obsidian_tags = {
+            name = "obsidian_tags",
+            module = "blink.compat.source",
+          },
+          dadbod = {
+            name = "Dadbod",
+            module = "vim_dadbod_completion.blink",
+          },
         },
       },
+    },
+    opts_extend = {
+      "sources.completion.enabled_providers",
+      "sources.compat",
+      "sources.default",
     },
   },
   -- add icons

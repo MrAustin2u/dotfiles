@@ -1,7 +1,6 @@
 local LazyUtil, err = pcall(require, "lazy.core.util")
 
 ---@class config.util: LazyUtilCore
----@field cmp config.util.cmp
 ---@field format config.util.format
 ---@field icons config.util.icons
 ---@field lsp config.util.lsp
