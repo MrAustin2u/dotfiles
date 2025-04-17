@@ -63,11 +63,6 @@ M.setup = function()
     -- Markdown
     "prosemd-lsp",
     "python-lsp-server",
-    "rust-analyzer",
-    -- Ruby
-    "rubocop",
-    "ruby-lsp",
-    "rubyfmt",
     -- SQL
     "sqlls",
     -- TailwindCSS
