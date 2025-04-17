@@ -4,7 +4,6 @@ local LazyUtil, err = pcall(require, "lazy.core.util")
 ---@field format config.util.format
 ---@field icons config.util.icons
 ---@field lsp config.util.lsp
----@field lualine config.util.lualine
 ---@field mini config.util.mini
 ---@field root config.util.root
 local M = {}
@@ -280,8 +279,8 @@ function M.get_root()
           and vim.tbl_map(function(ws)
             return vim.uri_to_fname(ws.uri)
           end, workspace)
-        or client.config.root_dir and { client.config.root_dir }
-        or {}
+          or client.config.root_dir and { client.config.root_dir }
+          or {}
       for _, p in ipairs(paths) do
         local r = vim.loop.fs_realpath(p)
         if path:find(r, 1, true) then
@@ -772,12 +771,12 @@ function M.lazy_require(module)
   -- if already loaded, return the module
   -- otherwise return a lazy module
   return type(package.loaded[module]) == "table" and package.loaded[module]
-    or setmetatable({}, {
-      __index = function(_, key)
-        mod = mod or require(module)
-        return mod[key]
-      end,
-    })
+      or setmetatable({}, {
+        __index = function(_, key)
+          mod = mod or require(module)
+          return mod[key]
+        end,
+      })
 end
 
 ---@param t table
