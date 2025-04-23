@@ -25,7 +25,6 @@ alias plseb="./scripts/provision_localstack_eventbridge"
 
 # Localstack S3 [BLVD]
 alias plss3="./scripts/provision_localstack_s3"
-
 # Just
 alias .j="just --justfile ~/.user.justfile --working-directory ."
 
@@ -96,14 +95,28 @@ alias mdg="mix deps.get"
 alias mdca="mix deps.clean --all"
 alias mf="mix format"
 alias killbeam="pgrep -f beam | xargs kill -9"
-alias vaultserve="PORT=5000 iex -S mix phx.server"
+alias vaultserve="PORT=5000 PRIVATE_PORT=4022 iex -S mix phx.server"
 
 # Yarn
 alias yrs="yarn run serve"
 alias yrp="yarn run publish"
 
-# BLVD - Dashboard
+# BLVD:
+## Dashboard
 alias yfs="yarn ts-node scripts/fetch-schema.ts && yarn run generate-types"
+
+## just-spin-up
+alias globaljustpath='echo $(cd ${HOME} && which just)'
+alias globaljust='$(globaljustpath)'
+alias justspin='globaljust --justfile $HOME/BLVD/just-spin-up/justfile spin'
+alias jspin='justspin'
+
+## BookingWidget
+alias bookingwidgetstart="yarn install && yarn run serve"
+
+## Mobile
+alias blvdstaffclean='yarn clean-project && yarn install && yarn install-bundler && yarn install-gems && yarn install-pods && yarn ios'
+alias blvdduoclean='yarn clean-project && yarn install && yarn install-bundler && yarn install-gems && yarn install-pods && yarn start && open ios/Duo.xcworkspace'
 
 # quick config
 alias aliasesconfig="nvim ~/dotfiles/.aliases"
