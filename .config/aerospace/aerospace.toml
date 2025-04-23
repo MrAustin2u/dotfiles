@@ -178,6 +178,10 @@ if.app-name-regex-substring = 'Obsidian'
 run = ['move-node-to-workspace 1']
 
 [[on-window-detected]]
+if.app-name-regex-substring = 'QuickTime'
+run = ['move-node-to-workspace 1']
+
+[[on-window-detected]]
 if.app-id = 'com.apple.Music'
 run = ['layout floating']
 
