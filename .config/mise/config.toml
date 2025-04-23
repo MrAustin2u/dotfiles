@@ -1,12 +1,18 @@
 [tools]
+1password = "latest"
+1password-cli = "latest"
 awscli = "2.6.3"
 elixir = "1.18.0-otp-27"
 erlang = "27.2"
+fd = "latest"
+fx = "latest"
 fzf = "latest"
 gleam = "1.4.1"
 go = "1.22.0"
 java = "liberica-18.0.1+12"
-just = "1.26.0"
+jless = "latest"
+jq = "latest"
+just = "latest"
 lazydocker = "latest"
 lazygit = "latest"
 localstack = "latest"
@@ -22,15 +28,15 @@ stylua = "latest"
 terraform = "latest"
 typos = "1.22.3"
 usage = "latest"
+uv = "latest"
 yarn = "1.22.5"
 zoxide = "latest"
-1password = "latest"
-1password-cli = "latest"
-uv = "latest"
-
 [tools.node]
 version = "22"
 postinstall = 'corepack enable && corepack enable pnpm'
 
 [settings]
 experimental = true
+
+[settings.python]
+compile = true
