@@ -202,6 +202,10 @@ if.app-name-regex-substring = '1Password'
 run = ['layout floating']
 
 [[on-window-detected]]
+if.app-name-regex-substring = 'zoom.us'
+run = ['layout floating']
+
+[[on-window-detected]]
 if.app-id = 'company.thebrowser.Browser'
 run = ['move-node-to-workspace 2']
 
@@ -213,9 +217,6 @@ run = ['move-node-to-workspace 2']
 if.app-id = 'app.zen-browser.zen'
 run = ['move-node-to-workspace 2']
 
-[[on-window-detected]]
-if.app-name-regex-substring = 'zoom.us'
-run = ['move-node-to-workspace 3']
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Slack'
