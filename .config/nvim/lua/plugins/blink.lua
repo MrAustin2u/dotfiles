@@ -3,7 +3,7 @@ return {
     "saghen/blink.cmp",
     event = "InsertEnter",
     dependencies = {
-      { "L3MON4D3/LuaSnip", version = "v2.*" },
+      { "L3MON4D3/LuaSnip",                     version = "v2.*" },
       "echasnovski/mini.icons",
       "rafamadriz/friendly-snippets",
       "onsails/lspkind.nvim",
@@ -23,9 +23,14 @@ return {
         -- end,
       },
       keymap = {
+        preset = "super-tab",
         ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
         ["<C-e>"] = { "hide", "fallback" },
-        ["<CR>"] = { "accept", "fallback" },
+
+        ["<CR>"] = {
+          "accept",
+          "fallback",
+        },
 
         ["<Tab>"] = {
           function(cmp)
@@ -121,9 +126,20 @@ return {
         },
       },
 
+      enabled = function()
+        return vim.bo.buftype ~= "prompt"
+            and vim.bo.buftype ~= "NvimTree"
+            and vim.bo.buftype ~= "TelescopePrompt"
+            and vim.bo.filetype ~= "DressingInput"
+            and vim.b.completion ~= false
+      end,
+
       signature = {
         enabled = true,
-        window = { border = "rounded" },
+        window = {
+          winblend = 0,
+          border = "rounded",
+        },
       },
 
       -- opts_extend = { "sources.default" },
@@ -166,7 +182,7 @@ return {
           },
           lsp = {
             min_keyword_length = 1, -- Number of characters to trigger provider
-            score_offset = 0, -- Boost/penalize the score of the items
+            score_offset = 0,       -- Boost/penalize the score of the items
           },
           path = {
             min_keyword_length = 0,
