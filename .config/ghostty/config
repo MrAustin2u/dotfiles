@@ -1,9 +1,11 @@
 # vim: ft=conf
 
 # Theme
-theme = tokyonight
-background-opacity = 0.6
+theme = tokyonight-storm
+background-opacity = 0.9
 background-blur = true
+
+macos-titlebar-proxy-icon = hidden
 
 # Font
 font-family = MonoLisa
