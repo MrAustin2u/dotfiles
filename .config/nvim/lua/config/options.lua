@@ -54,7 +54,7 @@ vim.opt.diffopt:append "algorithm:patience"
 vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0           -- Command line height
+vim.opt.ch = 0 -- Command line height
 vim.opt.cursorline = true
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
