@@ -104,6 +104,8 @@ alias yrp="yarn run publish"
 # BLVD:
 ## Dashboard
 alias yfs="yarn ts-node scripts/fetch-schema.ts && yarn run generate-types"
+## Sched
+alias checkwhitespace="./scripts/check_trailing_whitespace"
 
 ## just-spin-up
 alias globaljustpath='echo $(cd ${HOME} && which just)'
