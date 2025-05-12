@@ -19,98 +19,65 @@ local M = {}
 M.setup = function()
   local root_pattern = lspconfig.util.root_pattern
 
-  local package_list = {
-    "actionlint",
-    "ansible-lint",
-    -- Python formatter
-    "black",
-    "codespell",
-    -- Formatters (js, ts, tsx, etc.)
+  local mason_ensure_installed = {
     "prettier",
     "prettierd",
-    "biome",
-    -- SHELL
-    "shfmt",
-    -- LUA
     "stylua",
-    -- YAML
-    "yamllint",
-    "ansible-language-server",
-    "bash-language-server",
-    "clang-format",
-    "clangd",
-    "cmake-language-server",
-    "commitlint",
-    "css-lsp",
-    "dockerfile-language-server",
-    "elm-language-server",
-    "eslint-lsp",
-    "eslint_d",
-    "go-debug-adapter",
-    "goimports",
-    "golangci-lint",
-    "golangci-lint-langserver",
-    "gomodifytags",
-    "gopls",
-    "helm-ls",
-    "html-lsp",
-    "json-lsp",
-    "lexical",
-    -- XML
-    "lemminx",
-    "lua-language-server",
-    "powershell-editor-services",
-    -- Markdown
-    "prosemd-lsp",
-    "python-lsp-server",
-    -- SQL
-    "sqlls",
-    -- TailwindCSS
-    "tailwindcss-language-server",
-    "taplo",
-    -- Terraform
-    "terraform-ls",
-    -- Typescript
-    "typescript-language-server",
-    "vtsls",
-    -- VIM
-    "vim-language-server",
-    -- YAML
-    "yaml-language-server",
-    -- Zig
-    "zls",
-
-    -- DAP
-    "bash-debug-adapter",
-    "delve",
-    "js-debug-adapter",
-
-    -- Other utils
-    "tree-sitter-cli",
   }
 
-  ---@type MasonSettings
-  mason.setup {}
-
+  mason.setup()
   local mr = require "mason-registry"
-  local function ensure_installed()
-    for _, tool in ipairs(package_list) do
+  mr:on("package:install:success", function()
+    vim.defer_fn(function()
+      -- trigger FileType event to possibly load this newly installed LSP server
+      require("lazy.core.handler.event").trigger {
+        event = "FileType",
+        buf = vim.api.nvim_get_current_buf(),
+      }
+    end, 100)
+  end)
+
+  mr.refresh(function()
+    for _, tool in ipairs(mason_ensure_installed) do
       local p = mr.get_package(tool)
       if not p:is_installed() then
         p:install()
       end
     end
-  end
+  end)
 
-  if mr.refresh then
-    mr.refresh(ensure_installed)
-  else
-    ensure_installed()
-  end
-
-  lspconfig.nushell.setup {}
-
-  mason_lspconfig.setup {}
+  mason.setup()
+  mason_lspconfig.setup {
+    ensure_installed = {
+      "angularls",
+      "ansiblels",
+      "bashls",
+      "biome",
+      "denols",
+      "dockerls",
+      "erlangls",
+      "eslint",
+      "grammarly",
+      "graphql",
+      "html",
+      "jsonls",
+      "lemminx",
+      "lexical",
+      "lua_ls",
+      "rust_analyzer",
+      "sqlls",
+      "tailwindcss",
+      "taplo",
+      "terraformls",
+      "ts_ls",
+      "typos_lsp",
+      "vimls",
+      "vtsls",
+      "yamlls",
+      "zls",
+    },
+    automatic_enable = true,
+  }
   mason_lspconfig.setup_handlers {
     function(server_name)
       lspconfig[server_name].setup {}
