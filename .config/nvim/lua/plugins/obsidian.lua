@@ -70,7 +70,7 @@ return {
     {
       "<space>oo",
       function()
-        require("telescope").extensions.file_browser.file_browser { path = vault_dir }
+        Snacks.picker.files { cwd = vault_dir }
       end,
       desc = "Open Obsidian vault",
     },
