@@ -8,22 +8,13 @@ return {
     -- required for jsonls and yamlls
     { "b0o/schemastore.nvim", lazy = true },
     {
-      "glepnir/lspsaga.nvim",
-      config = function()
-        require("lspsaga").setup {
-          lightbulb = {
-            enable = false,
-          },
-          symbol_in_winbar = {
-            enable = true,
-          },
-          outline = {
-            win_width = 50,
-            auto_preview = false,
-          },
-        }
-        vim.keymap.set({ "n", "t" }, "<leader>to", "<cmd>Lspsaga term_toggle<CR>")
-        vim.keymap.set({ "n", "t" }, "<leader>so", "<cmd>Lspsaga outline<CR>")
+      "SmiteshP/nvim-navic",
+      dependencies = { "neovim/nvim-lspconfig" },
+      opts = {
+        highlight = true,
+      },
+      init = function()
+        vim.g.navic_silence = true
       end,
     },
   },
