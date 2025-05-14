@@ -54,7 +54,7 @@ vim.opt.diffopt:append "algorithm:patience"
 vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0 -- Command line height
+vim.opt.ch = 0           -- Command line height
 vim.opt.cursorline = true
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
@@ -110,3 +110,5 @@ if vim.fn.has "persistent_undo" then
   vim.opt.undofile = true
   vim.opt.undodir = cache_dir .. "undo/"
 end
+
+vim.lsp.set_log_level "off"
