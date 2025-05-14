@@ -396,5 +396,34 @@ return {
       },
     })
     vim.lsp.enable "gopls"
+
+    for name, icon in pairs(aa.icons.diagnostics) do
+      name = "DiagnosticSign" .. name
+      vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+    end
+
+    local diagnostic_config = {
+      underline = true,
+      update_in_insert = false,
+      virtual_text = {
+        spacing = 4,
+        source = "if_many",
+        prefix = "●",
+      },
+      severity_sort = true,
+      signs = {
+        text = {
+          [vim.diagnostic.severity.ERROR] = aa.icons.diagnostics.Error,
+          [vim.diagnostic.severity.WARN] = aa.icons.diagnostics.Warn,
+          [vim.diagnostic.severity.HINT] = aa.icons.diagnostics.Hint,
+          [vim.diagnostic.severity.INFO] = aa.icons.diagnostics.Info,
+        },
+      },
+      float = {
+        border = "rounded",
+      },
+    }
+
+    vim.diagnostic.config(diagnostic_config)
   end,
 }
