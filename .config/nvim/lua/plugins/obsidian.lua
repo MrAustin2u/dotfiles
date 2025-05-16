@@ -36,6 +36,10 @@ return {
         name = "blvd_standup",
         path = vim.fs.joinpath(vault_dir, "work/standup"),
       },
+      {
+        name = "blvd_initiatives",
+        path = vim.fs.joinpath(vault_dir, "work/initiatives"),
+      },
     },
     daily_notes = {
       folder = "dailies",
