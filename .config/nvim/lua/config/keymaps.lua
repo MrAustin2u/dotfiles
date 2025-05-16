@@ -514,7 +514,7 @@ M.snacks_mappings = {
   -- Terminal
   --------------
   {
-    "<c-/>",
+    "<leader>tt",
     function()
       Snacks.terminal()
     end,
