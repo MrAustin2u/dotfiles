@@ -160,6 +160,7 @@ alt-g = 'exec-and-forget open -a /Applications/Ghostty.app'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 alt-shift-semicolon = 'mode service'
+alt-shift-r = 'reload-config'
 
 [[on-window-detected]]
 if.app-id = 'com.github.wez.wezterm'
@@ -182,6 +183,26 @@ if.app-name-regex-substring = 'QuickTime'
 run = ['move-node-to-workspace 1']
 
 [[on-window-detected]]
+if.app-id = 'company.thebrowser.Browser'
+run = ['move-node-to-workspace 2']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Firefox'
+run = ['move-node-to-workspace 2']
+
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+run = ['move-node-to-workspace 2']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'DataGrip'
+run = ['move-node-to-workspace 3']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'zoom.us'
+run = ['move-node-to-workspace 4']
+
+[[on-window-detected]]
 if.app-id = 'com.apple.Music'
 run = ['layout floating']
 
@@ -200,32 +221,6 @@ run = ['layout floating']
 [[on-window-detected]]
 if.app-name-regex-substring = '1Password'
 run = ['layout floating']
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'zoom.us'
-run = ['layout floating']
-
-[[on-window-detected]]
-if.app-id = 'company.thebrowser.Browser'
-run = ['move-node-to-workspace 2']
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Firefox'
-run = ['move-node-to-workspace 2']
-
-[[on-window-detected]]
-if.app-id = 'app.zen-browser.zen'
-run = ['move-node-to-workspace 2']
-
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Slack'
-run = ['move-node-to-workspace 4']
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'DataGrip'
-run = ['move-node-to-workspace 5']
-
 
 [mode.service.binding]
 esc = ['reload-config', 'mode main']
