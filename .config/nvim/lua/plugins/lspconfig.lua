@@ -57,7 +57,6 @@ return {
         "ansiblels",
         "bashls",
         "biome",
-        "denols",
         "dockerls",
         "erlangls",
         "eslint",
