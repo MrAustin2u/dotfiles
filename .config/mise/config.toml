@@ -32,7 +32,7 @@ uv = "latest"
 yarn = "1.22.5"
 zoxide = "latest"
 [tools.node]
-version = "22"
+version = "24.0.1"
 postinstall = 'corepack enable && corepack enable pnpm'
 
 [settings]
