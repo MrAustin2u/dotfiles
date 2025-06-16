@@ -1,8 +1,8 @@
 return {
   "neovim/nvim-lspconfig",
   dependencies = {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason.nvim",
+    "mason-org/mason-lspconfig.nvim",
     "jose-elias-alvarez/nvim-lsp-ts-utils",
     "saghen/blink.cmp",
     -- required for jsonls and yamlls
