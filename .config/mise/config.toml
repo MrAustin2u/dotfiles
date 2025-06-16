@@ -37,6 +37,7 @@ postinstall = 'corepack enable && corepack enable pnpm'
 
 [settings]
 experimental = true
+idiomatic_version_file_enable_tools = ["node"]
 
 [settings.python]
 compile = true
