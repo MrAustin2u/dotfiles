@@ -148,7 +148,7 @@ work() {
       #Ngrok
       tmux new-window
       tmux rename-window "Ngrok"
-      tmux send-keys -t 0 "clear && cd" Enter & "clear && ngrok http 4000 --url aaustin-blvd.ngrok.io" Enter &
+      tmux send-keys -t 0 "clear && cd" Enter "clear && ngrok http 4000 --url aaustin-blvd.ngrok.io" Enter &
 
       tmux select-window -t "Servers"
   fi
