@@ -203,6 +203,10 @@ if.app-name-regex-substring = 'zoom.us'
 run = ['move-node-to-workspace 4']
 
 [[on-window-detected]]
+if.app-name-regex-substring = 'Slack'
+run = ['move-node-to-workspace 5']
+
+[[on-window-detected]]
 if.app-id = 'com.apple.Music'
 run = ['layout floating']
 
