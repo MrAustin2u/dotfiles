@@ -308,15 +308,15 @@ M.vim_test_mappings = function()
 end
 
 M.telescope_mappings = {
-  { "<leader>f?", telescope "search_history", desc = "Search History" },
-  { "<leader>fh", telescope "help_tags", desc = "[F]ind [H]elp" },
-  { "<leader>fO", telescope "vim_options", desc = "[F]ind [O]ptions" },
+  { "<leader>f?", telescope "search_history",   desc = "Search History" },
+  { "<leader>fh", telescope "help_tags",        desc = "[F]ind [H]elp" },
+  { "<leader>fO", telescope "vim_options",      desc = "[F]ind [O]ptions" },
 
   --  Extensions
-  { "<leader>bb", telescope "buffers", desc = "Find Buffers" },
+  { "<leader>bb", telescope "buffers",          desc = "Find Buffers" },
 
   -- better spell suggestions
-  { "z=", telescope "spell_suggest", desc = "Spelling Suggestions" },
+  { "z=",         telescope "spell_suggest",    desc = "Spelling Suggestions" },
 
   -- search unicode symbols 
   { "<leader>fu", "<cmd>Telescope symbols<cr>", desc = "[F]ind [U]nicode" },
@@ -519,6 +519,7 @@ M.snacks_mappings = {
       Snacks.terminal()
     end,
     desc = "Toggle Terminal",
+    mode = { "n", "t", "v" },
   },
 
   --------------
@@ -639,8 +640,8 @@ M.snacks_mappings = {
     desc = "Git Browse",
     mode = { "n", "v" },
   },
-  { "<leader>gY", git_copy_file_url, mode = { "n", "x" }, desc = "Git Copy File URL" },
-  { "<leader>gy", git_copy_line_url, mode = { "n", "x" }, desc = "Git Copy Line(s) URL" },
+  { "<leader>gY", git_copy_file_url, mode = { "n", "x" },       desc = "Git Copy File URL" },
+  { "<leader>gy", git_copy_line_url, mode = { "n", "x" },       desc = "Git Copy Line(s) URL" },
   {
     "<leader>gf",
     function()
@@ -660,7 +661,7 @@ M.snacks_mappings = {
   -- Buffer
   --------------
 
-  { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
+  { "<Tab>",   "<cmd>bnext<CR>", desc = "Next buffer" },
   { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
   {
     "<leader>,",
@@ -743,7 +744,7 @@ M.snacks_mappings = {
 }
 
 M.sort_mappings = {
-  { "go", ":Sort<CR>", mode = "v", desc = "Order (sort lines/line params)" },
+  { "go",   ":Sort<CR>",    mode = "v", desc = "Order (sort lines/line params)" },
   { "goi'", "vi':Sort<CR>", mode = "n", desc = "Order in [']" },
   { "goi(", "vi(:Sort<CR>", mode = "n", desc = "Order in (" },
   { "goi[", "vi[:Sort<CR>", mode = "n", desc = "Order in [" },
@@ -753,11 +754,11 @@ M.sort_mappings = {
 }
 
 M.tabby_mappings = {
-  { "<leader>ta", ":$tabnew<CR>", mode = "n", desc = "Tab new", noremap = true },
-  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose", noremap = true },
-  { "<leader>to", ":tabonly<CR>", mode = "n", desc = "Tab only", noremap = true },
-  { "<leader>tl", ":tabn<CR>", mode = "n", desc = "Tab next", noremap = true },
-  { "<leader>th", ":tabp<CR>", mode = "n", desc = "Tab previous", noremap = true },
+  { "<leader>ta", ":$tabnew<CR>",  mode = "n", desc = "Tab new",      noremap = true },
+  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose",  noremap = true },
+  { "<leader>to", ":tabonly<CR>",  mode = "n", desc = "Tab only",     noremap = true },
+  { "<leader>tl", ":tabn<CR>",     mode = "n", desc = "Tab next",     noremap = true },
+  { "<leader>th", ":tabp<CR>",     mode = "n", desc = "Tab previous", noremap = true },
 }
 
 return M
