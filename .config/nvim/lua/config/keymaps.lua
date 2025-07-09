@@ -140,7 +140,7 @@ vim.keymap.set("i", "<A-k>", "<Esc>:m .-2<CR>==gi")
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv")
 
-vim.keymap.set("n", "<C-p>", function()
+vim.keymap.set("n", "<Leader>cp", function()
   vim.cmd "let @+ = expand('%')"
 end, { desc = "Copy relative path" })
 
