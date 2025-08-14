@@ -1,7 +1,21 @@
 [tools]
-1password = "latest"
-1password-cli = "latest"
-awscli = "2.6.3"
+
+"npm:@types/node" = "^22.1.0"
+"npm:node-fetch" = "2.6.7"
+"npm:prettier" = "1.19.1"
+"npm:ts-node" = "10.9.1"
+"npm:tslib" = "2.6.3"
+"npm:@fsouza/prettierd" = "latest"
+"npm:codeowners" = "latest"
+"npm:eslint_d" = "latest"
+"npm:mcp-hub" = "latest"
+"npm:opencommit" = "latest"
+"npm:pnpm" = "latest"
+"npm:wscat" = "latest"
+"npm:@anthropic-ai/claude-code" = "latest"
+"npm:typescript" = "^5.6.3"
+"pipx:awscli" = "latest"
+"pipx:awscli-local" = "latest"
 elixir = "1.18.0-otp-27"
 erlang = "27.2"
 fd = "latest"
@@ -19,6 +33,7 @@ localstack = "latest"
 lua = "5"
 lua-language-server = "latest"
 neovim = "latest"
+node = "latest"
 python = "3.12"
 rebar = "3.24.0"
 ripgrep = "latest"
@@ -31,9 +46,9 @@ usage = "latest"
 uv = "latest"
 yarn = "1.22.5"
 zoxide = "latest"
-[tools.node]
-version = "24.0.1"
-postinstall = 'corepack enable && corepack enable pnpm'
+1password = "latest"
+1password-cli = "latest"
+
 
 [settings]
 experimental = true
