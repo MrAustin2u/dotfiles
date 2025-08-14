@@ -1,3 +1,5 @@
+alias stowdotfiles="z dotifles && stow --target="$HOME" --adopt ."
+
 # Postings
 alias telgopostings="posting --collection postings/telgorithm"
 
@@ -29,8 +31,12 @@ alias plss3="./scripts/provision_localstack_s3"
 alias .j="just --justfile ~/.user.justfile --working-directory ."
 
 # Docker
+alias orbstart="orb start && docker context use orbstack"
 alias colimastart="brew services restart colima"
 alias laws="docker run --network localstack --rm -it amazon/aws-cli --endpoint-url=http://localstack:4566"
+
+# AWS
+alias awsconfig="vim ~/.aws/config"
 
 # bat
 alias cat="bat"
@@ -61,6 +67,9 @@ alias cxp="cd ~/BLVD/client-portal/"
 
 # BLVD DB
 alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
+
+# BLVD
+alias yoinkdeploy="just yoink deploy"
 
 # Git
 alias gpod="git pull origin develop"
@@ -107,6 +116,7 @@ alias yrp="yarn run publish"
 alias yfs="yarn ts-node scripts/fetch-schema.ts && yarn run generate-types"
 ## Sched
 alias checkwhitespace="./scripts/check_trailing_whitespace"
+alias envreload="direnv reload"
 
 ## just-spin-up
 alias globaljustpath='echo $(cd ${HOME} && which just)'
