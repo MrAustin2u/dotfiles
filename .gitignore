@@ -13,3 +13,9 @@ tmux/.config/tmux/plugins/
 .colima/_lima
 .colima/ssh_config
 ngrok
+op/*
+!op/plugins.sh
+.claude/projects
+.claude/ide
+.claude/statsig
+.claude/todos
