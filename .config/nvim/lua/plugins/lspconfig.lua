@@ -64,7 +64,6 @@ return {
         "graphql",
         "html",
         "lemminx",
-        "rust_analyzer",
         "sqlls",
         "tailwindcss",
         "taplo",
