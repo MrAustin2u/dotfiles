@@ -50,17 +50,17 @@ return {
         map({ 'n', 'v' }, '<leader>ghs', ":Gitsigns stage_hunk<CR>", "Stage Hunk")
         map({ "n", "v" }, "<leader>ghr", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
         map("n", "<leader>gbr", gs.reset_buffer, "Reset Buffer")
-        map("n", "]h", function()
+        map("n", "<C-j>", function()
             if vim.wo.diff then
-              vim.cmd.normal({ ']h', bang = true })
+              vim.cmd.normal({ '<C-j>', bang = true })
             else
               gs.nav_hunk('next')
             end
           end,
           "Next Hunk")
-        map("n", "[h", function()
+        map("n", "<C-k>", function()
             if vim.wo.diff then
-              vim.cmd.normal({ '[h', bang = true })
+              vim.cmd.normal({ '<C-k>', bang = true })
             else
               gs.nav_hunk('prev')
             end
