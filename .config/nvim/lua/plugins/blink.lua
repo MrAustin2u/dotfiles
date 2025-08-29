@@ -75,6 +75,7 @@ return {
             preselect = function(ctx)
               return ctx.mode == "cmdline" and "auto_insert" or "preselect"
             end,
+            auto_insert = true,
           },
         },
 

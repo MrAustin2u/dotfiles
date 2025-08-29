@@ -20,3 +20,4 @@ op/*
 .claude/statsig
 .claude/todos
 .claude/shell-snapshots
+.claude/plugins

@@ -107,9 +107,9 @@ return {
         -- inlay hints
         aa.lsp.on_supports_method("textDocument/inlayHint", function(client, buffer)
           if
-              vim.api.nvim_buf_is_valid(buffer)
-              and vim.bo[buffer].buftype == ""
-              and not vim.tbl_contains({ "vue" }, vim.bo[buffer].filetype)
+            vim.api.nvim_buf_is_valid(buffer)
+            and vim.bo[buffer].buftype == ""
+            and not vim.tbl_contains({ "vue" }, vim.bo[buffer].filetype)
           then
             vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
           end
@@ -198,12 +198,21 @@ return {
     vim.lsp.enable "lua_ls"
 
     -- elixir
-    vim.lsp.config("lexical", {
+    -- vim.lsp.config("lexical", {
+    --   filetypes = { "elixir", "eelixir", "heex", "surface", "livebook" },
+    --   single_file_support = true,
+    --   dialyzer_enabled = true,
+    -- })
+    -- vim.lsp.enable "lexical"
+
+    vim.lsp.config("expert", {
+      root_markers = { "mix.exs", ".git" },
       filetypes = { "elixir", "eelixir", "heex", "surface", "livebook" },
       single_file_support = true,
       dialyzer_enabled = true,
     })
-    vim.lsp.enable "lexical"
+
+    vim.lsp.enable "expert"
 
     -- yaml
     vim.lsp.config("yamlls", {
@@ -217,7 +226,7 @@ return {
       },
       on_new_config = function(new_config)
         new_config.settings.yaml.schemas =
-            vim.tbl_deep_extend("force", new_config.settings.yaml.schemas or {}, require("schemastore").yaml.schemas())
+          vim.tbl_deep_extend("force", new_config.settings.yaml.schemas or {}, require("schemastore").yaml.schemas())
       end,
       settings = {
         redhat = { telemetry = { enabled = false } },
