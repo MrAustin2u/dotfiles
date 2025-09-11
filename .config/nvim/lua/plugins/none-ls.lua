@@ -8,20 +8,24 @@ return {
 
     null_ls.setup {
       sources = {
-        -- diagnostics
+        null_ls.builtins.formatting.biome.with {
+          condition = function(utils)
+            return utils.root_has_file { "biome.json" } -- only enable if root has a biome file
+          end,
+        },
         require("none-ls.diagnostics.eslint_d").with {
           condition = function(utils)
             return utils.root_has_file { ".eslintrc.js", ".eslintrc.ts", ".eslintrc.json" } -- only enable if root has an eslint file
           end,
         },
+        null_ls.builtins.formatting.prettierd,
         null_ls.builtins.diagnostics.credo.with {
           condition = function(utils)
             return utils.root_has_file { ".credo.exs" } -- only enable if root has a credo file
           end,
         },
-        null_ls.builtins.diagnostics.terraform_validate,
-        null_ls.builtins.diagnostics.yamllint,
-        null_ls.builtins.diagnostics.zsh,
+        null_ls.builtins.formatting.just,
+        null_ls.builtins.formatting.terraform_fmt,
       },
     }
   end,

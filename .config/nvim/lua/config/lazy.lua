@@ -18,7 +18,6 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-
 -- Add support for the LazyFile event
 local Event = require "lazy.core.handler.event"
 
@@ -32,6 +31,7 @@ local modules = {
   "config.autocmds",
   "config.util",
   "config.keymaps",
+  "config.lsp",
 }
 
 for _, module in ipairs(modules) do

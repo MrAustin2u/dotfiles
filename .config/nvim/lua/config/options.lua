@@ -55,6 +55,8 @@ vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
 vim.opt.ch = 0           -- Command line height
+-- Autocomplete with dictionary words when spell check is on
+vim.opt.complete:append "kspell"
 vim.opt.cursorline = true
 vim.opt.expandtab = true
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
@@ -96,6 +98,7 @@ vim.opt.timeoutlen = 300
 vim.opt.ttimeoutlen = 0
 vim.opt.undofile = true
 vim.opt.updatetime = 50
+vim.opt.winborder = "rounded"
 vim.opt.wrap = true
 ----------------------------------------------
 -- Files and directories

@@ -516,7 +516,19 @@ M.snacks_mappings = {
   {
     "<leader>tt",
     function()
-      Snacks.terminal()
+      Snacks.terminal(nil, {
+        win = {
+          style = "float",
+          title = "Terminal",
+          width = 0.9,
+          height = 0.8,
+          border = "rounded",
+        },
+        env = {
+          -- Ensure we're in the correct directory
+          PWD = vim.fn.getcwd(),
+        },
+      })
     end,
     desc = "Toggle Terminal",
     mode = { "n", "t", "v" },
@@ -760,5 +772,52 @@ M.tabby_mappings = {
   { "<leader>tl", ":tabn<CR>",     mode = "n", desc = "Tab next",     noremap = true },
   { "<leader>th", ":tabp<CR>",     mode = "n", desc = "Tab previous", noremap = true },
 }
+
+-- Jest Test Runner with Snacks Terminal
+M.jest_test_mappings = function()
+  local function run_jest_test()
+    local current_file = vim.fn.expand "%:p"
+    local filename = vim.fn.expand "%:t"
+
+    -- Check if current file is a test file
+    if not filename:match "%.test%.js$" then
+      vim.notify("Current file is not a Jest test file (.test.js)", vim.log.levels.WARN)
+      return
+    end
+
+    -- Get relative path from project root
+    local relative_path = vim.fn.expand "%:."
+
+    -- Create the Jest command with read to keep terminal open
+    local jest_cmd = string.format(
+      "clear && yarn test:dev --config jest.angular.config.js %s; read -p 'Press Enter to close...'",
+      relative_path
+    )
+
+    -- Run in Snacks terminal with floating window
+    Snacks.terminal(jest_cmd, {
+      win = {
+        style = "float",
+        title = "Jest Test: " .. filename,
+        width = 0.9,
+        height = 0.8,
+        border = "rounded",
+      },
+      env = {
+        -- Ensure we're in the correct directory
+        PWD = vim.fn.getcwd(),
+      },
+    })
+  end
+
+  nmap {
+    "<leader>tj",
+    run_jest_test,
+    { desc = "[T]est [J]est - Run current file" },
+  }
+end
+
+-- Initialize Jest test mappings
+M.jest_test_mappings()
 
 return M

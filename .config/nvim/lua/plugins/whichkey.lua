@@ -15,7 +15,7 @@ return {
           end,
         },
         { "<leader>q", group = "quit/session" },
-        { "<leader>s", group = "search" },
+        { "<leader>s", group = "search/screenshot" },
         { "<leader>sn", group = "noice" },
         { "<leader>u", group = "ui" },
         { "<leader>t", group = "tabs/test" },

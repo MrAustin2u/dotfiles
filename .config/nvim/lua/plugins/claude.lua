@@ -20,4 +20,15 @@ return {
     { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
     { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>",   desc = "Deny diff" },
   },
+  opts = {
+    terminal = {
+      ---@module "snacks"
+      ---@type snacks.win.Config|{}
+      snacks_win_opts = {
+        position = "float",
+        width = 0.9,
+        height = 0.9,
+      },
+    },
+  },
 }

@@ -1,3 +1,6 @@
+local kind_filter = require("config.utils").kind_filter
+local icons = require("config.utils").icons
+
 return {
   "hedyhli/outline.nvim",
   keys = { { "<leader>cs", "<cmd>Outline<cr>", desc = "Toggle Outline" } },
@@ -7,7 +10,7 @@ return {
     local opts = {
       symbols = {
         icons = {},
-        filter = vim.deepcopy(aa.icons.kind_filter),
+        filter = vim.deepcopy(kind_filter),
       },
       keymaps = {
         up_and_jump = "<up>",
@@ -17,7 +20,7 @@ return {
 
     for kind, symbol in pairs(defaults.symbols.icons) do
       opts.symbols.icons[kind] = {
-        icon = aa.icons.kinds[kind] or symbol.icon,
+        icon = icons.kinds[kind] or symbol.icon,
         hl = symbol.hl,
       }
     end

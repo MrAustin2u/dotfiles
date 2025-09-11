@@ -15,14 +15,14 @@ return {
   },
   opts = {
     options = {
-        -- stylua: ignore
-        close_command = function(n) Snacks.bufdelete(n) end,
-        -- stylua: ignore
-        right_mouse_command = function(n) Snacks.bufdelete(n) end,
+      -- stylua: ignore
+      close_command = function(n) Snacks.bufdelete(n) end,
+      -- stylua: ignore
+      right_mouse_command = function(n) Snacks.bufdelete(n) end,
       diagnostics = "nvim_lsp",
       always_show_bufferline = false,
       diagnostics_indicator = function(_, _, diag)
-        local icons = aa.icons.diagnostics
+        local icons = require("config.utils").icons.diagnostics
         local ret = (diag.error and icons.Error .. diag.error .. " " or "")
           .. (diag.warning and icons.Warning .. diag.warning or "")
         return vim.trim(ret)
@@ -40,7 +40,7 @@ return {
       },
       ---@param opts bufferline.IconFetcherOpts
       get_element_icon = function(opts)
-        return aa.icons.ft[opts.filetype]
+        return require("config.utils").icons.ft[opts.filetype]
       end,
     },
   },
