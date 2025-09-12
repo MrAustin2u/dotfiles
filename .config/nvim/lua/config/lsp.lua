@@ -14,8 +14,24 @@ end
 local M = {}
 
 M.on_attach = function(client, bufnr)
-  if client.server_capabilities.documentSymbolProvider then
-    navic.attach(client, bufnr)
+  if client.server_capabilities.documentSymbolProvider and navic_present then
+    local ok, err = pcall(navic.attach, client, bufnr)
+    if not ok then
+      vim.notify("navic.attach error: " .. tostring(err), vim.log.levels.ERROR)
+    end
+  end
+
+  if client.supports_method "textDocument/formatting" then
+    local format_on_save_group = vim.api.nvim_create_augroup("formatOnSave", {})
+
+    vim.api.nvim_clear_autocmds { group = format_on_save_group, buffer = bufnr }
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = format_on_save_group,
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.format { bufnr = bufnr }
+      end,
+    })
   end
 
   require("config.keymaps").lsp_mappings()
