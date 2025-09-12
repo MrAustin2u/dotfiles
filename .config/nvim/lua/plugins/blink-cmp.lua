@@ -30,7 +30,7 @@ return {
         "select_next",
         "snippet_forward",
         function(cmp)
-          if require("core.utils").has_words_before() or vim.api.nvim_get_mode().mode == "c" then
+          if require("config.utils").has_words_before() or vim.api.nvim_get_mode().mode == "c" then
             return cmp.show()
           end
         end,
