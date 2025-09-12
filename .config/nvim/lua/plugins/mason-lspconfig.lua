@@ -6,7 +6,9 @@ return {
     "mason-org/mason.nvim",
     {
       "neovim/nvim-lspconfig",
-      dependencies = { "saghen/blink.cmp" },
+      dependencies = {
+        "saghen/blink.cmp",
+      },
     },
     { "b0o/schemastore.nvim", lazy = true },
   },

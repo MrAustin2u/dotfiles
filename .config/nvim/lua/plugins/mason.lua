@@ -56,7 +56,6 @@ return {
       "vtsls",
     }
 
-    ---@type MasonSettings
     mason.setup {}
 
     -- Auto install all packages in the package_list
