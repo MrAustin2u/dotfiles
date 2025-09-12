@@ -1,68 +1,40 @@
-local icons = require("config.utils").icons
+local lspconfig_present, _lspconfig = pcall(require, "lspconfig")
+local navic_present, navic = pcall(require, "nvim-navic")
 
-vim.lsp.enable {
-  "dockerls",
-  "dprint",
-  "elixirls",
-  "erlangls",
-  "eslint",
-  "expert",
-  "gleam",
-  "gopls",
-  "graphql",
-  "html",
-  "json",
-  "jsonls",
-  "lexical",
-  "lua_ls",
-  "marksman",
-  "pyright",
-  "sqlls",
-  "tailwindcss",
-  "terraformls",
-  "ts_ls",
-  "typos_lsp",
-  "vtsls",
-  "yammls",
+local deps = {
+  lspconfig_present,
+  navic_present,
 }
 
-vim.diagnostic.config {
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = icons.Error,
-      [vim.diagnostic.severity.WARN] = icons.Warn,
-      [vim.diagnostic.severity.INFO] = icons.Info,
-      [vim.diagnostic.severity.HINT] = icons.Hint,
-    },
-  },
-  virtual_lines = { current_line = true },
-  severity_sort = true,
-  virtual_text = false,
-  float = {
-    border = "rounded",
-    source = true,
-  },
-}
-require("config.keymaps").lsp_diagnostic_mappings()
+if require("config.utils").contains(deps, false) then
+  vim.notify "Failed to load dependencies in plugins/lsp.lua"
+  return
+end
 
-vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("lsp", {}),
-  callback = function(ev)
-    local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
+local M = {}
 
-    if
-      not client:supports_method "textDocument/willSaveWaitUntil"
-      and client:supports_method "textDocument/formatting"
-    then
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        group = vim.api.nvim_create_augroup("my.lsp", { clear = false }),
-        buffer = ev.buf,
-        callback = function()
-          vim.lsp.buf.format { bufnr = ev.buf, id = client.id, timeout_ms = 1000 }
-        end,
-      })
-    end
+M.on_attach = function(client, bufnr)
+  if client.server_capabilities.documentSymbolProvider then
+    navic.attach(client, bufnr)
+  end
 
-    require("config.keymaps").lsp_mappings()
-  end,
-})
+  require("config.keymaps").lsp_mappings()
+end
+M.setup = function()
+  require("config.keymaps").lsp_diagnostic_mappings()
+
+  vim.api.nvim_create_autocmd("LspAttach", {
+    group = vim.api.nvim_create_augroup("lsp", {}),
+    callback = function(ev)
+      local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
+
+      local existing_capabilities = client.config.capabilities or vim.lsp.protocol.make_client_capabilities()
+      -- merge blink cmp capabilities
+      client.config.capabilities = require("blink.cmp").get_lsp_capabilities(existing_capabilities)
+
+      M.on_attach(client, ev.buf)
+    end,
+  })
+end
+
+return M

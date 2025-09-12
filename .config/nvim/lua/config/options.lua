@@ -1,3 +1,4 @@
+local icons = require("config.utils").icons
 local cache_dir = string.format("%s/.cache/nvim/", vim.env.HOME)
 
 vim.g.mapleader = " "
@@ -115,3 +116,21 @@ if vim.fn.has "persistent_undo" then
 end
 
 vim.lsp.set_log_level "off"
+
+vim.diagnostic.config {
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = icons.Error,
+      [vim.diagnostic.severity.WARN] = icons.Warn,
+      [vim.diagnostic.severity.INFO] = icons.Info,
+      [vim.diagnostic.severity.HINT] = icons.Hint,
+    },
+  },
+  virtual_lines = { current_line = true },
+  severity_sort = true,
+  virtual_text = false,
+  float = {
+    border = "rounded",
+    source = true,
+  },
+}
