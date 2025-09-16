@@ -1,10 +1,10 @@
-local lspconfig = require "lspconfig"
-
 ---@type vim.lsp.Config
 return {
+  cmd = { "typescript-language-server", "--stdio" },
+  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
   root_markers = {
     "package.json",
-    "tsconfig.json",
+    "tsconfig.json", 
     "jsconfig.json",
     "node_modules",
     ".git",
