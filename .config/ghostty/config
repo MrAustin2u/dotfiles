@@ -2,7 +2,7 @@
 
 # Theme
 macos-titlebar-style = tabs
-theme = tokyonight-storm
+theme = TokyoNight Moon
 background-opacity = 0.85
 background-blur = true
 
