@@ -18,13 +18,6 @@ return {
       end,
       desc = "Save code screenshot as file",
     },
-    {
-      "<leader>ss",
-      function()
-        require("nvim-silicon").shoot()
-      end,
-      desc = "Create code screenshot",
-    },
   },
   opts = {
     -- Configuration here, or leave empty to use defaults
@@ -32,11 +25,10 @@ return {
       return args.line1
     end,
     font = "MonoLisa",
-    theme = "tokyonight_moon",
+    theme = "Dracula",
     background = "#636da6",
-    output = {
-      path = "/Users/aaustin/Pictures/Screenshots",
-      format = "silicon_[year][month][day]_[hour][minute][second].png",
-    },
+    output = function()
+      return "/Users/aaustin/Pictures/Screenshots/" .. os.date "!%Y-%m-%d" .. "_code.png"
+    end,
   },
 }

@@ -41,7 +41,6 @@ vim.opt.ch = 0
 -- vim.opt.clipboard = "unnamedplus"
 vim.opt.cmdheight = 1
 vim.opt.colorcolumn = "120"
-vim.opt.completeopt = "menu,menuone,noselect"
 
 -- Make diffing better
 -- https://vimways.org/2018/the-power-of-diff/
@@ -55,7 +54,7 @@ vim.opt.diffopt:append "algorithm:patience"
 vim.opt.diffopt:append "indent-heuristic"
 ----------------------------------------------
 vim.opt.autowrite = true -- Automatically :write before running commands
-vim.opt.ch = 0           -- Command line height
+vim.opt.ch = 0 -- Command line height
 -- Autocomplete with dictionary words when spell check is on
 vim.opt.complete:append "kspell"
 vim.opt.cursorline = true
@@ -116,21 +115,3 @@ if vim.fn.has "persistent_undo" then
 end
 
 vim.lsp.set_log_level "off"
-
-vim.diagnostic.config {
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = icons.Error,
-      [vim.diagnostic.severity.WARN] = icons.Warn,
-      [vim.diagnostic.severity.INFO] = icons.Info,
-      [vim.diagnostic.severity.HINT] = icons.Hint,
-    },
-  },
-  virtual_lines = { current_line = true },
-  severity_sort = true,
-  virtual_text = false,
-  float = {
-    border = "rounded",
-    source = true,
-  },
-}

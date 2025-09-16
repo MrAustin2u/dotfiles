@@ -1,4 +1,11 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-require "config.lazy"
+require "core.mason_path"
+require "core.lsp"
+require "config.options"
+require "config.keymaps"
+require "config.autocmds"
+require "config.mason_verify"
+require "config.health_check"
+require "core.lazy"

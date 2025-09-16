@@ -21,17 +21,17 @@ local M = {}
 local default_opts = { noremap = true, silent = true }
 
 local map = function(tbl)
-  local opts = tbl[4] and aa.merge(default_opts, tbl[4]) or default_opts
+  local opts = tbl[4] and vim.tbl_deep_extend("force", default_opts, tbl[4]) or default_opts
   vim.keymap.set(tbl[1], tbl[2], tbl[3], opts)
 end
 
 local nmap = function(tbl)
-  local opts = tbl[3] and aa.merge(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and vim.tbl_deep_extend("force", default_opts, tbl[3]) or default_opts
   vim.keymap.set("n", tbl[1], tbl[2], opts)
 end
 
 local vmap = function(tbl)
-  local opts = tbl[3] and aa.merge(default_opts, tbl[3]) or default_opts
+  local opts = tbl[3] and vim.tbl_deep_extend("force", default_opts, tbl[3]) or default_opts
   vim.keymap.set("v", tbl[1], tbl[2], opts)
 end
 
@@ -173,15 +173,15 @@ end, { silent = true })
 
 M.attempt_mappings = function(attempt)
   -- new attempt, selecting extension
-  nmap { "<leader>an", attempt.new_select, aa.merge(default_opts, { desc = "New Attempt" }) }
+  nmap { "<leader>an", attempt.new_select, vim.tbl_deep_extend("force", default_opts, { desc = "New Attempt" }) }
   -- run current attempt buffer
-  nmap { "<leader>ar", attempt.run, aa.merge(default_opts, { desc = "Run Attempt" }) }
+  nmap { "<leader>ar", attempt.run, vim.tbl_deep_extend("force", default_opts, { desc = "Run Attempt" }) }
   -- delete attempt from current buffer
-  nmap { "<leader>ad", attempt.delete_buf, aa.merge(default_opts, { desc = "Delete Attempt" }) }
+  nmap { "<leader>ad", attempt.delete_buf, vim.tbl_deep_extend("force", default_opts, { desc = "Delete Attempt" }) }
   -- rename attempt from current buffer
-  nmap { "<leader>ac", attempt.rename_buf, aa.merge(default_opts, { desc = "Rename Attempt" }) }
+  nmap { "<leader>ac", attempt.rename_buf, vim.tbl_deep_extend("force", default_opts, { desc = "Rename Attempt" }) }
   -- open one of the existing scratch buffers
-  nmap { "<leader>al", attempt.open_select, aa.merge(default_opts, { desc = "Select Attempt" }) }
+  nmap { "<leader>al", attempt.open_select, vim.tbl_deep_extend("force", default_opts, { desc = "Select Attempt" }) }
 end
 
 M.formatting_mappings = function(conform)

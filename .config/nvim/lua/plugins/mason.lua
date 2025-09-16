@@ -1,15 +1,10 @@
 ---@type LazySpec
 return {
   "mason-org/mason.nvim",
-  -- temporarily lock to v1 to avoid dealing with breaking changes - after v2
-  -- stabilizes this can be updated to 2.0.0 or removed
-  build = ":MasonUpdate",
-  cmd = { "Mason", "MasonUpdate", "MasonUpdateAll" },
-  event = { "BufReadPre", "BufNewFile" },
-  config = function()
-    local mason = require "mason"
-
-    local package_list = {
+  lazy = false,
+  keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+  opts = {
+    ensure_installed = {
       -- Null LS
       "biome",
       "black",
@@ -18,6 +13,8 @@ return {
       "prettierd",
       "stylua",
       "yamllint",
+      "ansible-lint",
+      "actionlint",
 
       -- LSPs
       "ansible-language-server",
@@ -35,6 +32,7 @@ return {
       "golangci-lint-langserver",
       "gomodifytags",
       "gopls",
+      "graphql-language-service-cli",
       "helm-ls",
       "html-lsp",
       "json-lsp",
@@ -48,23 +46,35 @@ return {
       "tailwindcss-language-server",
       "taplo",
       "terraform-ls",
-      "typescript-language-server",
       "typos",
       "typos-lsp",
       "vim-language-server",
       "yaml-language-server",
       "vtsls",
-    }
+    },
+  },
+  config = function(_, opts)
+    -- PATH is handled by core.mason-path for consistency
+    require("mason").setup(opts)
 
-    mason.setup {}
-
-    -- Auto install all packages in the package_list
+    -- Auto-install ensure_installed tools with better error handling
     local mr = require "mason-registry"
     local function ensure_installed()
-      for _, tool in ipairs(package_list) do
-        local p = mr.get_package(tool)
-        if not p:is_installed() then
-          p:install()
+      for _, tool in ipairs(opts.ensure_installed) do
+        if mr.has_package(tool) then
+          local p = mr.get_package(tool)
+          if not p:is_installed() then
+            vim.notify("Mason: Installing " .. tool .. "...", vim.log.levels.INFO)
+            p:install():once("closed", function()
+              if p:is_installed() then
+                vim.notify("Mason: Successfully installed " .. tool, vim.log.levels.INFO)
+              else
+                vim.notify("Mason: Failed to install " .. tool, vim.log.levels.ERROR)
+              end
+            end)
+          end
+        else
+          vim.notify("Mason: Package '" .. tool .. "' not found", vim.log.levels.WARN)
         end
       end
     end
