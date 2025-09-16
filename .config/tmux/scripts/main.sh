@@ -151,17 +151,6 @@ main() {
       script="#($current_dir/network.sh)"
     fi
 
-    if [ $plugin = "weather" ]; then
-      # wait unit $datafile exists just to avoid errors
-      # this should almost never need to wait unless something unexpected occurs
-      while [ ! -f $datafile ]; do
-        sleep 0.01
-      done
-
-      IFS=' ' read -r -a colors <<<$(get_tmux_option "@weather-colors" "terminal_black blue")
-      script="#(cat $datafile)"
-    fi
-
     if [ $plugin = "time" ]; then
       tmux set-option -g status-right-length 250
       IFS=' ' read -r -a colors <<<$(get_tmux_option "@time-colors" "blue dark_grey")
