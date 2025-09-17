@@ -48,6 +48,7 @@ return {
         "query",
         "regex",
         "terraform",
+        "tmux",
         "toml",
         "tsx",
         "typescript",
