@@ -38,6 +38,7 @@ return {
         "json",
         "json5",
         "jsonc",
+        "kulala_http",
         "lua",
         "luadoc",
         "luap",
