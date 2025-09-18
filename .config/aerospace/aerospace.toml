@@ -70,7 +70,7 @@ inner.horizontal = 18
 inner.vertical = 18
 outer.left = 18
 outer.bottom = 18
-outer.top = [{ monitor."VP3268a" = 40 }, { monitor."LG" = 40 }, 24]
+outer.top = [{ monitor."VP3268a" = 40 }, { monitor."LG" = 40 }, {monitor."Odyssey G5" = 40}, 24]
 outer.right = 18
 
 # 'main' binding mode declaration
