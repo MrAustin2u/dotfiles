@@ -132,14 +132,6 @@ vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { silent = true })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { silent = true })
 
--- Move Lines
-vim.keymap.set("n", "<A-j>", ":m .+1<CR>==")
-vim.keymap.set("n", "<A-k>", ":m .-2<CR>==")
-vim.keymap.set("i", "<A-j>", "<Esc>:m .+1<CR>==gi")
-vim.keymap.set("i", "<A-k>", "<Esc>:m .-2<CR>==gi")
-vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv")
-
 vim.keymap.set("n", "<Leader>cp", function()
   vim.cmd "let @+ = expand('%')"
 end, { desc = "Copy relative path" })
@@ -247,8 +239,37 @@ M.lsp_mappings = function()
     end,
     { desc = "Goto Declaration", buffer = true },
   }
-  map { { "n", "v" }, "<leader>ca", "<cmd>Lspsaga code_action<CR>", { buffer = true, desc = "[C]ode [A]ction" } }
-  nmap { "K", vim.lsp.buf.hover, { buffer = true, desc = "LSP Hover Doc" } }
+  nmap { "<leader>ca", vim.lsp.buf.code_action, { buffer = true, desc = "[C]ode [A]ction" } }
+
+  -- Enhanced LSP hover with better error handling and debugging
+  nmap {
+    "K",
+    function()
+      local clients = vim.lsp.get_clients { bufnr = 0 }
+      if #clients == 0 then
+        vim.notify("No LSP clients attached to buffer", vim.log.levels.WARN)
+        return
+      end
+
+      -- Check if any client supports hover
+      local has_hover = false
+      for _, client in ipairs(clients) do
+        if client.server_capabilities.hoverProvider then
+          has_hover = true
+          break
+        end
+      end
+
+      if not has_hover then
+        vim.notify("No LSP client supports hover in this buffer", vim.log.levels.WARN)
+        return
+      end
+
+      vim.lsp.buf.hover()
+    end,
+    { buffer = true, desc = "LSP Hover Doc" },
+  }
+
   nmap { "<leader>rn", vim.lsp.buf.rename, { buffer = true, desc = "[R]e[n]ame Symbol Under Cursor" } }
   nmap {
     "<leader>th",
