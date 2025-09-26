@@ -97,7 +97,7 @@ return {
     rename = { enabled = true },
     scope = { enabled = true },
     scratch = { enabled = true },
-    statuscolumn = { enabled = false },
+    statuscolumn = { enabled = true },
     styles = {
       notification = {
         wo = { wrap = true }, -- Wrap notifications

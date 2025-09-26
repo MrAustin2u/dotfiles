@@ -6,9 +6,16 @@ return {
     "RRethy/nvim-treesitter-textsubjects",
     "JoosepAlviste/nvim-ts-context-commentstring",
     "IndianBoy42/tree-sitter-just",
+    "nvim-treesitter/nvim-treesitter-context",
   },
   config = function()
     require("tree-sitter-just").setup {}
+    require("treesitter-context").setup {
+      enable = true,
+      max_lines = 3,
+      trim_scope = "outer",
+      mode = "cursor",
+    }
     require("nvim-treesitter.configs").setup {
       modules = {},
       sync_install = false,
@@ -26,6 +33,7 @@ return {
         "gitattributes",
         "gitcommit",
         "gitignore",
+        "glsl",
         "go",
         "gomod",
         "gosum",
@@ -33,12 +41,12 @@ return {
         "hcl",
         "heex",
         "html",
+        "http",
         "javascript",
         "jsdoc",
         "json",
         "json5",
         "jsonc",
-        "kulala_http",
         "lua",
         "luadoc",
         "luap",

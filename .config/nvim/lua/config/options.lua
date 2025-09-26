@@ -1,17 +1,21 @@
-local icons = require("config.utils").icons
+----------------------------------------------
+-- Cache and directories
+----------------------------------------------
 local cache_dir = string.format("%s/.cache/nvim/", vim.env.HOME)
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-vim.g.matchup_surround_enabled = true
-vim.g.matchup_matchparen_deferred = true
-vim.g.matchup_matchparen_offscreen = {
-  method = "popup",
-  fullwidth = true,
-  highlight = "Normal",
-  border = "shadow",
-}
-vim.g.markdown_fenced_languages = {
+----------------------------------------------
+-- Leader keys
+----------------------------------------------
+vim.g.mapleader = " " -- Space as leader key
+vim.g.maplocalleader = " " -- Space as local leader key
+
+----------------------------------------------
+-- Global settings
+----------------------------------------------
+vim.g.autoformat = true -- Enable autoformatting
+vim.g.loaded_netrw = 1 -- Disable netrw
+vim.g.loaded_netrwPlugin = 1 -- Disable netrw plugin
+vim.g.markdown_fenced_languages = { -- Syntax highlighting for markdown code blocks
   "shell=sh",
   "bash=sh",
   "zsh=sh",
@@ -29,89 +33,138 @@ vim.g.markdown_fenced_languages = {
   "yaml",
   "json",
 }
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
 
-vim.g.autoformat = true
-
-vim.cmd.syntax "off"
-vim.opt.backupdir = cache_dir .. "backup/"
-vim.opt.bg = "dark"
-vim.opt.ch = 0
--- vim.opt.clipboard = "unnamedplus"
-vim.opt.cmdheight = 1
-vim.opt.colorcolumn = "120"
-
--- Make diffing better
--- https://vimways.org/2018/the-power-of-diff/
 ----------------------------------------------
--- Always use vertical diffs
-vim.opt.diffopt:append "vertical"
-vim.opt.diffopt:append "filler"
--- ignore whitespace
-vim.opt.diffopt:append "iwhite"
-vim.opt.diffopt:append "algorithm:patience"
-vim.opt.diffopt:append "indent-heuristic"
+-- Appearance and UI
 ----------------------------------------------
-vim.opt.autowrite = true -- Automatically :write before running commands
+vim.cmd.syntax "off" -- Disable syntax highlighting (using treesitter)
+vim.opt.bg = "dark" -- Dark background
 vim.opt.ch = 0 -- Command line height
--- Autocomplete with dictionary words when spell check is on
-vim.opt.complete:append "kspell"
-vim.opt.cursorline = true
-vim.opt.expandtab = true
-vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾"
-vim.opt.foldenable = false
-vim.opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()"
-vim.opt.foldmethod = "expr"
-vim.opt.foldtext = ""
-vim.opt.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
-vim.opt.guifont = "MonoLisa Nerd Font Mono:h15"
-vim.opt.hidden = true
-vim.opt.hlsearch = false
-vim.opt.laststatus = 3
-vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-vim.opt.matchtime = 1
-vim.opt.mouse = "a"
-vim.opt.number = true
-vim.opt.pumblend = 20
-vim.opt.pumheight = 10
-vim.opt.relativenumber = true
-vim.opt.scrolloff = 8
-vim.opt.shiftwidth = 2
-vim.opt.shortmess:append { W = true, I = true, c = true }
-vim.opt.showcmd = true
-vim.opt.showmatch = true
-vim.opt.sidescrolloff = 8
-vim.opt.signcolumn = "yes"
-vim.opt.smartindent = false
-vim.opt.smoothscroll = true
-vim.opt.softtabstop = 2
-vim.opt.spelllang = "en"
-vim.opt.splitkeep = "screen"
-vim.opt.splitright = true
-vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
-vim.opt.tabstop = 2
-vim.opt.termguicolors = true
-vim.opt.timeout = true
-vim.opt.timeoutlen = 300
-vim.opt.ttimeoutlen = 0
-vim.opt.undofile = true
-vim.opt.updatetime = 50
-vim.opt.winborder = "rounded"
-vim.opt.wrap = true
-----------------------------------------------
--- Files and directories
-----------------------------------------------
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.spellfile = cache_dir .. "spell/en.utf-8.add"
-vim.opt_global.spell = true
+vim.opt.cmdheight = 1 -- Command line height
+vim.opt.colorcolumn = "120" -- Show column at 120 characters
+vim.opt.cursorline = true -- Highlight current line
+vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾" -- Characters for UI elements
+vim.opt.guifont = "MonoLisa:h19" -- GUI font
+vim.opt.laststatus = 3 -- Global statusline
+vim.opt.list = true -- Show invisible characters
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" } -- Characters for invisible chars
+vim.opt.number = true -- Show line numbers
+vim.opt.pumblend = 20 -- Popup menu transparency
+vim.opt.pumheight = 10 -- Popup menu height
+vim.opt.relativenumber = true -- Show relative line numbers
+vim.opt.showcmd = true -- Show command in status line
+vim.opt.showmatch = true -- Show matching brackets
+vim.opt.signcolumn = "yes" -- Always show sign column
+vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]] -- Custom status column
+vim.opt.termguicolors = true -- Enable 24-bit RGB colors
+vim.opt.winborder = "rounded" -- Rounded window borders
 
--- persistent undo between file reloads
+----------------------------------------------
+-- Scrolling and navigation
+----------------------------------------------
+vim.opt.scrolloff = 8 -- Keep 8 lines above/below cursor
+vim.opt.sidescrolloff = 8 -- Keep 8 columns left/right of cursor
+vim.opt.smoothscroll = true -- Smooth scrolling
+vim.opt.splitkeep = "screen" -- Keep splits on screen
+vim.opt.splitright = true -- Open splits to the right
+vim.opt.ttyfast = true -- Fast terminal connection
+vim.opt.wrap = true -- Wrap long lines
+
+----------------------------------------------
+-- Search and matching
+----------------------------------------------
+vim.opt.hlsearch = false -- Don't highlight search results
+vim.opt.matchtime = 1 -- Time to show matching bracket
+
+----------------------------------------------
+-- Editing behavior
+----------------------------------------------
+vim.opt.autowrite = true -- Auto-save before running commands
+vim.opt.hidden = true -- Allow hidden buffers
+vim.opt.mouse = "a" -- Enable mouse support
+vim.opt.shortmess:append { W = true, I = true, c = true } -- Reduce messages
+
+----------------------------------------------
+-- Timing
+----------------------------------------------
+vim.opt.timeout = true -- Enable timeouts
+vim.opt.timeoutlen = 300 -- Mapping timeout
+vim.opt.ttimeoutlen = 0 -- Key code timeout
+vim.opt.updatetime = 50 -- Faster completion
+
+----------------------------------------------
+-- Folding
+----------------------------------------------
+vim.opt.foldenable = false -- Disable folding by default
+vim.opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()" -- Fold expression
+vim.opt.foldmethod = "expr" -- Use expression for folding
+vim.opt.foldtext = "" -- Empty fold text
+
+----------------------------------------------
+-- Formatting
+----------------------------------------------
+vim.opt.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()" -- Format expression
+vim.opt.formatoptions:append "r" -- Auto-insert comment leader
+
+----------------------------------------------
+-- Completion
+----------------------------------------------
+vim.opt.complete:append "kspell" -- Include spell checking in completion
+vim.opt.completeopt = { "menu", "menuone", "noselect" } -- Completion options
+
+----------------------------------------------
+-- Indentation and tabs
+----------------------------------------------
+local indent = 2
+vim.opt.expandtab = true -- Use spaces instead of tabs
+vim.opt.shiftround = true -- Round indent to multiple of shiftwidth
+vim.opt.shiftwidth = indent -- Number of spaces for auto-indent
+vim.opt.smartindent = false -- Disable smart indent (conflicts with # comments)
+vim.opt.softtabstop = indent -- Number of spaces for tab in insert mode
+vim.opt.tabstop = indent -- Number of spaces for tab character
+
+----------------------------------------------
+-- Files and backup
+----------------------------------------------
+vim.opt.backup = false -- Disable backup files
+vim.opt.backupdir = cache_dir .. "backup/" -- Backup directory
+vim.opt.swapfile = false -- Disable swap files
+vim.opt.undofile = true -- Enable persistent undo
+
+----------------------------------------------
+-- Spell checking
+----------------------------------------------
+vim.opt.spelllang = "en" -- English spell checking
+vim.opt.spellfile = cache_dir .. "spell/en.utf-8.add" -- Custom spell file
+vim.opt_global.spell = true -- Enable spell checking globally
+
+----------------------------------------------
+-- Diff options
+----------------------------------------------
+vim.opt.diffopt:append "vertical" -- Use vertical diffs
+vim.opt.diffopt:append "filler" -- Show filler lines
+vim.opt.diffopt:append "iwhite" -- Ignore whitespace
+vim.opt.diffopt:append "algorithm:patience" -- Use patience diff algorithm
+vim.opt.diffopt:append "indent-heuristic" -- Use indent heuristic
+
+----------------------------------------------
+-- File handling
+----------------------------------------------
+vim.opt.wildoptions = "pum" -- Use popup menu for file completion
+
+-- Persistent undo configuration
 if vim.fn.has "persistent_undo" then
-  vim.opt.undofile = true
-  vim.opt.undodir = cache_dir .. "undo/"
+  vim.opt.undofile = true -- Enable persistent undo
+  vim.opt.undodir = cache_dir .. "undo/" -- Undo directory
 end
 
-vim.lsp.set_log_level "off"
+-- RipGrep integration
+if vim.fn.executable "rg" then
+  vim.opt.grepprg = "rg --vimgrep --no-heading" -- Use ripgrep for grep
+  vim.opt.grepformat = "%f:%l:%c:%m,%f:%l:%m" -- Grep output format
+end
+
+----------------------------------------------
+-- LSP and diagnostics
+----------------------------------------------
+vim.lsp.set_log_level "off" -- Disable LSP logging

@@ -9,6 +9,7 @@ return {
       function()
         require("nvim-silicon").clip()
       end,
+      mode = { "n", "v" },
       desc = "Copy code screenshot to clipboard",
     },
     {

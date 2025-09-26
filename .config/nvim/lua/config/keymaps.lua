@@ -186,11 +186,6 @@ M.formatting_mappings = function(conform)
   end, { desc = "Trigger formatting (in visual mode)" })
 end
 
-M.harpoon_mappings = function()
-  nmap { "<s-m>", "<cmd>lua require('user.harpoon').mark_file()<cr>", default_opts }
-  nmap { "<TAB>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", default_opts }
-end
-
 M.lint_mappings = function(lint)
   nmap {
     "<leader>l",
@@ -840,5 +835,51 @@ end
 
 -- Initialize Jest test mappings
 M.jest_test_mappings()
+
+M.harpoon_mappings = function(harpoon)
+  local keys = {
+    nmap {
+      "<leader>H",
+      function()
+        harpoon:list():add()
+      end,
+      desc = "Harpoon File",
+    },
+    nmap {
+      "<leader>h",
+      function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end,
+      desc = "Harpoon Quick Menu",
+    },
+    nmap {
+      "<leader>h",
+      function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end,
+      desc = "Harpoon Quick Menu",
+    },
+    nmap {
+      "<leader>l",
+      function()
+        harpoon.ui:nav_next()
+      end,
+      desc = "Harpoon Next Mark",
+    },
+    -- nmap { "<s-m>", "<cmd>lua require('user.harpoon').mark_file()<cr>", default_opts },
+    -- nmap { "<TAB>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", default_opts },
+  }
+
+  for i = 1, 9 do
+    table.insert(keys, {
+      "<leader>" .. i,
+      function()
+        harpoon:list():select(i)
+      end,
+      desc = "Harpoon to File " .. i,
+    })
+  end
+  return keys
+end
 
 return M

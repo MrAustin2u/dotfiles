@@ -13,6 +13,32 @@ function M.load_local_vimrc()
   end
 end
 
+M.lsp_servers = {
+  "angularls",
+  "biome",
+  "cssls",
+  "dockerls",
+  "dprint",
+  "erlangls",
+  -- "eslint",
+  "expert",
+  "gleam",
+  -- "gopls",
+  "graphql",
+  "html",
+  "json",
+  "jsonls",
+  "lua_ls",
+  "marksman",
+  "pyright",
+  "sqlls",
+  "tailwindcss",
+  "terraformls",
+  "vtsls", -- Use vtsls instead of ts_ls to avoid conflicts
+  "typos_lsp",
+  "yamlls",
+}
+
 M.icons = {
   dap = {
     Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
@@ -404,10 +430,10 @@ function M.delete_comments_in_buffer()
 
   local function delete_comments(node)
     if
-      node:type() == "comment"
-      or node:type() == "line_comment"
-      or node:type() == "block_comment"
-      or node:type() == "html_comment"
+        node:type() == "comment"
+        or node:type() == "line_comment"
+        or node:type() == "block_comment"
+        or node:type() == "html_comment"
     then
       local start_row, start_col, end_row, end_col = node:range()
       vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, {})

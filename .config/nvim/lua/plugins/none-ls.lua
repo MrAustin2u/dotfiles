@@ -1,40 +1,41 @@
 return {
   "nvimtools/none-ls.nvim",
+  event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     "nvimtools/none-ls-extras.nvim",
   },
   config = function()
     local null_ls = require "null-ls"
+    local b = null_ls.builtins
 
     null_ls.setup {
       sources = {
         ----------------------
         --   Code Actions   --
         ----------------------
-        null_ls.builtins.code_actions.gomodifytags,
+        b.code_actions.gomodifytags,
         -- Injects code actions for Git operations at the current cursor position (stage / preview / reset hunks, blame, etc.).
-        null_ls.builtins.code_actions.gitsigns,
+        b.code_actions.gitsigns,
 
         ----------------------
         --    Diagnostics   --
         ----------------------
-        null_ls.builtins.diagnostics.actionlint,
-        null_ls.builtins.diagnostics.ansiblelint,
-        null_ls.builtins.diagnostics.credo,
-        null_ls.builtins.diagnostics.yamllint,
-        null_ls.builtins.diagnostics.zsh,
+        b.diagnostics.actionlint,
+        b.diagnostics.ansiblelint,
+        b.diagnostics.yamllint,
+        b.diagnostics.zsh,
         -- ESLint diagnostics removed to avoid duplication with ESLint LSP
-        -- require("none-ls.diagnostics.eslint_d").with {
-        --   condition = function(utils)
-        --     return utils.root_has_file { ".eslintrc.js", ".eslintrc.ts", ".eslintrc.json" } -- only enable if root has an eslint file
-        --   end,
-        -- },
-        null_ls.builtins.diagnostics.credo.with {
+        require("none-ls.diagnostics.eslint_d").with {
+          condition = function(utils)
+            return utils.root_has_file { ".eslintrc.js", ".eslintrc.ts", ".eslintrc.json" } -- only enable if root has an eslint file
+          end,
+        },
+        b.diagnostics.credo.with {
           condition = function(utils)
             return utils.root_has_file { ".credo.exs" } -- only enable if root has a credo file
           end,
         },
-        null_ls.builtins.diagnostics.commitlint.with {
+        b.diagnostics.commitlint.with {
           condition = function(utils)
             return utils.root_has_file { "commitlint.config.js" }
           end,

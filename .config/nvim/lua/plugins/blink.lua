@@ -1,5 +1,4 @@
 return {
-  { "L3MON4D3/LuaSnip", keys = {} },
   {
     "saghen/blink.cmp",
     dependencies = {
@@ -32,8 +31,12 @@ return {
         use_nvim_cmp_as_default = false,
         nerd_font_variant = "mono",
       },
+      signature = { enabled = true },
       sources = {
-        default = { "lsp", "path", "supermaven", "snippets", "lazydev", "buffer" },
+        default = { "lsp", "path", "supermaven", "snippets", "buffer", "lazydev", "tmux" },
+        per_filetype = {
+          sql = { "snippets", "dadbod", "buffer" },
+        },
         providers = {
           supermaven = {
             name = "supermaven",
@@ -47,6 +50,28 @@ return {
           },
           cmdline = {
             min_keyword_length = 2,
+          },
+          dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
+          snippets = {
+            should_show_items = function(ctx)
+              return ctx.trigger.initial_kind ~= "trigger_character"
+            end,
+          },
+          tmux = {
+            enabled = function()
+              return os.getenv "TMUX" ~= nil
+            end,
+            module = "blink-cmp-tmux",
+            name = "tmux",
+            -- default options
+            opts = {
+              all_panes = true,
+              capture_history = true,
+              -- only suggest completions from `tmux` if the `trigger_chars` are
+              -- used
+              triggered_only = true,
+              trigger_chars = { ";" },
+            },
           },
         },
       },
@@ -164,5 +189,16 @@ return {
       },
       opts_extend = { "sources.default" },
     },
+    config = function()
+      local blink = require "blink.cmp"
+
+      -- Override each server's capabilities
+      for _, server in ipairs(require("config.utils").lsp_servers) do
+        if vim.lsp.config[server] then
+          vim.lsp.config[server].capabilities =
+              vim.tbl_deep_extend("force", blink.get_lsp_capabilities(), vim.lsp.config[server].capabilities or {})
+        end
+      end
+    end,
   },
 }

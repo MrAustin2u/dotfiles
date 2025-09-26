@@ -1,20 +1,29 @@
 ---@type LazySpec[]
 return {
-  "tpope/vim-dadbod",
-  cmd = { "DB" },
+  "kristijanhusak/vim-dadbod-ui",
   dependencies = {
-    "kristijanhusak/vim-dadbod-ui",
+    {
+      "tpope/vim-dadbod",
+      lazy = true,
+      keys = {
+        { "<leader>do", ":DBUI<CR><CR>",  desc = "Database UI Open" },
+        { "<leader>dc", ":DBUIClose<CR>", desc = "Database UI Close" },
+      },
+    },
+    { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true }, -- Optional
   },
-  keys = {
-    { "<leader>do", ":DBUI<CR><CR>",  desc = "Database UI Open" },
-    { "<leader>dc", ":DBUIClose<CR>", desc = "Database UI Close" },
+  cmd = {
+    "DBUI",
+    "DBUIToggle",
+    "DBUIAddConnection",
+    "DBUIFindBuffer",
   },
-  config = function()
+  init = function()
     -- Your DBUI configuration
-    vim.g.db_ui_use_nerd_fonts = true
-    vim.g.db_ui_execute_on_save = false
-    vim.g.db_ui_disable_mappings = true
+    vim.g.db_ui_use_nerd_fonts = 1
+    vim.g.db_ui_execute_on_save = 0
+    vim.g.db_ui_disable_mappings = 1
     vim.g.db_ui_save_location = "$HOME/code/sql/queries"
-    vim.g.db_ui_use_nvim_notify = true
+    vim.g.db_ui_use_nvim_notify = 1
   end,
 }
