@@ -1,10 +1,27 @@
 [tools]
 
+# Programming Languages & Runtimes
+elixir = "1.18.4-otp-27"
+erlang = "27.2"
+gleam = "1.4.1"
+go = "1.22.0"
+java = "liberica-18.0.1+12"
+lua = "5"
+node = "latest"
+python = "latest"
+ruby = "3.3.6"
+zig = "0.14.1"
+rust = "latest"
+
+# Node.js Packages & TypeScript
 "npm:@types/node" = "^22.1.0"
 "npm:node-fetch" = "2.6.7"
 "npm:prettier" = "1.19.1"
 "npm:ts-node" = "10.9.1"
 "npm:tslib" = "2.6.3"
+"npm:typescript" = "^5.6.3"
+
+# JavaScript/Node.js Tools
 "npm:@fsouza/prettierd" = "latest"
 "npm:codeowners" = "latest"
 "npm:eslint_d" = "latest"
@@ -13,44 +30,75 @@
 "npm:pnpm" = "latest"
 "npm:wscat" = "latest"
 "npm:@anthropic-ai/claude-code" = "latest"
-"npm:typescript" = "^5.6.3"
+yarn = "1.22.5"
+
+# Language Servers
+lua-language-server = "latest"
+marksman = "latest"
+rust-analyzer = "latest"
+terraform-ls = "latest"
+"npm:@ansible/ansible-language-server" = "latest"
+"npm:bash-language-server" = "latest"
+"npm:vscode-langservers-extracted" = "latest"  # provides html, css, json, eslint LSPs
+"npm:typescript-language-server" = "latest"
+"npm:@vtsls/language-server" = "latest"
+"npm:vim-language-server" = "latest"
+"npm:yaml-language-server" = "latest"
+"npm:@tailwindcss/language-server" = "latest"
+"npm:dockerfile-language-server-nodejs" = "latest"
+"npm:sql-language-server" = "latest"
+"npm:graphql-language-service-cli" = "latest"
+"npm:@angular/language-service" = "latest"
+"cargo:typos-cli" = "latest"
+"go:golang.org/x/tools/gopls" = "latest"
+
+
+# Formatters & Linters
+biome = "latest"
+black = "latest"
+prettier = "latest"
+shellcheck = "latest"
+stylua = "latest"
+yamllint = "latest"
+"pipx:ansible-lint" = "latest"
+actionlint = "latest"
+golangci-lint = "latest"
+typos = "1.22.3"
+"npm:dprint" = "latest"
+"npm:@commitlint/cli" = "latest"
+"npm:@commitlint/config-conventional" = "latest"
+"npm:@taplo/cli" = "latest"
+
+# Cloud & Infrastructure
 awscli = "latest"
-elixir = "1.18.0-otp-27"
-erlang = "27.2"
+localstack = "latest"
+terraform = "latest"
+
+# Development Tools
 fd = "latest"
 fx = "latest"
 fzf = "latest"
 github-cli = "2.78.0"
-gleam = "1.4.1"
-go = "1.22.0"
-java = "liberica-18.0.1+12"
 jless = "latest"
 jq = "latest"
 just = "latest"
 lazydocker = "latest"
 lazygit = "latest"
-localstack = "latest"
-lua = "5"
-lua-language-server = "latest"
 neovim = "latest"
-node = "latest"
-python = "latest"
 rebar = "3.24.0"
 ripgrep = "latest"
-ruby = "3.3.6"
 starship = "latest"
-stylua = "latest"
-terraform = "latest"
-typos = "1.22.3"
 usage = "latest"
 uv = "latest"
-yarn = "1.22.5"
 zoxide = "latest"
+"ubi:sibprogrammer/xq" = "latest"
+
+# Security & Authentication
 1password = "latest"
 1password-cli = "latest"
-zig = "0.14.1"
-xz = "latest"
 
+# Package Managers & Build Tools
+pipx = "latest"
 
 [settings]
 experimental = true
