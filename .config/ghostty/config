@@ -2,15 +2,20 @@
 
 # Theme
 macos-titlebar-style = tabs
-theme = Catppuccin Mocha
+theme = TokyoNight Moon
 background-opacity = 0.7
 background-blur-radius = 20
 
-font-size = 14
+font-size = 19
 adjust-cell-height = 10
-font-family = JetBrainsMono Nerd Font Mono
+font-family = MonoLisa
 
 macos-titlebar-proxy-icon = hidden
+title = "Ghostty"
+
+# enable cursor animation
+custom-shader = "~/.config/ghostty/shaders/cursor.glsl"
+custom-shader-animation = true
 
 # Keybinds
 keybind = super+shift+r=reload_config
