@@ -225,6 +225,10 @@ if.app-name-regex-substring = 'Chrome'
 run = ['move-node-to-workspace 6']
 
 [[on-window-detected]]
+if.app-name-regex-substring = 'Zen'
+run = ['move-node-to-workspace 6']
+
+[[on-window-detected]]
 if.app-name-regex-substring = 'Simulator'
 run = ['move-node-to-workspace 6']
 
