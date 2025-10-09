@@ -56,6 +56,7 @@ return {
         "python",
         "query",
         "regex",
+        "sql",
         "terraform",
         "tmux",
         "toml",

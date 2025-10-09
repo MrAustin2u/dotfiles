@@ -1,80 +1,28 @@
 return {
   {
+    "saghen/blink.compat",
+    version = "*",
+    lazy = true,
+    opts = {
+      impersonate_nvim_cmp = true,
+    },
+  },
+  {
     "saghen/blink.cmp",
     dependencies = {
       "rafamadriz/friendly-snippets",
-      {
-        "saghen/blink.compat",
-        version = "*",
-        lazy = true,
-        opts = {},
-      },
-      {
-        "supermaven-inc/supermaven-nvim",
-        opts = {
-          log_level = "off",
-          disable_inline_completion = true, -- disables inline completion for use with cmp
-          disable_keymaps = true,           -- disables built in keymaps for more manual control
-          disable_native_completion = true, -- disable built-in completion
-        },
-      },
-      {
-        "huijiro/blink-cmp-supermaven",
-      },
+      "hrsh7th/cmp-nvim-lua",
       { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true },
-      "mgalliou/blink-cmp-tmux",
     },
     version = "*",
+
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
     opts = {
-      snippets = { preset = "luasnip" },
-      appearance = {
-        use_nvim_cmp_as_default = false,
-        nerd_font_variant = "mono",
-      },
-      signature = { enabled = true },
-      sources = {
-        default = { "lsp", "path", "supermaven", "snippets", "buffer", "lazydev", "tmux" },
-        per_filetype = {
-          sql = { "snippets", "dadbod", "buffer" },
-        },
-        providers = {
-          supermaven = {
-            name = "supermaven",
-            module = "blink-cmp-supermaven",
-            async = true,
-          },
-          lazydev = {
-            name = "LazyDev",
-            module = "lazydev.integrations.blink",
-            score_offset = 100,
-          },
-          cmdline = {
-            min_keyword_length = 2,
-          },
-          dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
-          snippets = {
-            should_show_items = function(ctx)
-              return ctx.trigger.initial_kind ~= "trigger_character"
-            end,
-          },
-          tmux = {
-            enabled = function()
-              return os.getenv "TMUX" ~= nil
-            end,
-            module = "blink-cmp-tmux",
-            name = "tmux",
-            -- default options
-            opts = {
-              all_panes = true,
-              capture_history = true,
-              -- only suggest completions from `tmux` if the `trigger_chars` are
-              -- used
-              triggered_only = true,
-              trigger_chars = { ";" },
-            },
-          },
-        },
-      },
+      -- 'default' for mappings similar to built-in completion
+      -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
+      -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
+      -- See the full 'keymap' documentation for information on defining your own keymap.
       keymap = {
         preset = "super-tab",
         ["<C-Z>"] = { "accept", "fallback" },
@@ -100,105 +48,131 @@ return {
           "fallback",
         },
       },
-      cmdline = {
-        keymap = {
-          -- recommended, as the default keymap will only show and select the next item
-          ["<Tab>"] = { "show", "accept" },
-        },
-        completion = {
-          menu = {
-            draw = {
-              columns = {
-                { "kind_icon",        "label", gap = 1 },
-                { "label_description" },
-              },
-            },
-          },
+      enabled = function()
+        return vim.bo.buftype ~= "prompt"
+          and vim.bo.buftype ~= "NvimTree"
+          and vim.bo.buftype ~= "TelescopePrompt"
+          and vim.bo.filetype ~= "DressingInput"
+          and vim.b.completion ~= false
+      end,
+      signature = {
+        enabled = true,
+        window = {
+          winblend = 0,
         },
       },
       completion = {
-        list = {
-          selection = {
-            preselect = false,
-            auto_insert = true,
+        documentation = {
+          auto_show = true,
+          window = {
+            border = "rounded",
+            winblend = 0,
           },
         },
         menu = {
-          auto_show = true,
-          border = "rounded",
           draw = {
-            components = {
-              kind_icon = {
-                ellipsis = false,
-                text = function(ctx)
-                  if ctx.kind == "Supermaven" then
-                    return require("config.utils").icons.kinds.Copilot .. " "
-                  end
-
-                  local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
-                  return kind_icon
-                end,
-                highlight = function(ctx)
-                  local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
-                  return hl
-                end,
-              },
-              label = {
-                text = function(ctx)
-                  -- Fix for weird rendering in ElixirLS structs/behaviours etc
-                  -- structs, behaviours and others have a label_detail emitted
-                  -- by ElixirLS, and it looks bad when there's no space between
-                  -- the module label and the label_detail.
-                  --
-                  -- The label_detail has no space because it is normally meant
-                  -- for function signatures, e.g. `my_function(arg1, arg2)` -
-                  -- this case the label is `my_function` and the label_detail
-                  -- is `(arg1, arg2)`.
-                  --
-                  -- In an ideal world ElixirLS would not emit them for these
-                  -- types - these belong in `kind` only.
-                  if ctx.item.client_name == "elixirls" and ctx.kind ~= "Function" and ctx.kind ~= "Macro" then
-                    return ctx.label
-                  end
-
-                  return ctx.label .. ctx.label_detail
-                end,
-                highlight = "CmpItemAbbr",
-              },
-            },
+            columns = { { "label", gap = 1 }, { "kind_icon", "kind" } },
             treesitter = { "lsp" },
-            columns = {
-              { "kind_icon",         "label", gap = 1 },
-              { "label_description", gap = 1 },
-              { "source_name" },
-            },
           },
+          border = "rounded",
+          winblend = 0,
+          winhighlight = "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
         },
-        documentation = {
-          auto_show = true,
-          auto_show_delay_ms = 100,
-          window = {
-            -- for each of the possible menu window directions,
-            -- falling back to the next direction when there's not enough space
-            direction_priority = {
-              menu_north = { "e", "w", "n", "s" },
-              menu_south = { "e", "w", "s", "n" },
-            },
+      },
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        nerd_font_variant = "mono",
+        kind_icons = {
+          Text = "󰉿 ",
+          Method = "󰊕 ",
+          Function = "󰊕 ",
+          Constructor = "󰒓 ",
+
+          Field = "󰜢 ",
+          Variable = "󰆦 ",
+          Property = "󰖷 ",
+
+          Class = "󱡠 ",
+          Interface = "󱡠 ",
+          Struct = "󱡠 ",
+          Module = "󰅩 ",
+
+          Unit = "󰪚 ",
+          Value = "󰦨 ",
+          Enum = "󰦨 ",
+          EnumMember = "󰦨 ",
+
+          Keyword = "󰻾 ",
+          Constant = "󰏿 ",
+
+          Snippet = "󱄽 ",
+          Color = "󰏘 ",
+          File = "󰈔 ",
+          Reference = "󰬲 ",
+          Folder = "󰉋 ",
+          Event = "󱐋 ",
+          Operator = "󰪚 ",
+          TypeParameter = "󰬛 ",
+
+          Supermaven = " ",
+        },
+      },
+      cmdline = {
+        enabled = false,
+        sources = function()
+          return {}
+        end,
+      },
+      sources = {
+        default = {
+          "supermaven",
+          "lsp",
+          "path",
+          "snippets",
+          "buffer",
+          "nvim_lua",
+          "obsidian",
+          "obsidian_new",
+          "obsidian_tags",
+          "dadbod",
+        },
+        providers = {
+          supermaven = {
+            name = "supermaven",
+            module = "blink.compat.source",
+            score_offset = 1,
+            transform_items = function(ctx, items)
+              local kind = "Supermaven"
+              require("blink.cmp.types").CompletionItemKind[kind] = kind
+              for i, _ in ipairs(items) do
+                items[i].kind = kind
+              end
+              return items
+            end,
+          },
+          nvim_lua = {
+            name = "nvim_lua",
+            module = "blink.compat.source",
+          },
+          obsidian = {
+            name = "obsidian",
+            module = "blink.compat.source",
+          },
+          obsidian_new = {
+            name = "obsidian_new",
+            module = "blink.compat.source",
+          },
+          obsidian_tags = {
+            name = "obsidian_tags",
+            module = "blink.compat.source",
+          },
+          dadbod = {
+            name = "Dadbod",
+            module = "vim_dadbod_completion.blink",
           },
         },
       },
-      opts_extend = { "sources.default" },
     },
-    config = function()
-      local blink = require "blink.cmp"
-
-      -- Override each server's capabilities
-      for _, server in ipairs(require("config.utils").lsp_servers) do
-        if vim.lsp.config[server] then
-          vim.lsp.config[server].capabilities =
-              vim.tbl_deep_extend("force", blink.get_lsp_capabilities(), vim.lsp.config[server].capabilities or {})
-        end
-      end
-    end,
+    opts_extend = { "sources.default" },
   },
 }

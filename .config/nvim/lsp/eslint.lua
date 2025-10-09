@@ -46,8 +46,7 @@ return {
     end, {})
   end,
   root_dir = function(bufnr, on_dir)
-    -- The project root is where the LSP can be started from
-    -- As stated in the documentation above, this LSP supports monorepos and simple projects.
+    -- The project root is where the LSP can be started from As stated in the documentation above, this LSP supports monorepos and simple projects.
     -- We select then from the project root, which is identified by the presence of a package
     -- manager lock file.
     local root_markers = { "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb", "bun.lock", "deno.lock" }
@@ -65,7 +64,7 @@ return {
     -- We keep this for backward compatibility.
     local filename = vim.api.nvim_buf_get_name(bufnr)
     local eslint_config_files_with_package_json =
-      util.insert_package_json(eslint_config_files, "eslintConfig", filename)
+        util.insert_package_json(eslint_config_files, "eslintConfig", filename)
     local is_buffer_using_eslint = vim.fs.find(eslint_config_files_with_package_json, {
       path = filename,
       type = "file",
