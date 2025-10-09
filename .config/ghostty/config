@@ -6,12 +6,13 @@ theme = TokyoNight Moon
 background-opacity = 0.7
 background-blur-radius = 20
 
-font-size = 19
+font-size = 14
 adjust-cell-height = 10
 font-family = MonoLisa
 
 macos-titlebar-proxy-icon = hidden
 title = "Ghostty"
+desktop-notifications = true
 
 # enable cursor animation
 custom-shader = "~/.config/ghostty/shaders/cursor.glsl"
