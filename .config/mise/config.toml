@@ -92,6 +92,7 @@ usage = "latest"
 uv = "latest"
 zoxide = "latest"
 "ubi:sibprogrammer/xq" = "latest"
+"npm:@withgraphite/graphite-cli" = "latest"
 
 # Security & Authentication
 1password = "latest"
