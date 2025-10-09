@@ -34,3 +34,6 @@ nvim/.config/nvim/plugin/
 op/*
 packer_compiled.lua
 tmux/.config/tmux/plugins/
+mcphub
+raycast
+op
