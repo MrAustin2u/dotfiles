@@ -11,6 +11,9 @@
 .claude/shell-snapshots
 .claude/statsig
 .claude/todos
+.claude/debug
+.claude/file-history
+.claude/history.jsonl
 .colima/_lima
 .colima/ssh_config
 .elixir_ls
