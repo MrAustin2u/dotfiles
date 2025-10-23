@@ -68,7 +68,8 @@ alias cxp="cd ~/BLVD/client-portal/"
 
 # BLVD DB
 alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
-alias blvdsnow="snowsql -c blvd"
+alias blvdsnow="snowsql -c blvd.sched.published"
+alias blvdeventssnow="snowsql -c blvd.eventbridge.published"
 
 # BLVD
 alias yoinkdeploy="just yoink deploy"
