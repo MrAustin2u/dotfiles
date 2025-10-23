@@ -5,6 +5,7 @@ return {
     {
       "preservim/vimux",
       keys = {
+        { "<leader>ro", "<CMD>VimuxOpenRunner<CR>", desc = "open/create the runner" },
         { "<leader>rr", "<CMD>VimuxPromptCommand<CR>", desc = "run a command (prompt)" },
         { "<leader>r.", "<CMD>VimuxRunLastCommand<CR>", desc = "run the last run command" },
         { "<leader>rc", "<CMD>VimuxClearTerminalScreen<CR>", desc = "clear the current run terminal" },
