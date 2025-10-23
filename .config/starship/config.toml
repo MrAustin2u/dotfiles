@@ -1,5 +1,7 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
 add_newline = false
-command_timeout = 5000
+command_timeout = 10000
 
 # Move the directory to the second line
 format = '''
@@ -69,4 +71,4 @@ format = "[$symbol](purple)[$output]($style) "
 shell = ["bash", "--noprofile", "--norc"]
 
 [battery]
-disabled=true
+disabled = true
