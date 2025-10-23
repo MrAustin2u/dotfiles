@@ -25,11 +25,11 @@ return {
         b.diagnostics.yamllint,
         b.diagnostics.zsh,
         -- ESLint diagnostics removed to avoid duplication with ESLint LSP
-        require("none-ls.diagnostics.eslint_d").with {
-          condition = function(utils)
-            return utils.root_has_file { ".eslintrc.js", ".eslintrc.ts", ".eslintrc.json" } -- only enable if root has an eslint file
-          end,
-        },
+        -- require("none-ls.diagnostics.eslint_d").with {
+        --   condition = function(utils)
+        --     return utils.root_has_file { ".eslintrc.js", ".eslintrc.ts", ".eslintrc.json" } -- only enable if root has an eslint file
+        --   end,
+        -- },
         b.diagnostics.credo.with {
           condition = function(utils)
             return utils.root_has_file { ".credo.exs" } -- only enable if root has a credo file
