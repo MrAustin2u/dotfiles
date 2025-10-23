@@ -24,18 +24,14 @@ local function get_biome_or_fallback(fallback)
   return get_with_fallback({ "biome.json", "biome.jsonc" }, { "biome", "biome-check" }, fallback)
 end
 
--- try dprint first, then fallback to prettier
-local dprint_or_prettier = get_with_fallback(
-  { "dprint.json" },
-  { "dprint" },
-  { "prettierd", "prettier", stop_after_first = true }
-)
+-- Use prettier as the fallback (removed dprint)
+local prettier_fallback = { "prettierd", "prettier", stop_after_first = true }
 
 -- Compute formatters at setup time
-local js_formatters = get_biome_or_fallback(dprint_or_prettier)
-local json_formatters = get_biome_or_fallback(dprint_or_prettier)
-local css_formatters = get_biome_or_fallback(dprint_or_prettier)
-local graphql_formatters = get_biome_or_fallback(dprint_or_prettier)
+local js_formatters = get_biome_or_fallback(prettier_fallback)
+local json_formatters = get_biome_or_fallback(prettier_fallback)
+local css_formatters = get_biome_or_fallback(prettier_fallback)
+local graphql_formatters = get_biome_or_fallback(prettier_fallback)
 
 ---@type LazySpec
 return {
@@ -61,21 +57,21 @@ return {
       svelte = js_formatters,
       astro = js_formatters,
       graphql = graphql_formatters,
-      markdown = dprint_or_prettier,
-      html = dprint_or_prettier,
+      markdown = prettier_fallback,
+      html = prettier_fallback,
       go = { "gofmt", "goimports" },
       ruby = { "rubyfmt" },
       sql = { "pg_format" },
-      yaml = dprint_or_prettier,
+      yaml = prettier_fallback,
       -- mix format is taking long to format, so I bumped the timeout, I'm not
       -- sure why it's taking long though (is it large files, is it all files,
       -- is it the warm up time - maybe I can build a mix_format_d to prevent
       -- the need for warm up). Actually it could be elixir-styler that we use
       -- at PDQ is slow AF - can disable it momentarily and see if this improves
-      elixir = { "mix", timeout_ms = 2000 },
+      -- elixir = { "mix", timeout_ms = 2000 },
       sh = { "shfmt" },
       terraform = { "terraform_fmt" },
-      toml = { "dprint", "taplo", stop_after_first = true },
+      toml = { "taplo" },
     },
     -- Set default options
     default_format_opts = {
