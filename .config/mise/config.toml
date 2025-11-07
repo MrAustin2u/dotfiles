@@ -10,7 +10,7 @@ lua = "5"
 node = "latest"
 python = "latest"
 ruby = "3.3.6"
-zig = "0.14.1"
+zig = "latest"
 rust = "latest"
 
 # Node.js Packages & TypeScript

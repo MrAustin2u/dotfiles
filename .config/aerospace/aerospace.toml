@@ -68,10 +68,15 @@ preset = 'qwerty'
 [gaps]
 inner.horizontal = 24
 inner.vertical = 24
-outer.left = 24
-outer.bottom = 24
-outer.top = [{ monitor."VP3268a" = 40 }, { monitor."LG" = 40 }, {monitor."Odyssey G91F" = 50}, 40]
-outer.right = 24
+outer.left = [{ monitor."odyssey g91f" = 640 }, 24]
+outer.bottom = [{ monitor."odyssey g91f" = 80 }, 70]
+outer.top = [
+  { monitor."vp3268a" = 40 },
+  { monitor."lg" = 40 },
+  { monitor."odyssey g91f" = 50 },
+  40,
+]
+outer.right = [{ monitor."odyssey g91f" = 640 }, 24]
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -179,6 +184,10 @@ backspace = ['close-all-windows-but-current', 'mode main']
 [[on-window-detected]]
 if.app-id = 'com.github.wez.wezterm'
 run = ['move-node-to-workspace 1']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'System Settings'
+run = ['layout tiling']
 
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'

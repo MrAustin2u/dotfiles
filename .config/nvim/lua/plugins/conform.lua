@@ -68,7 +68,7 @@ return {
       -- is it the warm up time - maybe I can build a mix_format_d to prevent
       -- the need for warm up). Actually it could be elixir-styler that we use
       -- at PDQ is slow AF - can disable it momentarily and see if this improves
-      -- elixir = { "mix", timeout_ms = 2000 },
+      elixir = { "mix" },
       sh = { "shfmt" },
       terraform = { "terraform_fmt" },
       toml = { "taplo" },

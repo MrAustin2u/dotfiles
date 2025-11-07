@@ -39,8 +39,10 @@ alias laws="docker run --network localstack --rm -it amazon/aws-cli --endpoint-u
 # AWS
 alias awsconfig="vim ~/.aws/config"
 
-# bat
-alias cat="bat"
+# bat - only use in interactive shells to avoid breaking scripts
+if [[ -t 1 ]]; then
+  alias cat="bat"
+fi
 
 # Pretty print the path
 alias path="echo $PATH | tr -s ":" "\n""
@@ -108,7 +110,7 @@ alias mdg="mix deps.get"
 alias mdca="mix deps.clean --all"
 alias mf="mix format"
 alias killbeam="pgrep -f beam | xargs kill -9"
-alias vaultserve="PORT=5000 PRIVATE_PORT=4022 iex -S mix phx.server"
+alias vaultserve="PORT=4001 PRIVATE_PORT=4022 LOGGER_BACKEND=logger_json iex -S mix phx.server"
 
 # Yarn
 alias yrs="yarn run serve"
