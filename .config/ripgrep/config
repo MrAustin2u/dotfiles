@@ -1,5 +1,8 @@
+# always search hidden files
+--hidden
+
 --smart-case
 
 # Add my 'web' type.
 --type-add
-frontend:*.{html,css,js,jsx}*
+web:*.{html,css,js,jsx,ts,tsx}

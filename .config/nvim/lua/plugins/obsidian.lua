@@ -1,28 +1,17 @@
 local vault_dir = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Ashteka"
 
 return {
-  "epwalsh/obsidian.nvim",
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-  },
+  "obsidian-nvim/obsidian.nvim",
   version = "*",
   ft = { "markdown", "livemd" },
-  cmd = {
-    "ObsidianNew",
-    "ObsidianOpen",
-    "ObsidianOpen",
-    "ObsidianSearch",
-    "ObsidianToday",
-    "ObsidianTomorrow",
-    "ObsidianWorkspace",
-    "ObsidianYesterday",
-  },
   opts = {
+    legacy_commands = false,
     dir = vault_dir,
     workspaces = {
       {
         name = "personal",
         path = vim.fs.joinpath(vault_dir, "personal"),
+        strict = true,
       },
       {
         name = "work",
@@ -73,25 +62,8 @@ return {
   keys = {
     {
       "<space>oo",
-      function()
-        Snacks.picker.files { cwd = vault_dir }
-      end,
-      desc = "Open Obsidian vault",
-    },
-    {
-      "<space>ow",
-      "<cmd>ObsidianWorkspace<cr>",
-      desc = "Switch Obsidian workspace",
-    },
-    {
-      "<space>on",
-      "<cmd>ObsidianNew<cr>",
-      desc = "New Obsidian note",
-    },
-    {
-      "<space>ot",
-      "<cmd>ObsidianNewFromTemplate<cr>",
-      desc = "New Obsidian note from template",
+      "ObsidianOpen<cr>",
+      desc = "Open Obsidian",
     },
   },
 }

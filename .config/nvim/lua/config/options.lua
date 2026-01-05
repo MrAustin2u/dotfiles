@@ -44,7 +44,7 @@ vim.opt.cmdheight = 1 -- Command line height
 vim.opt.colorcolumn = "120" -- Show column at 120 characters
 vim.opt.cursorline = true -- Highlight current line
 vim.opt.fillchars = "fold: ,vert:│,eob: ,msgsep:‾" -- Characters for UI elements
-vim.opt.guifont = "MonoLisa:h14" -- GUI font
+vim.opt.guifont = "MonoLisa:h16" -- GUI font
 vim.opt.laststatus = 3 -- Global statusline
 vim.opt.list = true -- Show invisible characters
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" } -- Characters for invisible chars

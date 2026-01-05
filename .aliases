@@ -31,7 +31,7 @@ alias plss3="./scripts/provision_localstack_s3"
 alias .j="just --justfile ~/.user.justfile --working-directory ."
 
 # Docker
-alias dockerprune="docker image prune -f && docker volume prune -f"
+alias dockerprune="docker image prune -a -f && docker volume prune -f"
 alias orbstart="orb start && docker context use orbstack"
 alias colimastart="brew services restart colima"
 alias laws="docker run --network localstack --rm -it amazon/aws-cli --endpoint-url=http://localstack:4566"
