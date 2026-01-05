@@ -1,7 +1,7 @@
 ---@type vim.lsp.Config
 return {
   filetypes = { "elixir", "eelixir", "heex", "surface", "livebook" },
-  cmd = { "expert" },
+  cmd = { "expert", "--stdio" },
   single_file_support = true,
   dialyzer_enabled = true,
   root_dir = function(bufnr, on_dir)
