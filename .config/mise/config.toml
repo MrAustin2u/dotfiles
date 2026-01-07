@@ -1,8 +1,8 @@
 [tools]
 
 # Programming Languages & Runtimes
-elixir = "1.18.4-otp-27"
-erlang = "27.2"
+elixir = "1.19.4-otp-27"
+erlang = "27.3.4.2"
 gleam = "1.4.1"
 go = "1.22.0"
 java = "liberica-18.0.1+12"
