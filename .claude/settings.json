@@ -8,7 +8,8 @@
       "Bash(gh pr create:*)",
       "Bash(gh auth:*)",
       "Bash(GH_PAGER=\"\" gh pr create --fill --base develop)",
-      "Bash(mix format)"
+      "Bash(mix format)",
+      "Bash(npm test:*)"
     ]
   }
 }

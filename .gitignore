@@ -14,6 +14,10 @@
 .claude/debug
 .claude/file-history
 .claude/history.jsonl
+.claude/cache
+.claude/paste-cache
+.claude/telemetry
+.claude/stats-cache.json
 .colima/_lima
 .colima/ssh_config
 .elixir_ls

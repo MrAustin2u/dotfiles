@@ -13,6 +13,7 @@ description: Create a git commit
 ## Your task
 
 Based on the above changes, create a single git commit.
+If changes can be placed into separate relevant commits suggest them.
 Follow the formatting guidelines in ~/.config/git/commit-template
 
 ## Restrictions
