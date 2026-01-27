@@ -1,14 +1,17 @@
 # vim: ft=conf
 
-# Theme
+# Appearance
 macos-titlebar-style = tabs
 theme = TokyoNight Moon
-background-opacity = 0.7
+background-opacity = 0.85
 background-blur-radius = 20
+window-decoration = true
+window-padding-x = 15
+window-padding-y = 15
 
-font-size = 16
+font-size = 18
 adjust-cell-height = 10
-font-family = JetBrains Mono
+font-family = MonoLisa
 
 macos-titlebar-proxy-icon = hidden
 title = "Ghostty"
@@ -37,11 +40,6 @@ keybind = ctrl+v=new_split:right
 keybind = ctrl+v=new_split:down
 keybind = super+t=new_tab
 
-# Window
-window-decoration = true
-window-padding-x = 15
-window-padding-y = 15
-
 # Shell
 shell-integration = zsh
 
@@ -49,3 +47,7 @@ shell-integration = zsh
 macos-option-as-alt = true
 mouse-hide-while-typing = true
 desktop-notifications = true
+
+
+# Slowdown mouse scrolling
+mouse-scroll-multiplier = 0.95
