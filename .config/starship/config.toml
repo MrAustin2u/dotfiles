@@ -1,74 +1,67 @@
+# Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
-add_newline = false
-command_timeout = 10000
 
-# Move the directory to the second line
-format = '''
-$all$directory
-$character
-'''
+format = """
+$username\
+$hostname\
+$kubernetes\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$docker_context\
+$memory_usage\
+$sudo\
+$cmd_duration\
+$fill\
+[$time]($style) \
+$line_break\
+$jobs\
+$battery\
+$status\
+$character"""
 
-[character]
-success_symbol = "[➜](bold green)"
-error_symbol = "[✗](bold red)"
-vicmd_symbol = "[V](bold green)"
+add_newline = true
+
+# language plugins
+deno.disabled = true
+docker_context.disabled = true
+elixir.disabled = true
+erlang.disabled = true
+gcloud.disabled = true
+golang.disabled = true
+lua.disabled = true
+nodejs.disabled = true
+package.disabled = true
+python.disabled = true
+ruby.disabled = true
+rust.disabled = true
+sudo.disabled = false
+bun.disabled = true
+
+# to hide this from the prompt you can run kctx -u to unset the current context
+[kubernetes]
+disabled = false
+style = "bright-blue"
 
 [cmd_duration]
-style = "bold yellow"
+format = "[$duration]($style) "
+min_time = 0
+style = "dimmed"
+show_milliseconds = true
 
-[directory]
-style = "bold green"
+[time]
+disabled = false
+format = "[  $time]($style)"
+time_format = "%r"
+utc_time_offset = "local"
+style = "italic dimmed white"
 
-[git_branch]
-style = "bold blue"
-
-[hostname]
-disabled = true
-style = "bold red"
-
-[username]
-format = "[$user]($style) on "
-style_user = "bold purple"
-
-[line_break]
-disabled = true
-
-[package]
-disabled = true
-
-[python]
-disabled = true
-
-[aws]
-disabled = true
-
-[gcloud]
-disabled = true
-
-[terraform]
-disabled = true
-
-[elixir]
-disabled = true
-
-[git_status]
-ahead = '⇡${count}'
-behind = '⇣${count}'
-diverged = '⇕⇡${ahead_count}⇣${behind_count}'
-staged = '[++\($count\)](green)'
-up_to_date = '✓'
-
-[docker_context]
-disabled = true
-
-[custom.elixir]
-symbol = " "
-command = "echo v$(elixir --short-version)"
-files = ["mix.exs"]
-style = "bold cyan"
-format = "[$symbol](purple)[$output]($style) "
-shell = ["bash", "--noprofile", "--norc"]
-
-[battery]
-disabled = true
+[memory_usage]
+disabled = false
+# percent threshold to start showing memory usage
+threshold = 90
+symbol = "󰘚 "
