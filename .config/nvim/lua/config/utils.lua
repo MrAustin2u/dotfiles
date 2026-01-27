@@ -20,7 +20,7 @@ M.lsp_servers = {
   "dockerls",
   "dprint",
   "erlangls",
-  -- "eslint",
+  "eslint",
   "expert",
   "gleam",
   -- "gopls",
