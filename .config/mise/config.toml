@@ -22,6 +22,7 @@ rust = "latest"
 "npm:typescript" = "^5.6.3"
 
 # JavaScript/Node.js Tools
+"npm:@zed-industries/claude-code-acp" = "latest"
 "npm:@fsouza/prettierd" = "latest"
 "npm:codeowners" = "latest"
 "npm:eslint_d" = "latest"
@@ -29,6 +30,7 @@ rust = "latest"
 "npm:opencommit" = "latest"
 "npm:pnpm" = "latest"
 "npm:wscat" = "latest"
+"npm:@forge/cli" = "latest"
 yarn = "1.22.5"
 
 # Language Servers
@@ -87,6 +89,7 @@ neovim = "latest"
 rebar = "3.24.0"
 ripgrep = "latest"
 starship = "latest"
+tmux = "latest"
 usage = "latest"
 uv = "latest"
 zoxide = "latest"
@@ -106,3 +109,13 @@ idiomatic_version_file_enable_tools = ["node"]
 
 [settings.python]
 compile = true
+
+[settings.ruby]
+compile = true
+
+[tool_alias]
+
+[tool_alias.java]
+
+[tool_alias.java.versions]
+"adoptopenjdk-16.0.2+7" = "zulu-16.32.15.0"

@@ -229,17 +229,17 @@ run = ['move-node-to-workspace 4']
 if.app-name-regex-substring = 'Slack'
 run = ['move-node-to-workspace 5']
 
-[[on-window-detected]]
-if.app-name-regex-substring = 'Chrome'
-run = ['move-node-to-workspace 2']
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Zen'
-run = ['move-node-to-workspace 6']
+# [[on-window-detected]]
+# if.app-name-regex-substring = 'Chrome'
+# run = ['move-node-to-workspace 2']
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Simulator'
 run = ['move-node-to-workspace 6']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Claude'
+run = ['move-node-to-workspace 8']
 
 [[on-window-detected]]
 if.app-id = 'com.apple.Music'
