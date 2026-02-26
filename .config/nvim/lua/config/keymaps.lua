@@ -280,11 +280,6 @@ M.lsp_mappings = function()
     end,
     { desc = "LSP: [f]or[m]at", noremap = true, silent = true, buffer = true },
   }
-  nmap {
-    "<leader>cc",
-    picker("pick", require "plugins.snacks.conventional_commits_picker"),
-    { desc = "[C]onventional [C]ommits" },
-  }
 end
 
 M.lsp_diagnostic_mappings = function()

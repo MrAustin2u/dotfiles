@@ -2,11 +2,11 @@ return {
   "willothy/nvim-cokeline",
   lazy = false,
   dependencies = {
-    "kyazdani42/nvim-web-devicons",
+    "nvim-tree/nvim-web-devicons",
   },
   keys = {
-    { "<S-Tab>", "<Plug>(cokeline-focus-prev)", { silent = true, desc = "Prev Buffer" } },
-    { "<Tab>", "<Plug>(cokeline-focus-next)", { silent = true, desc = "Next Buffer" } },
+    { "<S-Tab>",   "<Plug>(cokeline-focus-prev)",  { silent = true, desc = "Prev Buffer" } },
+    { "<Tab>",     "<Plug>(cokeline-focus-next)",  { silent = true, desc = "Next Buffer" } },
     { "<Leader>p", "<Plug>(cokeline-switch-prev)", { silent = true, desc = "Switch Prev Buffer" } },
     { "<Leader>n", "<Plug>(cokeline-switch-next)", { silent = true, desc = "Switch Next Buffer" } },
   },
@@ -70,13 +70,13 @@ return {
         {
           text = function(buffer)
             return (buffer.diagnostics.errors ~= 0 and "  " .. buffer.diagnostics.errors)
-              or (buffer.diagnostics.warnings ~= 0 and " ⚠ " .. buffer.diagnostics.warnings)
-              or ""
+                or (buffer.diagnostics.warnings ~= 0 and " ⚠ " .. buffer.diagnostics.warnings)
+                or ""
           end,
           fg = function(buffer)
             return (buffer.diagnostics.errors ~= 0 and errors_fg)
-              or (buffer.diagnostics.warnings ~= 0 and warnings_fg)
-              or nil
+                or (buffer.diagnostics.warnings ~= 0 and warnings_fg)
+                or nil
           end,
           truncation = { priority = 1 },
         },

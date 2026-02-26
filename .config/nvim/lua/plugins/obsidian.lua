@@ -1,4 +1,4 @@
-local vault_dir = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Ashteka"
+local vault_dir = "~/Library/Mobile\\ Documents/iCloud~md~obsidian/Documents/Ashteka"
 
 return {
   "obsidian-nvim/obsidian.nvim",

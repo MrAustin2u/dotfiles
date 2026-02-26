@@ -36,13 +36,23 @@ return {
       autosave = true,
       initial_content = {
         ex = elixir_template,
+        exs = elixir_template,
         js = javascript_template,
         ts = typescript_template,
       },
-      ext_options = { "lua", "js", "ts", "ex", "yml", "" },
-      format_opts = { [""] = "[None]", js = "JavaScript", lua = "Lua", ex = "Elixir", ts = "Typescript" },
+      ext_options = { "lua", "js", "ts", "ex", "exs", "yml", "", "md" },
+      format_opts = {
+        [""] = "[None]",
+        js = "JavaScript",
+        lua = "Lua",
+        ex = "Elixir",
+        exs = "Elixir Script",
+        ts = "Typescript",
+        md = "Markdown",
+      },
       run = {
         ex = { "w", "!elixir %" },
+        exs = { "w", "!elixir %" },
       },
     }
     local attempt = require "attempt"

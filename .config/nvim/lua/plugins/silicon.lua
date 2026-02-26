@@ -25,7 +25,7 @@ return {
     line_offset = function(args)
       return args.line1
     end,
-    font = "MonoLisa",
+    font = "Maple Mono NF",
     theme = "Dracula",
     background = "#636da6",
     output = function()

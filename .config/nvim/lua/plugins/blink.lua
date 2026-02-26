@@ -11,7 +11,6 @@ return {
     "saghen/blink.cmp",
     dependencies = {
       "rafamadriz/friendly-snippets",
-      "hrsh7th/cmp-nvim-lua",
       { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true },
     },
     version = "*",
@@ -50,10 +49,10 @@ return {
       },
       enabled = function()
         return vim.bo.buftype ~= "prompt"
-          and vim.bo.buftype ~= "NvimTree"
-          and vim.bo.buftype ~= "TelescopePrompt"
-          and vim.bo.filetype ~= "DressingInput"
-          and vim.b.completion ~= false
+            and vim.bo.buftype ~= "NvimTree"
+            and vim.bo.buftype ~= "TelescopePrompt"
+            and vim.bo.filetype ~= "DressingInput"
+            and vim.b.completion ~= false
       end,
       signature = {
         enabled = true,
@@ -76,7 +75,8 @@ return {
           },
           border = "rounded",
           winblend = 0,
-          winhighlight = "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
+          winhighlight =
+          "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
         },
       },
       appearance = {
@@ -126,11 +126,11 @@ return {
       sources = {
         default = {
           "supermaven",
+          "codecompanion",
           "lsp",
           "path",
           "snippets",
           "buffer",
-          "nvim_lua",
           "obsidian",
           "obsidian_new",
           "obsidian_tags",
@@ -150,10 +150,6 @@ return {
               return items
             end,
           },
-          nvim_lua = {
-            name = "nvim_lua",
-            module = "blink.compat.source",
-          },
           obsidian = {
             name = "obsidian",
             module = "blink.compat.source",
@@ -170,6 +166,14 @@ return {
             name = "Dadbod",
             module = "vim_dadbod_completion.blink",
           },
+          codecompanion = {
+            name = "codecompanion",
+            module = "codecompanion.providers.completion.blink",
+          },
+        },
+        per_filetype = {
+          codecompanion = { "codecompanion" },
+          markdown = { "supermaven", "lsp", "path", "snippets", "buffer", "obsidian", "obsidian_new", "obsidian_tags" },
         },
       },
     },
