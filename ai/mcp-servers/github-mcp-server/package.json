@@ -1,0 +1,26 @@
+{
+  "name": "github-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for GitHub integration",
+  "main": "build/index.js",
+  "type": "module",
+  "bin": {
+    "github-mcp-cli": "./build/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepare": "pnpm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@octokit/rest": "^21.0.2",
+    "commander": "^14.0.3",
+    "dotenv": "^17.2.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

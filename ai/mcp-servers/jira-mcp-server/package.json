@@ -1,0 +1,26 @@
+{
+  "name": "jira-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Jira integration",
+  "main": "build/index.js",
+  "type": "module",
+  "bin": {
+    "jira-mcp-cli": "./build/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "commander": "^14.0.3",
+    "dotenv": "^17.2.4",
+    "node-fetch": "^3.3.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
