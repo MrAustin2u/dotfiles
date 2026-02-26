@@ -177,6 +177,9 @@ script -q /dev/null gh pr list --head "$(git branch --show-current)"
                 -- ANTHROPIC_API_KEY = "cmd:op read op://Private/Anthropic/credential --no-newline",
                 CLAUDE_CODE_OAUTH_TOKEN = "cmd:op read op://Private/Claude_Code_OAuth/credential --no-newline",
               },
+              defaults = {
+                model = "opus",
+              },
             })
           end,
         },
