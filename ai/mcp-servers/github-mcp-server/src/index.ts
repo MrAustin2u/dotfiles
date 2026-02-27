@@ -310,6 +310,56 @@ server.registerTool(
 );
 
 server.registerTool(
+  "github-update-pr",
+  {
+    description: "Update an existing pull request (title, body, base branch, or state)",
+    inputSchema: {
+      owner: z.string().describe("Repository owner"),
+      repo: z.string().describe("Repository name"),
+      pull_number: z.number().describe("Pull request number"),
+      title: z.string().optional().describe("New pull request title"),
+      body: z.string().optional().describe("New pull request description"),
+      base: z.string().optional().describe("New base branch name"),
+      state: z
+        .enum(["open", "closed"])
+        .optional()
+        .describe("State of the pull request (open or closed)"),
+    },
+  },
+  async ({ owner, repo, pull_number, title, body, base, state }) => {
+    const updateParams: {
+      owner: string;
+      repo: string;
+      pull_number: number;
+      title?: string;
+      body?: string;
+      base?: string;
+      state?: "open" | "closed";
+    } = {
+      owner,
+      repo,
+      pull_number,
+    };
+
+    if (title !== undefined) updateParams.title = title;
+    if (body !== undefined) updateParams.body = body;
+    if (base !== undefined) updateParams.base = base;
+    if (state !== undefined) updateParams.state = state;
+
+    const { data } = await octokit.pulls.update(updateParams);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  },
+);
+
+server.registerTool(
   "github-get-push-branch",
   {
     description:

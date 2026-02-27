@@ -25,6 +25,7 @@ return {
             "github-get-pr-comments",
             "github-get-pr-commits",
             "github-create-pr",
+            "github-update-pr",
             "github-get-push-branch",
           },
         },
