@@ -4,7 +4,7 @@ alias stowdotfiles="z dotifles && stow --target="$HOME" --adopt ."
 alias telgopostings="posting --collection postings/telgorithm"
 
 # brew bundle
-alias brewb="$HOME/dotfiles/.config/brew brew bundle"
+alias brewb="cd $HOME/dotfiles/.config/brew && brew bundle"
 
 # Just
 alias jy="just yoink $1"

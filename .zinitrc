@@ -35,10 +35,11 @@ zinit light dkarter/kube-aliases
 zinit ice depth=1
 zinit light jeffreytse/zsh-vi-mode
 
-# Get the fzf binary from releases
+# Get the fzf binary from releases and load shell integration from it
 zinit for \
     from'gh-r' \
     sbin'fzf' \
+    atload'eval "$(fzf --zsh)"' \
     junegunn/fzf
 
 # Get fzf-tmux script specifically
@@ -48,9 +49,11 @@ zinit ice as"command" \
     atpull"%atclone"
 zinit snippet https://raw.githubusercontent.com/junegunn/fzf/master/bin/fzf-tmux
 
-# Load key bindings and completion
-zinit for \
-    https://github.com/junegunn/fzf/raw/master/shell/{'completion','key-bindings'}.zsh
+# zsh-vi-mode needs to rebind ctrl-r to make it available in insert mode
+# https://github.com/jeffreytse/zsh-vi-mode/issues/242
+function zvm_after_init() {
+  zvm_bindkey viins "^R" fzf-history-widget
+}
 
 
 # cht.sh
