@@ -76,6 +76,7 @@ brew "xq"
 brew "xz"
 brew "zlib"
 brew "k6"
+brew "grafana"
 brew "pandoc"
 
 cask "aerospace"

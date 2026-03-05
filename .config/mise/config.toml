@@ -22,7 +22,7 @@ rust = "latest"
 "npm:typescript" = "^5.6.3"
 
 # JavaScript/Node.js Tools
-"npm:@zed-industries/claude-code-acp" = "latest"
+"npm:@zed-industries/claude-agent-acp" = "latest"
 "npm:@fsouza/prettierd" = "latest"
 "npm:codeowners" = "latest"
 "npm:eslint_d" = "latest"
@@ -52,6 +52,7 @@ terraform-ls = "latest"
 "npm:@angular/language-service" = "latest"
 "cargo:typos-cli" = "latest"
 "go:golang.org/x/tools/gopls" = "latest"
+"go:go.k6.io/xk6/cmd/xk6" ="latest"
 
 
 # Formatters & Linters
@@ -102,6 +103,7 @@ zoxide = "latest"
 
 # Package Managers & Build Tools
 pipx = "latest"
+claude-code = "latest"
 
 [settings]
 experimental = true
