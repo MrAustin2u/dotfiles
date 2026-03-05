@@ -353,4 +353,32 @@ program
     }
   });
 
+// Request PR review command
+program
+  .command("github-request-pr-review")
+  .description("Request reviewers for a pull request")
+  .requiredOption("-o, --owner <owner>", "Repository owner")
+  .requiredOption("-r, --repo <repo>", "Repository name")
+  .requiredOption("-n, --number <number>", "Pull request number")
+  .requiredOption(
+    "-t, --team-reviewers <teams...>",
+    "Team slugs to request review from",
+  )
+  .action(async (options) => {
+    try {
+      const octokit = getOctokit();
+      const { data } = await octokit.pulls.requestReviewers({
+        owner: options.owner,
+        repo: options.repo,
+        pull_number: parseInt(options.number),
+        team_reviewers: options.teamReviewers,
+      });
+
+      console.log(JSON.stringify(data, null, 2));
+    } catch (error: any) {
+      console.error("Error:", error.message);
+      process.exit(1);
+    }
+  });
+
 program.parse();

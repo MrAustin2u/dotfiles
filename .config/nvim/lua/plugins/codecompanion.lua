@@ -22,7 +22,7 @@ return {
             add_mcp_prefix_to_tool_names = false,
             show_result_in_chat = true,
             format_tool = nil,
-            make_vars = true,
+            make_vars = false,
             make_slash_commands = true,
           },
         },
@@ -121,6 +121,7 @@ Follow the formatting guidelines below:
   - Use `mcp__github__github-create-pr` tool to create the pull request
   - Use `mcp__github__github-get-push-branch` to check if branch exists remotely
   - Use `mcp__github__github-list-prs` to check for existing PRs
+  - Use `mcp__github__github-request-pr-review` to request review from relevant team reviewers. Check for repos ".github/CODEOWNERS" file
   - Extract owner/repo from git remote URL using `git config --get remote.origin.url`
   - Parse remote URL formats: `git@github.com:owner/repo.git` or `https://github.com/owner/repo.git`
 - **FALLBACK METHOD**: If github-mcp-server is not available or fails, use gh CLI:

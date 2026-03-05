@@ -14,7 +14,7 @@ return {
         github = {
           command = "node",
           args = {
-            "$HOME/ai/mcp-servers/github-mcp-server/build/index.js",
+            "$HOME/dotfiles/ai/mcp-servers/github-mcp-server/build/index.js",
           },
           autoApprove = {
             "github-list-repos",
@@ -27,12 +27,13 @@ return {
             "github-create-pr",
             "github-update-pr",
             "github-get-push-branch",
+            "github-request-pr-review",
           },
         },
         jira = {
           command = "node",
           args = {
-            "$HOME/ai/mcp-servers/jira-mcp-server/build/index.js",
+            "$HOME/dotfiles/ai/mcp-servers/jira-mcp-server/build/index.js",
           },
           autoApprove = {
             "jira_read_ticket",
@@ -43,6 +44,12 @@ return {
       },
       extensions = {
         codecompanion = {
+          make_tools = true,
+          show_server_tools_in_chat = true,
+          add_mcp_prefix_to_tool_names = false,
+          show_result_in_chat = true,
+          format_tool = nil,
+          make_vars = false,
           make_slash_commands = true,
         },
       },

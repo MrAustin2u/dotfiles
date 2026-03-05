@@ -312,7 +312,8 @@ server.registerTool(
 server.registerTool(
   "github-update-pr",
   {
-    description: "Update an existing pull request (title, body, base branch, or state)",
+    description:
+      "Update an existing pull request (title, body, base branch, or state)",
     inputSchema: {
       owner: z.string().describe("Repository owner"),
       repo: z.string().describe("Repository name"),
@@ -397,6 +398,60 @@ server.registerTool(
                   exists: false,
                   branch,
                   message: "Branch not found - it can be pushed",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+      throw error;
+    }
+  },
+);
+
+server.registerTool(
+  "github-request-pr-review",
+  {
+    description: "Request reviewers for a pull request",
+    inputSchema: {
+      owner: z.string().describe("Repository owner"),
+      repo: z.string().describe("Repository name"),
+      pull_number: z.number().describe("Pull request number"),
+      team_reviewers: z
+        .array(z.string())
+        .describe("An array of team slugs that will be requested."),
+    },
+  },
+  async ({ owner, repo, pull_number, team_reviewers }) => {
+    try {
+      const { data } = await octokit.pulls.requestReviewers({
+        owner,
+        repo,
+        pull_number,
+        team_reviewers,
+      });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(data, null, 2),
+          },
+        ],
+      };
+    } catch (error: any) {
+      if (error.status === 404) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  success: false,
+                  pull_number,
+                  message: `Pull request #${pull_number} not found`,
                 },
                 null,
                 2,
