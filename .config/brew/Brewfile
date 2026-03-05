@@ -78,6 +78,7 @@ brew "zlib"
 brew "k6"
 brew "grafana"
 brew "pandoc"
+brew "postgresql@17"
 
 cask "aerospace"
 cask "font-sketchybar-app-font"
