@@ -5,7 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { Octokit } from "@octokit/rest";
 import { config } from "dotenv";
-import { getEnv } from "./utils.js";
+import { getEnv, getGitRemoteUrl, parseRepoUrl } from "./utils.js";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -461,6 +461,164 @@ server.registerTool(
         };
       }
       throw error;
+    }
+  },
+);
+
+server.registerTool(
+  "github-push-branch",
+  {
+    description:
+      "Push a local branch to a remote GitHub repository by updating or creating a git ref via the GitHub API",
+    inputSchema: {
+      owner: z
+        .string()
+        .optional()
+        .describe(
+          "Repository owner (auto-detected from git remote if not provided)",
+        ),
+      repo: z
+        .string()
+        .optional()
+        .describe(
+          "Repository name (auto-detected from git remote if not provided)",
+        ),
+      branch: z.string().describe("Branch name to push"),
+      sha: z.string().describe("The SHA of the commit to push"),
+      force: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe("Force push (overwrite remote branch)"),
+    },
+  },
+  async ({ owner, repo, branch, sha, force }) => {
+    let resolvedOwner = owner;
+    let resolvedRepo = repo;
+
+    if (!resolvedOwner || !resolvedRepo) {
+      const remoteUrl = getGitRemoteUrl();
+      const parsed = parseRepoUrl(remoteUrl);
+      if (parsed) {
+        resolvedOwner = resolvedOwner || parsed.owner;
+        resolvedRepo = resolvedRepo || parsed.repo;
+      }
+    }
+
+    if (!resolvedOwner || !resolvedRepo) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                success: false,
+                message:
+                  "Could not determine owner/repo. Provide them explicitly or run from a git repository with a GitHub remote.",
+              },
+              null,
+              2,
+            ),
+          },
+        ],
+      };
+    }
+
+    const ref = `refs/heads/${branch}`;
+
+    try {
+      // Try to update existing ref
+      const { data } = await octokit.git.updateRef({
+        owner: resolvedOwner,
+        repo: resolvedRepo,
+        ref: `heads/${branch}`,
+        sha,
+        force,
+      });
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                success: true,
+                action: "updated",
+                ref: data.ref,
+                sha: data.object.sha,
+                url: data.object.url,
+              },
+              null,
+              2,
+            ),
+          },
+        ],
+      };
+    } catch (error: any) {
+      if (error.status === 422) {
+        // Ref doesn't exist, create it
+        try {
+          const { data } = await octokit.git.createRef({
+            owner: resolvedOwner,
+            repo: resolvedRepo,
+            ref,
+            sha,
+          });
+
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: JSON.stringify(
+                  {
+                    success: true,
+                    action: "created",
+                    ref: data.ref,
+                    sha: data.object.sha,
+                    url: data.object.url,
+                  },
+                  null,
+                  2,
+                ),
+              },
+            ],
+          };
+        } catch (createError: any) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: JSON.stringify(
+                  {
+                    success: false,
+                    message: createError.message,
+                    status: createError.status,
+                  },
+                  null,
+                  2,
+                ),
+              },
+            ],
+          };
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                success: false,
+                message: error.message,
+                status: error.status,
+              },
+              null,
+              2,
+            ),
+          },
+        ],
+      };
     }
   },
 );

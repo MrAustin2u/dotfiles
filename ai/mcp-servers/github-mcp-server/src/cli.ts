@@ -2,7 +2,7 @@
 import { config } from "dotenv";
 import { Command } from "commander";
 import { Octokit } from "@octokit/rest";
-import { getEnv } from "./utils.js";
+import { getEnv, getGitRemoteUrl, parseRepoUrl } from "./utils.js";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -375,6 +375,81 @@ program
       });
 
       console.log(JSON.stringify(data, null, 2));
+    } catch (error: any) {
+      console.error("Error:", error.message);
+      process.exit(1);
+    }
+  });
+
+// Push branch command
+program
+  .command("github-push-branch")
+  .description(
+    "Push a local branch to GitHub by updating or creating a git ref via the API",
+  )
+  .option("-o, --owner <owner>", "Repository owner (auto-detected from git remote)")
+  .option("-r, --repo <repo>", "Repository name (auto-detected from git remote)")
+  .requiredOption("-b, --branch <branch>", "Branch name to push")
+  .requiredOption("-s, --sha <sha>", "The SHA of the commit to push")
+  .option("-f, --force", "Force push (overwrite remote branch)", false)
+  .action(async (options) => {
+    try {
+      const octokit = getOctokit();
+      let owner = options.owner;
+      let repo = options.repo;
+
+      if (!owner || !repo) {
+        const remoteUrl = getGitRemoteUrl();
+        const parsed = parseRepoUrl(remoteUrl);
+        if (parsed) {
+          owner = owner || parsed.owner;
+          repo = repo || parsed.repo;
+        }
+      }
+
+      if (!owner || !repo) {
+        console.error(
+          "Error: Could not determine owner/repo. Provide --owner and --repo or run from a git repository with a GitHub remote.",
+        );
+        process.exit(1);
+      }
+
+      const ref = `refs/heads/${options.branch}`;
+
+      try {
+        const { data } = await octokit.git.updateRef({
+          owner,
+          repo,
+          ref: `heads/${options.branch}`,
+          sha: options.sha,
+          force: options.force,
+        });
+        console.log(
+          JSON.stringify(
+            { success: true, action: "updated", ref: data.ref, sha: data.object.sha },
+            null,
+            2,
+          ),
+        );
+      } catch (error: any) {
+        if (error.status === 422) {
+          const { data } = await octokit.git.createRef({
+            owner,
+            repo,
+            ref,
+            sha: options.sha,
+          });
+          console.log(
+            JSON.stringify(
+              { success: true, action: "created", ref: data.ref, sha: data.object.sha },
+              null,
+              2,
+            ),
+          );
+        } else {
+          throw error;
+        }
+      }
     } catch (error: any) {
       console.error("Error:", error.message);
       process.exit(1);
