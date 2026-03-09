@@ -142,7 +142,7 @@ Follow the formatting guidelines below:
 2. Get remote URL: git config --get remote.origin.url
 3. Parse owner/repo from URL (e.g., "git@github.com:owner/repo.git" -> owner="owner", repo="repo")
 4. Check if branch exists remotely: mcp__github__github-get-push-branch with owner, repo, branch
-5. Push branch if needed: git push -u origin branch-name
+5. Push branch if needed: mcp__github__github-push-branch with owner, repo, branch, sha
 6. Create PR: mcp__github__github-create-pr with owner, repo, title, body, head (branch), base (e.g., "develop"), draft
 ```
 

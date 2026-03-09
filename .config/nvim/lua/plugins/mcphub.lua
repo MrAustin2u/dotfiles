@@ -28,6 +28,7 @@ return {
             "github-update-pr",
             "github-get-push-branch",
             "github-request-pr-review",
+            "github-push-branch",
           },
         },
         jira = {
