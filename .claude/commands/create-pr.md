@@ -31,6 +31,10 @@ Create a new branch, commit changes, and submit a pull request.
 
 - Use Jira ticket number in pull request title if available in branch name
 - Check for pull request template, and fill all the requirements
+- If in a stack, use `git stack` to find the base branch for the pull request, and put the stack in the description in a nice format
+- Assign the PR to me
+- Add reviewers: include CODEOWNERS for modified files AND any teams referenced in the changes
+- Add labels: use `team/<team-name>` for the owning team, `chore` for non-functional changes
 - **PRIMARY METHOD**: Try using the github-mcp-server tools first:
   - Use `mcp__github__github-create-pr` tool to create the pull request
   - Use `mcp__github__github-get-push-branch` to check if branch exists remotely
@@ -48,6 +52,25 @@ Create a new branch, commit changes, and submit a pull request.
   - Never use interactive `gh pr create` without these flags as it will fail in non-interactive environments
 - If a pull request template exists (.github/pull_request_template.md), read it and format the --body accordingly
 
+## Stack Detection (REQUIRED before creating PR)
+
+- ALWAYS run `git stack` first to check if the branch is part of a stack
+- If `git stack` shows multiple branches, the PR base should be the branch ABOVE the current branch in the stack output (the parent)
+- Use `--base <parent-branch>` flag with `gh pr create`
+- If not in a stack (or git stack fails), use the default base branch (develop/main/master)
+
+## Branch Creation Rules (REQUIRED)
+
+1. ALWAYS run `git stack` first to understand the current stack state
+2. Check if current branch already has an open PR: `gh pr list --head <current-branch>`
+3. If the branch already has a PR:
+
+- Create a NEW branch from the current branch for new changes
+- Use the current branch as the `--base` for the new PR
+
+4. If NOT in a stack and no existing PR, use develop/main as base
+5. NEVER commit directly to a branch that already has an open PR
+
 ## Example PR Creation with MCP Server
 
 ```
@@ -55,7 +78,7 @@ Create a new branch, commit changes, and submit a pull request.
 2. Get remote URL: git config --get remote.origin.url
 3. Parse owner/repo from URL (e.g., "git@github.com:owner/repo.git" -> owner="owner", repo="repo")
 4. Check if branch exists remotely: mcp__github__github-get-push-branch with owner, repo, branch
-5. Push branch if needed: git push -u origin branch-name
+5. Push branch: mcp__github__github-push-branch with owner, repo, branch, sha
 6. Create PR: mcp__github__github-create-pr with owner, repo, title, body, head (branch), base (e.g., "develop"), draft
 ```
 

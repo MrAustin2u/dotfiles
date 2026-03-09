@@ -1,15 +1,82 @@
 {
-  "alwaysThinkingEnabled": true,
   "permissions": {
     "allow": [
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(gh pr create:*)",
-      "Bash(gh auth:*)",
       "Bash(GH_PAGER=\"\" gh pr create --fill --base develop)",
+      "Bash(MIX_ENV=test mix test:*)",
+      "Bash(awk:*)",
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Bash(elixir --version:*)",
+      "Bash(elixir:*)",
+      "Bash(find:*)",
+      "Bash(gh api:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh workflow list:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(git diff:*)",
+      "Bash(git fetch:*)",
+      "Bash(git push:*)",
+      "Bash(git rebase:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(git rm:*)",
+      "Bash(git show:*)",
+      "Bash(git stash:*)",
+      "Bash(grep:*)",
+      "Bash(just:*)",
+      "Bash(mix compile:*)",
       "Bash(mix format)",
-      "Bash(npm test:*)"
+      "Bash(mix format:*)",
+      "Bash(mix help:*)",
+      "Bash(mix run:*)",
+      "Bash(mix test:*)",
+      "Bash(mix xref:*)",
+      "Bash(npm test:*)",
+      "Bash(open:*)",
+      "Bash(perl -i -pe:*)",
+      "Bash(python3:*)",
+      "Bash(sed:*)",
+      "Bash(sort:*)",
+      "Bash(xargs ls:*)",
+      "Bash(xxd:*)",
+      "WebSearch"
     ]
-  }
+  },
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/statusline.sh",
+    "padding": 2
+  },
+  "enabledPlugins": {
+    "elixir-phoenix-guide@elixir-phoenix-guide": true
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude is ready for input\" with title \"Claude Code\"'"
+          }
+        ]
+      },
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude needs your permission\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  },
+  "alwaysThinkingEnabled": true
 }
