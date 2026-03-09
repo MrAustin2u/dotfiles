@@ -95,8 +95,6 @@ usage = "latest"
 uv = "latest"
 zoxide = "latest"
 "ubi:sibprogrammer/xq" = "latest"
-"npm:@withgraphite/graphite-cli" = "latest"
-
 # Security & Authentication
 1password = "latest"
 1password-cli = "latest"
@@ -104,6 +102,9 @@ zoxide = "latest"
 # Package Managers & Build Tools
 pipx = "latest"
 claude-code = "latest"
+
+# AI
+"npm:agent-browser" = "latest"
 
 [settings]
 experimental = true
