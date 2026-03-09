@@ -150,4 +150,8 @@ alias ngrokconfig="nvim ~/dotfiles/.config/ngrok/ngrok.yml"
 
 alias luamake=/Users/aaustin/dotfiles/.config/nvim/lua-language-server/3rd/luamake/luamake
 
+# AI
+alias aiskillfind="pnpx skills find $1"
+alias aiskilladd="pnpx skills add $1 -g -y"
+
 [ -f ~/.aliases.local ] && source ~/.aliases.local

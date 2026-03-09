@@ -13,9 +13,5 @@ if [[ "$(uname)" = "Darwin" ]]; then
   fi
 fi
 
-# Unset GITHUB_TOKEN to prevent gh CLI from using it
-# gh CLI will use keyring authentication instead
-unset GITHUB_TOKEN
-
 # Local config
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
