@@ -175,11 +175,13 @@ server.registerTool(
       maxResults: (maxResults || 50).toString(),
     });
 
-    if (fields && fields.length > 0) {
-      params.append("fields", fields.join(","));
-    }
+    const requestedFields =
+      fields && fields.length > 0
+        ? fields.join(",")
+        : "summary,status,assignee,priority,issuetype,created,updated";
+    params.append("fields", requestedFields);
 
-    const data = await jiraRequest(`/search?${params.toString()}`);
+    const data = await jiraRequest(`/search/jql?${params.toString()}`);
 
     return {
       content: [

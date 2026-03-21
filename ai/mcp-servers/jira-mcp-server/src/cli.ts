@@ -179,11 +179,11 @@ program
         maxResults: options.maxResults,
       });
 
-      if (options.fields) {
-        params.append("fields", options.fields);
-      }
+      const requestedFields = options.fields
+        || "summary,status,assignee,priority,issuetype,created,updated";
+      params.append("fields", requestedFields);
 
-      const data = await jiraRequest(`/search?${params.toString()}`);
+      const data = await jiraRequest(`/search/jql?${params.toString()}`);
 
       console.log(JSON.stringify(data, null, 2));
     } catch (error: any) {
