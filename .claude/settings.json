@@ -44,18 +44,12 @@
       "Bash(sort:*)",
       "Bash(xargs ls:*)",
       "Bash(xxd:*)",
+      "Bash(ddcli-llm *)",
+      "Bash(ddcli *)",
       "WebSearch"
     ]
   },
   "model": "opus",
-  "statusLine": {
-    "type": "command",
-    "command": "$HOME/.claude/statusline.sh",
-    "padding": 2
-  },
-  "enabledPlugins": {
-    "elixir-phoenix-guide@elixir-phoenix-guide": true
-  },
   "hooks": {
     "Notification": [
       {
@@ -77,6 +71,18 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/statusline.sh",
+    "padding": 2
+  },
+  "enabledPlugins": {
+    "elixir-phoenix-guide@elixir-phoenix-guide": true,
+    "blvd-reliability@blvd-ai-tools": true,
+    "sentry@claude-plugins-official": true,
+    "sentry-mcp@sentry-mcp": true,
+    "atlassian@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true
 }
