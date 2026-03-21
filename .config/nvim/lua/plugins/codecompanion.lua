@@ -192,7 +192,7 @@ script -q /dev/null gh pr list --head "$(git branch --show-current)"
               },
               schema = {
                 model = {
-                  default = "claude-sonnet-4-20250514",
+                  default = "claude-sonnet-4-6",
                 },
                 extended_thinking = {
                   default = true,
@@ -207,7 +207,7 @@ script -q /dev/null gh pr list --head "$(git branch --show-current)"
               },
               schema = {
                 model = {
-                  default = "claude-3-5-haiku-20241022",
+                  default = "claude-haiku-4-5",
                 },
                 extended_thinking = {
                   default = false,

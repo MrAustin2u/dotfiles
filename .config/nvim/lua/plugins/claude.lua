@@ -2,14 +2,23 @@ return {
   "coder/claudecode.nvim",
   dependencies = { "folke/snacks.nvim" },
   config = true,
+  cmd = {
+    "ClaudeCode",
+    "ClaudeCodeFocus",
+    "ClaudeCodeAdd",
+    "ClaudeCodeSend",
+    "ClaudeCodeTreeAdd",
+    "ClaudeCodeDiffAccept",
+    "ClaudeCodeDiffDeny",
+  },
   keys = {
-    { "<leader>cc", nil, desc = "AI/Claude Code" },
-    { "<leader>cct", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
-    { "<leader>ccf", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
-    { "<leader>ccr", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
-    { "<leader>ccC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
-    { "<leader>ccab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
-    { "<leader>ccs", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+    { "<leader>cc",   nil,                              desc = "AI/Claude Code" },
+    { "<leader>cct",  "<cmd>ClaudeCode<cr>",            desc = "Toggle Claude" },
+    { "<leader>ccf",  "<cmd>ClaudeCodeFocus<cr>",       desc = "Focus Claude" },
+    { "<leader>ccr",  "<cmd>ClaudeCode --resume<cr>",   desc = "Resume Claude" },
+    { "<leader>ccC",  "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
+    { "<leader>ccab", "<cmd>ClaudeCodeAdd %<cr>",       desc = "Add current buffer" },
+    { "<leader>ccs",  "<cmd>ClaudeCodeSend<cr>",        mode = "v",                 desc = "Send to Claude" },
     {
       "<leader>ccaf",
       "<cmd>ClaudeCodeTreeAdd<cr>",
@@ -18,7 +27,7 @@ return {
     },
     -- Diff management
     { "<leader>ccad", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
-    { "<leader>ccdd", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+    { "<leader>ccdd", "<cmd>ClaudeCodeDiffDeny<cr>",   desc = "Deny diff" },
   },
   opts = {
     terminal = {
