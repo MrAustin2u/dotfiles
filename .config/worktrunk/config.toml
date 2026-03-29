@@ -48,9 +48,9 @@
 # Persistent flag values for `wt list`. Override on command line as needed.
 #
 [list]
-summary = true # Enable LLM branch summaries (requires [commit.generation])
+# summary = true # Enable LLM branch summaries (requires [commit.generation])
 #
-# full = false       # Show CI, main…± diffstat, and LLM summaries (--full)
+full = true # Show CI, main…± diffstat, and LLM summaries (--full)
 # branches = false   # Include branches without worktrees (--branches)
 # remotes = false    # Include remote-only branches (--remotes)
 #
@@ -114,6 +114,12 @@ summary = true # Enable LLM branch summaries (requires [commit.generation])
 # merge.squash = false
 # post-create.env = "cp .env.example .env"
 # aliases.deploy = "make deploy BRANCH={{ branch }}"
+[projects."github.com/MrAustin2u/dotfiles"]
+post-create.install = "mise trust"
+
+[projects."github.com/Boulevard/sched"]
+post-create.install = "direnv allow && direnv reload && mix deps.get && mix compile"
+post-create.env = "cp .env .env"
 #
 [commit.generation]
 command = "CLAUDECODE= MAX_THINKING_TOKENS=0 claude -p --model=opus --tools='' --disable-slash-commands --setting-sources='' --system-prompt=''"
