@@ -40,7 +40,7 @@ rust-analyzer = "latest"
 terraform-ls = "latest"
 "npm:@ansible/ansible-language-server" = "latest"
 "npm:bash-language-server" = "latest"
-"npm:vscode-langservers-extracted" = "latest"  # provides html, css, json, eslint LSPs
+"npm:vscode-langservers-extracted" = "latest"      # provides html, css, json, eslint LSPs
 "npm:typescript-language-server" = "latest"
 "npm:@vtsls/language-server" = "latest"
 "npm:vim-language-server" = "latest"
@@ -52,7 +52,7 @@ terraform-ls = "latest"
 "npm:@angular/language-service" = "latest"
 "cargo:typos-cli" = "latest"
 "go:golang.org/x/tools/gopls" = "latest"
-"go:go.k6.io/xk6/cmd/xk6" ="latest"
+"go:go.k6.io/xk6/cmd/xk6" = "latest"
 
 
 # Formatters & Linters
