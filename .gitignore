@@ -1,49 +1,67 @@
+# OS
+.DS_Store
 *~
-!op/plugins.sh
-**node_modules
-.DS_Store
-.DS_Store
-.cfg
+
+# Editor / IDE
+.luarc.json
+.vscode
+.vscode/
+nvim/.config/nvim/plugin/
+packer_compiled.lua
+
+# Claude Code
+.claude/cache
+.claude/debug
+.claude/file-history
+.claude/history.jsonl
 .claude/ide
+.claude/paste-cache
 .claude/plugins
 .claude/projects
 .claude/settings.json
 .claude/settings.local.json
 .claude/shell-snapshots
-.claude/statsig
-.claude/todos
-.claude/debug
-.claude/file-history
-.claude/history.jsonl
-.claude/cache
-.claude/paste-cache
-.claude/telemetry
 .claude/stats-cache.json
-.colima/_lima
-.colima/ssh_config
+.claude/statsig
+.claude/telemetry
+.claude/todos
+
+# Elixir / Phoenix
 .elixir_ls
 .elixir_ls/
-.env
-.envrc
-.expert
 .iex.exs
-.luarc.json
 .mix_tasks
-.node-version
-.vscode
-.vscode/
 _build/
 deps/
-ngrok
+
+# Node
+.node-version
 node_modules
-nvim/.config/nvim/plugin/
-op/*
-packer_compiled.lua
-tmux/.config/tmux/plugins/
-mcphub
-raycast
+**node_modules
+
+# Environment / secrets
+.env
+.envrc
+.cfg
+
+# Docker (Colima)
+.colima/_lima
+.colima/ssh_config
+
+# Tools (stowed separately or not tracked)
+!op/plugins.sh
 op
-graphite
+op/*
 gh
+graphite
+ngrok
+raycast
+mcphub
 claude-agent-acp
+.expert
+
+# Logs
 debug.log
+
+# Tmux plugins (managed by tpm)
+tmux/.config/tmux/plugins/
