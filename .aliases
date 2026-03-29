@@ -120,7 +120,7 @@ alias yrp="yarn run publish"
 ## Dashboard
 alias yfs="yarn ts-node scripts/fetch-schema.ts && yarn run generate-types"
 ## Sched
-alias checkwhitespace="./scripts/check_trailing_whitespace"
+alias schedcws="./scripts/check_trailing_whitespace"
 alias envreload="direnv reload"
 
 ## just-spin-up
@@ -153,5 +153,10 @@ alias luamake=/Users/aaustin/dotfiles/.config/nvim/lua-language-server/3rd/luama
 # AI
 alias aiskillfind="pnpx skills find $1"
 alias aiskilladd="pnpx skills add $1 -g -y"
+alias openslidev="pnpx @slidev/cli $1"
+
+# TMUX
+alias wm='workmux'
+alias wmadd='wm add -w -u $1'
 
 [ -f ~/.aliases.local ] && source ~/.aliases.local
