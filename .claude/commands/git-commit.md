@@ -52,5 +52,6 @@ Or with options:
   - `chore`: Changes to the build process, tools, etc.
 - **Present tense, imperative mood**: Write commit messages as commands (e.g., "add feature" not "added feature")
 - **Concise first line**: Keep the first line under 72 characters
+- **No attribution**: NEVER include `Co-Authored-By`, `Signed-off-by`, or any other trailer that references the AI model or agent. Commit messages should contain only the conventional commit message itself.
 - **Emoji**: Each commit type is paired with an appropriate emoji:
   - ✨ `feat`: New feature
