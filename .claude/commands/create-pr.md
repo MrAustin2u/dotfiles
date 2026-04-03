@@ -34,7 +34,7 @@ Create a new branch, commit changes, and submit a pull request.
 - If in a stack, use `git stack` to find the base branch for the pull request, and put the stack in the description in a nice format
 - Assign the PR to me
 - Add reviewers: include CODEOWNERS for modified files AND any teams referenced in the changes
-- Add labels: use `team/<team-name>` for the owning team, `chore` for non-functional changes
+- Add labels: use `COMMS` and `needs review` if labels are available
 - **PRIMARY METHOD**: Try using the github-mcp-server tools first:
   - Use `mcp__github__github-create-pr` tool to create the pull request
   - Use `mcp__github__github-get-push-branch` to check if branch exists remotely

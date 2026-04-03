@@ -35,6 +35,12 @@ Or with options:
 5. Analyzes the diff to determine if multiple distinct logical changes are present
 6. If multiple distinct changes are detected, suggests breaking the commit into multiple smaller commits
 7. For each commit (or the single commit if not split), creates a commit message using emoji conventional commit format
+8. After the commit succeeds, rebase onto the latest base branch:
+   - Determine the base branch: run `gh pr view --json baseRefName -q .baseRefName` to check for an open PR's base. If no PR exists, fall back to `master` (or `main` if master doesn't exist on the remote).
+   - Run `git fetch origin <base-branch>`
+   - Run `git rebase origin/<base-branch>`
+   - If the rebase has conflicts: stop and inform the user that they need to resolve conflicts manually before continuing. Do NOT run `git rebase --abort`.
+   - If the rebase succeeds cleanly: report that the branch is up to date with the base branch.
 
 ## Best Practices for Commits
 
