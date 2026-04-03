@@ -40,7 +40,7 @@ merge_strategy: rebase
 panes:
   - command: clear
     focus: true
-  - command: "(clear && claude)"
+  - command: "<agent>"
     split: horizontal
 
 # Auto-apply agent status icons to tmux window format.
@@ -68,14 +68,14 @@ agent: "claude"
 # Commands to run in new worktree before tmux window opens.
 # These block window creation - use for short tasks only.
 post_create:
-  - "[ -f mise.toml ] && mise trust && mise install"
+  - "[ -f mise.toml ] && mise trust && mise install || true"
   - "[ -f .env ] && direnv allow && direnv reload || true"
   - "[ -f yarn.lock ] && yarn && yarn generate-types || true"
   - "[ -f mix.lock ] && mix deps.get && mix compile && mix ecto.migrate || true"
-  - "[-f .scripts/download_config_json ] && ./scripts/download_config_json.sh --latest || true"
+  - "[ -f .scripts/download_config_json ] && ./scripts/download_config_json.sh --latest || true"
 
 pre_merge:
-  - "[-f mix.exs] && mixt test"
+  - "[ -f mix.exs ] && git diff --name-only $(git merge-base HEAD main)..HEAD -- '*.ex' '*.exs' | grep -v _test.exs | sed 's|lib/|test/|;s|\\.ex$|_test.exs|' | xargs -I{} sh -c 'test -f \"{}\" && echo \"{}\"' | xargs --no-run-if-empty mix test"
 
 # -------------------------------------------------------------------------------
 # Files
@@ -85,10 +85,11 @@ pre_merge:
 files:
   #   # Files to copy (useful for .env files that need to be unique).
   copy:
-    - "[-f .env ] && .env || true"
+    - .env
 
   symlink:
     - CLAUDE.md
+    - .claude
 # -------------------------------------------------------------------------------
 # Dashboard
 # -------------------------------------------------------------------------------
