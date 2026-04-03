@@ -11,6 +11,10 @@ return {
   config = function()
     require("mcphub").setup {
       mcp_servers = {
+        datadog = {
+          command = "/Users/aaustin/.local/bin/datadog_mcp_cli",
+          args = { "--force-oauth" },
+        },
         github = {
           command = "node",
           args = {
