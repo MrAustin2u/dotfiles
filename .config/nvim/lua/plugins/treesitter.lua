@@ -52,6 +52,7 @@ return {
         "luap",
         "markdown",
         "markdown_inline",
+        "mermaid",
         "printf",
         "python",
         "query",
