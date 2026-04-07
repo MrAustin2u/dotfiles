@@ -100,13 +100,18 @@ vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Sav
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
--- save and source config files
-vim.keymap.set(
-  { "n" },
-  "<leader>so",
-  ':w<CR>:source %<CR>:lua vim.notify("File sourced!")<CR>',
-  { desc = "[SO]urce file", silent = true }
-)
+-- save and source config files (restricted to nvim config directory)
+vim.keymap.set("n", "<leader>so", function()
+  local file = vim.fn.expand "%:p"
+  local config_dir = vim.uv.fs_realpath(vim.fn.stdpath "config") or vim.fn.stdpath "config"
+  if not file:match("%.lua$") or not vim.startswith(file, config_dir) then
+    vim.notify("Only sources Lua files inside " .. config_dir, vim.log.levels.WARN)
+    return
+  end
+  vim.cmd "write"
+  vim.cmd "source %"
+  vim.notify("File sourced!", vim.log.levels.INFO)
+end, { desc = "[SO]urce file", silent = true })
 
 -- ================================
 -- # Copy, Paste, Movements, Etc..
@@ -642,14 +647,6 @@ M.snacks_mappings = {
     desc = "Buffer Lines",
   },
   {
-    "<leader>sw",
-    function()
-      Snacks.picker.grep_word()
-    end,
-    desc = "Visual selection or word",
-    mode = { "n", "x" },
-  },
-  {
     "<leader>pp",
     function()
       Snacks.picker.registers()
@@ -862,51 +859,5 @@ end
 
 -- Initialize Jest test mappings
 M.jest_test_mappings()
-
-M.harpoon_mappings = function(harpoon)
-  local keys = {
-    nmap {
-      "<leader>H",
-      function()
-        harpoon:list():add()
-      end,
-      desc = "Harpoon File",
-    },
-    nmap {
-      "<leader>h",
-      function()
-        harpoon.ui:toggle_quick_menu(harpoon:list())
-      end,
-      desc = "Harpoon Quick Menu",
-    },
-    nmap {
-      "<leader>h",
-      function()
-        harpoon.ui:toggle_quick_menu(harpoon:list())
-      end,
-      desc = "Harpoon Quick Menu",
-    },
-    nmap {
-      "<leader>l",
-      function()
-        harpoon.ui:nav_next()
-      end,
-      desc = "Harpoon Next Mark",
-    },
-    -- nmap { "<s-m>", "<cmd>lua require('user.harpoon').mark_file()<cr>", default_opts },
-    -- nmap { "<TAB>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", default_opts },
-  }
-
-  for i = 1, 9 do
-    table.insert(keys, {
-      "<leader>" .. i,
-      function()
-        harpoon:list():select(i)
-      end,
-      desc = "Harpoon to File " .. i,
-    })
-  end
-  return keys
-end
 
 return M

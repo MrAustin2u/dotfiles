@@ -3,10 +3,11 @@
 -- Check if config files exists in the current working directory or any parent directory
 -- Uses vim.fs.find for cross-platform compatibility and reasonable search limits
 local function has_config(files)
+  local root = vim.fs.find({ ".git", "package.json" }, { upward = true })[1]
   local config_files = vim.fs.find(files, {
     upward = true,
     type = "file",
-    stop = vim.fs.dirname(vim.fs.find({ ".git", "package.json" }, { upward = true })[1]),
+    stop = root and vim.fs.dirname(root) or nil,
   })
   return #config_files > 0
 end

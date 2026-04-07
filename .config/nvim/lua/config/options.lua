@@ -39,7 +39,6 @@ vim.g.markdown_fenced_languages = { -- Syntax highlighting for markdown code blo
 ----------------------------------------------
 vim.cmd.syntax "off" -- Disable syntax highlighting (using treesitter)
 vim.opt.bg = "dark" -- Dark background
-vim.opt.ch = 0 -- Command line height
 vim.opt.cmdheight = 1 -- Command line height
 vim.opt.colorcolumn = "120" -- Show column at 120 characters
 vim.opt.cursorline = true -- Highlight current line
@@ -96,14 +95,14 @@ vim.opt.updatetime = 50  -- Faster completion
 -- Folding
 ----------------------------------------------
 vim.opt.foldenable = false                                     -- Disable folding by default
-vim.opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()" -- Fold expression
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Fold expression
 vim.opt.foldmethod = "expr"                                    -- Use expression for folding
 vim.opt.foldtext = ""                                          -- Empty fold text
 
 ----------------------------------------------
 -- Formatting
 ----------------------------------------------
-vim.opt.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()" -- Format expression
+vim.opt.formatexpr = "v:lua.require'conform'.formatexpr()" -- Format expression
 vim.opt.formatoptions:append "r"                                       -- Auto-insert comment leader
 
 ----------------------------------------------
@@ -136,7 +135,6 @@ vim.opt.undofile = true                    -- Enable persistent undo
 ----------------------------------------------
 vim.opt.spelllang = "en"                              -- English spell checking
 vim.opt.spellfile = cache_dir .. "spell/en.utf-8.add" -- Custom spell file
-vim.opt_global.spell = true                           -- Enable spell checking globally
 
 ----------------------------------------------
 -- Diff options
