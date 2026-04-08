@@ -1,6 +1,6 @@
 return {
   "willothy/nvim-cokeline",
-  lazy = false,
+  event = "VeryLazy",
   dependencies = {
     "nvim-tree/nvim-web-devicons",
   },

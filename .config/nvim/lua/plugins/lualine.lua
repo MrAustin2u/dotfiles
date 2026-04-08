@@ -1,5 +1,6 @@
 return {
   "nvim-lualine/lualine.nvim",
+  event = "VeryLazy",
   config = function()
     local colors = require("tokyonight.colors").setup { style = "moon" }
     local tokyonight = require "lualine.themes.tokyonight-moon"

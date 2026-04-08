@@ -1,25 +1,24 @@
 return {
   "kevinhwang91/nvim-hlslens",
-  config = function()
-    require("hlslens").setup()
-
-    local opts = { noremap = true, silent = true }
-
-    vim.api.nvim_set_keymap(
-      "n",
+  keys = {
+    {
       "n",
       [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
-      opts
-    )
-    vim.api.nvim_set_keymap(
-      "n",
+      mode = "n",
+      silent = true,
+    },
+    {
       "N",
       [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
-      opts
-    )
-    vim.api.nvim_set_keymap("n", "*", [[*<Cmd>lua require('hlslens').start()<CR>]], opts)
-    vim.api.nvim_set_keymap("n", "#", [[#<Cmd>lua require('hlslens').start()<CR>]], opts)
-    vim.api.nvim_set_keymap("n", "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], opts)
-    vim.api.nvim_set_keymap("n", "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], opts)
+      mode = "n",
+      silent = true,
+    },
+    { "*", [[*<Cmd>lua require('hlslens').start()<CR>]], mode = "n", silent = true },
+    { "#", [[#<Cmd>lua require('hlslens').start()<CR>]], mode = "n", silent = true },
+    { "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], mode = "n", silent = true },
+    { "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], mode = "n", silent = true },
+  },
+  config = function()
+    require("hlslens").setup()
   end,
 }
