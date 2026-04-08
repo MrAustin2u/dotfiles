@@ -49,8 +49,11 @@ terraform-ls = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
 "npm:sql-language-server" = "latest"
 "npm:graphql-language-service-cli" = "latest"
-"npm:@angular/language-service" = "latest"
+"npm:@angular/language-server" = "latest"          # provides `ngserver` binary for angularls
+"npm:pyright" = "latest"                           # provides `pyright-langserver` for python LSP
 "cargo:typos-cli" = "latest"
+"github:tekumara/typos-lsp" = "latest"             # provides `typos-lsp` binary for typos_lsp nvim config
+"github:elixir-lang/expert" = "latest"             # official Elixir LSP (successor to ElixirLS/Lexical/Next LS)
 "go:golang.org/x/tools/gopls" = "latest"
 "go:go.k6.io/xk6/cmd/xk6" = "latest"
 
