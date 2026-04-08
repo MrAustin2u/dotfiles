@@ -43,10 +43,35 @@ local ngserver_exe = vim.fn.exepath "ngserver"
 local ngserver_path = #(ngserver_exe or "") > 0 and vim.fs.dirname(vim.uv.fs_realpath(ngserver_exe)) or "?"
 local extension_path = vim.fs.normalize(vim.fs.joinpath(ngserver_path, "../../../"))
 
+-- Resolve mise-installed typescript as an additional ts probe location so
+-- ngserver can find `typescript/lib/tsserverlibrary` when the project's
+-- node_modules doesn't provide TypeScript itself. mise installs typescript to
+-- <mise>/installs/npm-typescript/<ver>/lib/node_modules/typescript/..., so its
+-- `lib/` dir works as a node `require.resolve` probe base.
+local function mise_typescript_probe_dir()
+  local result = vim.fn.system { "mise", "where", "npm:typescript" }
+  if vim.v.shell_error ~= 0 then
+    return nil
+  end
+  local path = vim.trim(result)
+  if path == "" then
+    return nil
+  end
+  local probe = vim.fs.joinpath(path, "lib")
+  return (vim.uv.fs_stat(probe) ~= nil) and probe or nil
+end
+
+local mise_ts_probe = mise_typescript_probe_dir()
+
 -- angularls will get module by `require.resolve(PROBE_PATH, MODULE_NAME)` of nodejs
-local ts_probe_dirs = vim.iter({ extension_path, default_probe_dir }):join ","
+local ts_probe_dirs = vim.iter({ default_probe_dir, extension_path, mise_ts_probe }):filter(function(p)
+  return p ~= nil and p ~= ""
+end):join ","
 local ng_probe_dirs = vim
   .iter({ extension_path, default_probe_dir })
+  :filter(function(p)
+    return p ~= nil and p ~= ""
+  end)
   :map(function(p)
     return vim.fs.joinpath(p, "/@angular/language-server/node_modules")
   end)
