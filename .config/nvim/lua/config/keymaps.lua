@@ -20,11 +20,6 @@ local M = {}
 --
 local default_opts = { noremap = true, silent = true }
 
-local map = function(tbl)
-  local opts = tbl[4] and vim.tbl_deep_extend("force", default_opts, tbl[4]) or default_opts
-  vim.keymap.set(tbl[1], tbl[2], tbl[3], opts)
-end
-
 local nmap = function(tbl)
   local opts = tbl[3] and vim.tbl_deep_extend("force", default_opts, tbl[3]) or default_opts
   vim.keymap.set("n", tbl[1], tbl[2], opts)
@@ -33,17 +28,6 @@ end
 local vmap = function(tbl)
   local opts = tbl[3] and vim.tbl_deep_extend("force", default_opts, tbl[3]) or default_opts
   vim.keymap.set("v", tbl[1], tbl[2], opts)
-end
-
---- returns a function that calls the specified telescope builtin
-local telescope = function(fun, opts)
-  if opts == nil then
-    opts = {}
-  end
-
-  return function()
-    require("telescope.builtin")[fun](opts)
-  end
 end
 
 local picker = function(fun, opts)
@@ -220,37 +204,12 @@ M.lsp_diagnostic_mappings = function()
   nmap { "<leader>qd", "<cmd>lua vim.diagnostic.setloclist()<CR>", { desc = "Set loclist to LSP diagnostics" } }
 end
 
--- M.lsp_inlay_hints_mappings = function(buf)
---   nmap {
---     "<leader>th",
---     function()
---       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf })
---     end,
---     { desc = "LSP: [T]oggle Inlay [H]ints", noremap = true, silent = true, buffer = buf },
---   }
--- end
-
 M.vim_test_mappings = function()
   nmap { "<leader>tn", ":TestNearest<CR>", { desc = "Test Nearest" } }
   nmap { "<leader>tf", ":TestFile<CR>", { desc = "Test File" } }
   nmap { "<leader>ts", ":TestSuite<CR>", { desc = "Test Suite" } }
   nmap { "<leader>tl", ":TestLast<CR>", { desc = "Test Last" } }
 end
-
-M.telescope_mappings = {
-  { "<leader>f?", telescope "search_history",   desc = "Search History" },
-  { "<leader>fh", telescope "help_tags",        desc = "[F]ind [H]elp" },
-  { "<leader>fO", telescope "vim_options",      desc = "[F]ind [O]ptions" },
-
-  --  Extensions
-  { "<leader>bb", telescope "buffers",          desc = "Find Buffers" },
-
-  -- better spell suggestions
-  { "z=",         telescope "spell_suggest",    desc = "Spelling Suggestions" },
-
-  -- search unicode symbols 
-  { "<leader>fu", "<cmd>Telescope symbols<cr>", desc = "[F]ind [U]nicode" },
-}
 
 M.git_conflict_mappings = function()
   vim.keymap.set("n", "co", "<Plug>(git-conflict-ours)")
@@ -341,72 +300,6 @@ M.todo_comments_mappings = {
     desc = "Todo/Fix/Fixme",
   },
 }
-
-M.neo_test_mappings = function()
-  nmap {
-    "<leader>tt",
-    function()
-      require("neotest").run.run(vim.fn.expand "%")
-    end,
-    { desc = "[T]est Run File" },
-  }
-  nmap {
-    "<leader>tT",
-    function()
-      require("neotest").run.run(vim.uv.cwd())
-    end,
-    { desc = "[T]est Run All [T]est Files" },
-  }
-  nmap {
-    "<leader>tr",
-    function()
-      require("neotest").run.run()
-    end,
-    { desc = "[T]est [R]un Nearest" },
-  }
-  nmap {
-    "<leader>tl",
-    function()
-      require("neotest").run.run_last()
-    end,
-    { desc = "[T]est Run [L]ast" },
-  }
-  nmap {
-    "<leader>ts",
-    function()
-      require("neotest").summary.toggle()
-    end,
-    { desc = "[T]est Toggle [S]ummary" },
-  }
-  nmap {
-    "<leader>to",
-    function()
-      require("neotest").output.open { enter = true, auto_close = true }
-    end,
-    { desc = "[T]est Show Output" },
-  }
-  nmap {
-    "<leader>tO",
-    function()
-      require("neotest").output_panel.toggle()
-    end,
-    { desc = "[T]est Toggle Output Panel" },
-  }
-  nmap {
-    "<leader>tS",
-    function()
-      require("neotest").run.stop()
-    end,
-    { desc = "[T]est [S]top" },
-  }
-  nmap {
-    "<leader>tw",
-    function()
-      require("neotest").watch.toggle(vim.fn.expand "%")
-    end,
-    { desc = "[T]est Toggle [W]atch" },
-  }
-end
 
 M.snacks_mappings = {
   --------------
@@ -726,52 +619,5 @@ M.tabby_mappings = {
   { "<leader>tl", ":tabn<CR>",     mode = "n", desc = "Tab next",     noremap = true },
   { "<leader>th", ":tabp<CR>",     mode = "n", desc = "Tab previous", noremap = true },
 }
-
--- Jest Test Runner with Snacks Terminal
-M.jest_test_mappings = function()
-  local function run_jest_test()
-    local current_file = vim.fn.expand "%:p"
-    local filename = vim.fn.expand "%:t"
-
-    -- Check if current file is a test file
-    if not filename:match "%.test%.js$" then
-      vim.notify("Current file is not a Jest test file (.test.js)", vim.log.levels.WARN)
-      return
-    end
-
-    -- Get relative path from project root
-    local relative_path = vim.fn.expand "%:."
-
-    -- Create the Jest command with read to keep terminal open
-    local jest_cmd = string.format(
-      "clear && yarn test:dev --config jest.angular.config.js %s; read -p 'Press Enter to close...'",
-      relative_path
-    )
-
-    -- Run in Snacks terminal with floating window
-    Snacks.terminal(jest_cmd, {
-      win = {
-        style = "float",
-        title = "Jest Test: " .. filename,
-        width = 0.9,
-        height = 0.8,
-        border = "rounded",
-      },
-      env = {
-        -- Ensure we're in the correct directory
-        PWD = vim.fn.getcwd(),
-      },
-    })
-  end
-
-  nmap {
-    "<leader>tj",
-    run_jest_test,
-    { desc = "[T]est [J]est - Run current file" },
-  }
-end
-
--- Initialize Jest test mappings
-M.jest_test_mappings()
 
 return M
