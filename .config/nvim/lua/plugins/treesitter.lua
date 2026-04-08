@@ -2,7 +2,6 @@ return {
   "nvim-treesitter/nvim-treesitter",
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
-    "nvim-treesitter/playground",
     "RRethy/nvim-treesitter-textsubjects",
     "JoosepAlviste/nvim-ts-context-commentstring",
     "IndianBoy42/tree-sitter-just",
@@ -80,7 +79,6 @@ return {
       },
       highlight = {
         enable = true,
-        use_languagetree = true,
         additional_vim_regex_highlighting = false,
       },
       textobjects = {
