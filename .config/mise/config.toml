@@ -49,6 +49,7 @@ terraform-ls = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
 "npm:sql-language-server" = "latest"
 "npm:graphql-language-service-cli" = "latest"
+"npm:tree-sitter-cli" = "latest"                   # required by nvim-treesitter (main branch) to compile parsers
 "npm:@angular/language-server" = "latest"          # provides `ngserver` binary for angularls
 "npm:pyright" = "latest"                           # provides `pyright-langserver` for python LSP
 "cargo:typos-cli" = "latest"

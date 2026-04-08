@@ -15,6 +15,61 @@ return {
         mode = "cursor",
       }
 
+      -- Ensure parsers are installed. On the main branch rewrite the old
+      -- `ensure_installed` setup field is gone -- users must call install()
+      -- explicitly. This is async and skips already-installed parsers.
+      require("nvim-treesitter").install {
+        "angular",
+        "bash",
+        "c",
+        "diff",
+        "eex",
+        "elixir",
+        "erlang",
+        "git_config",
+        "git_rebase",
+        "gitattributes",
+        "gitcommit",
+        "gitignore",
+        "gleam",
+        "go",
+        "gomod",
+        "gosum",
+        "gowork",
+        "graphql",
+        "hcl",
+        "heex",
+        "html",
+        "http",
+        "javascript",
+        "jsdoc",
+        "json",
+        "json5",
+        "jsonc",
+        "lua",
+        "luadoc",
+        "luap",
+        "markdown",
+        "markdown_inline",
+        "mermaid",
+        "printf",
+        "python",
+        "query",
+        "regex",
+        "ruby",
+        "rust",
+        "sql",
+        "terraform",
+        "tmux",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+        "xml",
+        "yaml",
+      }
+
       local function is_supported_by_treesitter(buf)
         local ft = vim.bo[buf].filetype
         local lang = vim.treesitter.language.get_lang(ft)
