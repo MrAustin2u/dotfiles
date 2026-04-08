@@ -1,6 +1,5 @@
 local M = {}
 
-
 M.lsp_servers = {
   "angularls",
   "biome",
@@ -21,7 +20,6 @@ M.lsp_servers = {
   "pyright",
   "sqlls",
   "tailwindcss",
-  "terraformls",
   "vtsls", -- Use vtsls instead of ts_ls to avoid conflicts
   "typos_lsp",
   "yamlls",
