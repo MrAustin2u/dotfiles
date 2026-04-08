@@ -1,30 +1,5 @@
 local M = {}
 
-M.lsp_servers = {
-  "angularls",
-  "biome",
-  "cssls",
-  "dockerls",
-  "dprint",
-  "erlangls",
-  "eslint",
-  "expert",
-  "gleam",
-  -- "gopls",
-  "graphql",
-  "html",
-  "json",
-  "jsonls",
-  "lua_ls",
-  "marksman",
-  "pyright",
-  "sqlls",
-  "tailwindcss",
-  "vtsls", -- Use vtsls instead of ts_ls to avoid conflicts
-  "typos_lsp",
-  "yamlls",
-}
-
 M.icons = {
   dap = {
     Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
