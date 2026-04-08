@@ -58,11 +58,15 @@ local function on_attach(client, bufnr)
     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = bufnr })
   end, "LSP: [T]oggle Inlay [H]ints")
 
-  -- nvim-navic breadcrumbs
-  if client.server_capabilities.documentSymbolProvider then
+  -- nvim-navic breadcrumbs. Only the first client per buffer that
+  -- supports documentSymbolProvider may attach -- navic errors out
+  -- when a second client (e.g. graphql on a .tsx file already served
+  -- by vtsls) tries to take over.
+  if client.server_capabilities.documentSymbolProvider and not vim.b[bufnr].navic_client_id then
     local has_navic, navic = pcall(require, "nvim-navic")
     if has_navic then
       navic.attach(client, bufnr)
+      vim.b[bufnr].navic_client_id = client.id
     end
   end
 
