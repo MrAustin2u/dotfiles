@@ -215,6 +215,18 @@ function M.insert_package_json(root_files, field, fname)
   return M.root_markers_with_field(root_files, { "package.json", "package.json5" }, field, fname)
 end
 
+--- JS/TS project root detection via package-manager lockfiles.
+--- All lockfiles are given equal priority (wrapped in a nested table on
+--- Neovim >= 0.11.3) so that e.g. `pnpm-lock.yaml` doesn't lose to a
+--- stray `package-lock.json` higher in the tree.
+--- @param bufnr integer
+--- @return string|nil
+function M.js_project_root(bufnr)
+  local root_markers = { "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb", "bun.lock", "deno.lock" }
+  root_markers = vim.version.ge(vim.version(), { 0, 11, 3 }) and { root_markers } or root_markers
+  return vim.fs.root(bufnr, root_markers)
+end
+
 ---Create an autocommand in Neovim
 ---@param autocmd string|table The autocmd event(s) to trigger the command
 ---@param opts {group: string, buffer: number, pattern: string, callback: function|string} Optional parameters for the autocmd
