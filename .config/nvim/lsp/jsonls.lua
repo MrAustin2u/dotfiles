@@ -5,7 +5,6 @@ return {
   init_options = {
     provideFormatter = true,
   },
-  root_markers = { ".git" },
   on_new_config = function(new_config)
     new_config.settings = new_config.settings or {}
     new_config.settings.json = new_config.settings.json or {}
