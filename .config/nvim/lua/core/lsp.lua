@@ -65,6 +65,46 @@ local function on_attach(client, bufnr)
       navic.attach(client, bufnr)
     end
   end
+
+  -- Server-specific user commands
+  if client.name == "eslint" then
+    vim.api.nvim_buf_create_user_command(bufnr, "LspEslintFixAll", function()
+      client:request_sync("workspace/executeCommand", {
+        command = "eslint.applyAllFixes",
+        arguments = {
+          {
+            uri = vim.uri_from_bufnr(bufnr),
+            version = vim.lsp.util.buf_versions[bufnr],
+          },
+        },
+      }, nil, bufnr)
+    end, { desc = "ESLint: Fix all auto-fixable problems" })
+  elseif client.name == "pyright" then
+    vim.api.nvim_buf_create_user_command(bufnr, "LspPyrightOrganizeImports", function()
+      -- Using client.request() directly because "pyright.organizeimports" is
+      -- private (not advertised via capabilities), which client:exec_cmd()
+      -- refuses to call.
+      client.request("workspace/executeCommand", {
+        command = "pyright.organizeimports",
+        arguments = { vim.uri_from_bufnr(bufnr) },
+      }, nil, bufnr)
+    end, { desc = "Pyright: Organize imports" })
+
+    vim.api.nvim_buf_create_user_command(bufnr, "LspPyrightSetPythonPath", function(command)
+      local path = command.args
+      if client.settings then
+        client.settings.python = vim.tbl_deep_extend("force", client.settings.python, { pythonPath = path })
+      else
+        client.config.settings =
+            vim.tbl_deep_extend("force", client.config.settings, { python = { pythonPath = path } })
+      end
+      client:notify("workspace/didChangeConfiguration", { settings = nil })
+    end, {
+      desc = "Pyright: Reconfigure with the provided python path",
+      nargs = 1,
+      complete = "file",
+    })
+  end
 end
 
 local lsp_group = vim.api.nvim_create_augroup("UserLspConfig", {})
