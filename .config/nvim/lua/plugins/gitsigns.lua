@@ -1,29 +1,17 @@
-local icons = require("config.utils").icons
-
 return {
   "lewis6991/gitsigns.nvim",
   event = { "BufReadPre", "BufNewFile" },
   config = function()
     require("gitsigns").setup {
       signs = {
-        add = {
-          text = icons.ui.BoldLineLeft,
-        },
-        change = {
-          text = icons.ui.BoldLineDashedMiddle,
-        },
-        delete = {
-          text = icons.ui.TriangleMediumArrowRight,
-        },
-        topdelete = {
-          text = icons.ui.TriangleMediumArrowRight,
-        },
-        changedelete = {
-          text = icons.ui.BoldLineLeft,
-        },
-        untracked = {
-          text = icons.ui.BoldLineLeft,
-        },
+        -- Sign column markers for git hunk status. Glyphs below are standard
+        -- Unicode block/line characters; they do not require a Nerd Font.
+        add = { text = "▎" },          -- bold vertical line
+        change = { text = "┋" },        -- dashed vertical line
+        delete = { text = " " },  -- nf-fa-caret_right
+        topdelete = { text = " " }, -- nf-fa-caret_right
+        changedelete = { text = "▎" }, -- bold vertical line
+        untracked = { text = "▎" },    -- bold vertical line
       },
       watch_gitdir = {
         interval = 1000,
@@ -41,7 +29,7 @@ return {
         col = 1,
       },
       on_attach = function(buffer)
-        local gs = package.loaded.gitsigns
+        local gs = require "gitsigns"
 
         local function map(mode, l, r, desc)
           vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })

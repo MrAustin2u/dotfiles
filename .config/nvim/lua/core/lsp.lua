@@ -1,5 +1,3 @@
-local icons = require("config.utils").icons
-
 -- Auto-discover LSP configs from lsp/*.lua files
 local lsp_dir = vim.fn.stdpath "config" .. "/lsp"
 local servers = {}
@@ -137,11 +135,13 @@ end
 
 vim.diagnostic.config {
   signs = {
+    -- Diagnostic sign glyphs. Matches LazyVim's defaults and requires a Nerd
+    -- Font (see https://www.nerdfonts.com) for the glyphs to render.
     text = {
-      [vim.diagnostic.severity.ERROR] = icons.diagnostics.Error,
-      [vim.diagnostic.severity.WARN] = icons.diagnostics.Warn,
-      [vim.diagnostic.severity.INFO] = icons.diagnostics.Info,
-      [vim.diagnostic.severity.HINT] = icons.diagnostics.Hint,
+      [vim.diagnostic.severity.ERROR] = " ", -- nf-fa-times_circle
+      [vim.diagnostic.severity.WARN] = " ", -- nf-fa-exclamation_triangle
+      [vim.diagnostic.severity.INFO] = " ", -- nf-fa-info_circle
+      [vim.diagnostic.severity.HINT] = " ", -- nf-fa-lightbulb_o
     },
   },
   virtual_text = {
