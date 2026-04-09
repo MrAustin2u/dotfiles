@@ -33,7 +33,7 @@ return {
         },
         lualine_b = { "branch", "diff", "diagnostics" },
         lualine_c = {
-          { "filename", path = 4 },
+          { "filename", path = 3 },
         },
         lualine_x = {
           {
