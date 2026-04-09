@@ -110,9 +110,9 @@ return {
         },
       }
 
-      local select = require("nvim-treesitter-textobjects.select")
-      local swap = require("nvim-treesitter-textobjects.swap")
-      local move = require("nvim-treesitter-textobjects.move")
+      local select = require "nvim-treesitter-textobjects.select"
+      local swap = require "nvim-treesitter-textobjects.swap"
+      local move = require "nvim-treesitter-textobjects.move"
 
       local select_maps = {
         af = "@function.outer",
