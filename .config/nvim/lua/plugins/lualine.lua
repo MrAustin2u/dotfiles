@@ -2,8 +2,12 @@ return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
   config = function()
-    local colors = require("tokyonight.colors").setup { style = "moon" }
-    local tokyonight = require "lualine.themes.tokyonight-moon"
+    -- Derive the tokyonight variant from the active colorscheme so this file
+    -- stays in sync with plugins/tokyonight.lua without a hardcoded constant.
+    local theme_name = vim.g.colors_name or "tokyonight-moon"
+    local style = theme_name:match "^tokyonight%-(.+)$" or "moon"
+    local colors = require("tokyonight.colors").setup { style = style }
+    local tokyonight = require("lualine.themes." .. theme_name)
 
     -- Pin section backgrounds so pills always render with transparent bg
     tokyonight.normal.a = { bg = colors.blue, fg = colors.black, gui = "bold" }

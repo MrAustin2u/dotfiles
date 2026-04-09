@@ -3,11 +3,8 @@
 ----------------------------------------------
 local cache_dir = string.format("%s/.cache/nvim/", vim.env.HOME)
 
-----------------------------------------------
--- Leader keys
-----------------------------------------------
-vim.g.mapleader = " "      -- Space as leader key
-vim.g.maplocalleader = " " -- Space as local leader key
+-- NOTE: leader keys are intentionally set in init.lua (before lazy loads)
+-- and must not be duplicated here.
 
 ----------------------------------------------
 -- Global settings
@@ -37,7 +34,10 @@ vim.g.markdown_fenced_languages = { -- Syntax highlighting for markdown code blo
 ----------------------------------------------
 -- Appearance and UI
 ----------------------------------------------
-vim.cmd.syntax "off" -- Disable syntax highlighting (using treesitter)
+-- Legacy Vim regex syntax is disabled in favour of treesitter highlighting
+-- (see plugins/treesitter.lua). Treesitter manages highlight/indent per
+-- FileType, so there is no need to `syntax on` anywhere.
+vim.cmd.syntax "off"
 vim.opt.bg = "dark" -- Dark background
 vim.opt.cmdheight = 1 -- Command line height
 vim.opt.colorcolumn = "120" -- Show column at 120 characters
@@ -61,13 +61,14 @@ vim.opt.winborder = "rounded" -- Rounded window borders
 ----------------------------------------------
 -- Scrolling and navigation
 ----------------------------------------------
-vim.opt.scrolloff = 8        -- Keep 8 lines above/below cursor
-vim.opt.sidescrolloff = 8    -- Keep 8 columns left/right of cursor
-vim.opt.smoothscroll = true  -- Smooth scrolling
-vim.opt.splitkeep = "screen" -- Keep splits on screen
-vim.opt.splitright = true    -- Open splits to the right
-vim.opt.ttyfast = true       -- Fast terminal connection
-vim.opt.wrap = true          -- Wrap long lines
+vim.opt.jumpoptions = "view"  -- Restore mark view when jumping (Neovim 0.11+)
+vim.opt.scrolloff = 8         -- Keep 8 lines above/below cursor
+vim.opt.sidescrolloff = 8     -- Keep 8 columns left/right of cursor
+vim.opt.smoothscroll = true   -- Smooth scrolling
+vim.opt.splitkeep = "screen"  -- Keep splits on screen
+vim.opt.splitright = true     -- Open splits to the right
+vim.opt.ttyfast = true        -- Fast terminal connection
+vim.opt.wrap = true           -- Wrap long lines
 
 ----------------------------------------------
 -- Search and matching
@@ -94,10 +95,11 @@ vim.opt.updatetime = 50  -- Faster completion
 ----------------------------------------------
 -- Folding
 ----------------------------------------------
-vim.opt.foldenable = false                                     -- Disable folding by default
+vim.opt.foldenable = false                           -- Disable folding by default
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Fold expression
-vim.opt.foldmethod = "expr"                                    -- Use expression for folding
-vim.opt.foldtext = ""                                          -- Empty fold text
+vim.opt.foldmethod = "expr"                          -- Use expression for folding
+vim.opt.foldtext = ""                                -- Empty fold text
+vim.opt.foldlevelstart = 99                          -- Open all folds by default when entering a buffer
 
 ----------------------------------------------
 -- Formatting

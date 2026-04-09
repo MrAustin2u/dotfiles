@@ -81,9 +81,11 @@ return {
     },
     -- Set up format-on-save
     format_on_save = function(bufnr)
-      -- Disable with a global or buffer-local variable
+      -- Disable with a global or buffer-local variable. Returning nil skips
+      -- formatting entirely; returning an empty table would still trigger a
+      -- format with default opts.
       if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-        return
+        return nil
       end
 
       return {}

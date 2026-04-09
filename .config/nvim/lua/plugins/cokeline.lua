@@ -32,16 +32,6 @@ return {
         end,
         bg = default_bg,
       },
-      -- sidebar = {
-      --   filetype = 'NvimTree',
-      --   components = {
-      --     {
-      --       text = '  LeftBar',
-      --       style = 'bold',
-      --       bg = 'none',
-      --     },
-      --   }
-      -- },
       components = {
         {
           text = "",

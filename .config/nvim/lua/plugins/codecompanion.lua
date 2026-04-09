@@ -12,7 +12,7 @@ return {
   end,
   config = function()
     require("codecompanion").setup {
-      log_level = "DEBUG",
+      log_level = "WARN",
       extensions = {
         mcphub = {
           callback = "mcphub.extensions.codecompanion",
