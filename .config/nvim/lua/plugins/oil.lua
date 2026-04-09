@@ -1,6 +1,5 @@
 return {
   "stevearc/oil.nvim",
-  event = { "VimEnter" },
   keys = require("config.keymaps").oil_mappings(),
   opts = {
     default_file_explorer = true,
