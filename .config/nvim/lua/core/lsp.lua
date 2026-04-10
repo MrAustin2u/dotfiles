@@ -91,10 +91,10 @@ local function on_attach(client, bufnr)
     end, { desc = "ESLint: Fix all auto-fixable problems" })
   elseif client.name == "pyright" then
     vim.api.nvim_buf_create_user_command(bufnr, "LspPyrightOrganizeImports", function()
-      -- Using client.request() directly because "pyright.organizeimports" is
+      -- Using client:request() directly because "pyright.organizeimports" is
       -- private (not advertised via capabilities), which client:exec_cmd()
       -- refuses to call.
-      client.request("workspace/executeCommand", {
+      client:request("workspace/executeCommand", {
         command = "pyright.organizeimports",
         arguments = { vim.uri_from_bufnr(bufnr) },
       }, nil, bufnr)
@@ -103,10 +103,12 @@ local function on_attach(client, bufnr)
     vim.api.nvim_buf_create_user_command(bufnr, "LspPyrightSetPythonPath", function(command)
       local path = command.args
       if client.settings then
-        client.settings.python = vim.tbl_deep_extend("force", client.settings.python, { pythonPath = path })
+        local existing = client.settings.python --[[@as table?]]
+          or {}
+        client.settings.python = vim.tbl_deep_extend("force", existing, { pythonPath = path })
       else
         client.config.settings =
-            vim.tbl_deep_extend("force", client.config.settings, { python = { pythonPath = path } })
+          vim.tbl_deep_extend("force", client.config.settings, { python = { pythonPath = path } })
       end
       client:notify("workspace/didChangeConfiguration", { settings = nil })
     end, {
@@ -128,12 +130,18 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- Re-run on_attach when capabilities are dynamically registered (e.g. eslint)
--- so late-arriving keymaps/handlers get wired up.
+-- so late-arriving keymaps/handlers get wired up. Iterate every buffer the
+-- client is actually attached to instead of `nvim_get_current_buf()`, which
+-- can be wrong if the user switched buffers while the server was initialising.
 local register_capability = vim.lsp.handlers["client/registerCapability"]
+
+---@diagnostic disable-next-line: duplicate-set-field
 vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
   local client = vim.lsp.get_client_by_id(ctx.client_id)
   if client then
-    on_attach(client, vim.api.nvim_get_current_buf())
+    for bufnr in pairs(client.attached_buffers) do
+      on_attach(client, bufnr)
+    end
   end
   return register_capability(err, res, ctx)
 end

@@ -16,9 +16,15 @@ local function get_angular_core_version()
     return ""
   end
 
-  local contents = io.open(package_json):read "*a"
-  local json = vim.json.decode(contents)
-  if not json.dependencies then
+  local file = io.open(package_json)
+  if not file then
+    return ""
+  end
+  local contents = file:read "*a"
+  file:close()
+
+  local ok, json = pcall(vim.json.decode, contents)
+  if not ok or not json or not json.dependencies then
     return ""
   end
 

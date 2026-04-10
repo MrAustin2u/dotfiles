@@ -20,8 +20,9 @@ return {
         enable = true,
       },
       diagnostics = {
-        -- Get the language server to recognize the `vim` global
-        globals = { "vim" },
+        -- Globals injected at runtime by plugins (snacks.nvim sets _G.Snacks)
+        -- so LuaLS doesn't flag them as undefined.
+        globals = { "vim", "Snacks" },
         unusedLocalExclude = { "_*" },
       },
       workspace = {

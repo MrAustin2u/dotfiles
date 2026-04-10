@@ -2,6 +2,22 @@ local function augroup(name)
   return vim.api.nvim_create_augroup("aa_" .. name, { clear = true })
 end
 
+-- Extra filetype mappings for dotfiles that Neovim doesn't recognize by default
+vim.filetype.add {
+  filename = {
+    [".envrc"] = "bash",
+    [".eslintrc"] = "json",
+    [".prettierrc"] = "json",
+    [".babelrc"] = "json",
+    [".codespellrc"] = "ini",
+    [".zinitrc"] = "zsh",
+  },
+  extension = {
+    yrl = "erlang",
+    plist = "xml",
+  },
+}
+
 -- Check if we need to reload the file when it changed
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup "checktime",
