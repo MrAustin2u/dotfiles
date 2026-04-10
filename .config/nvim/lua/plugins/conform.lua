@@ -64,12 +64,10 @@ return {
       ruby = { "rubyfmt" },
       sql = { "pg_format" },
       yaml = prettier_fallback,
-      -- mix format is taking long to format, so I bumped the timeout, I'm not
-      -- sure why it's taking long though (is it large files, is it all files,
-      -- is it the warm up time - maybe I can build a mix_format_d to prevent
-      -- the need for warm up). Actually it could be elixir-styler that we use
-      -- at PDQ is slow AF - can disable it momentarily and see if this improves
-      elixir = { "mix" },
+      -- `mix format` has to cold-start the BEAM and (at PDQ) load
+      -- elixir-styler, so 500ms is nowhere near enough. Override the
+      -- default timeout for this filetype only.
+      elixir = { "mix", timeout_ms = 5000 },
       sh = { "shfmt" },
       terraform = { "terraform_fmt" },
       toml = { "taplo" },
@@ -102,9 +100,14 @@ return {
         -- few folders above. For example in Phoenix projects, the
         -- .formatter.exs is created in the priv/repo/migrations dir and it
         -- references :ecto_sql, which can not be found if mix format is run
-        -- directly from the migrations dir
+        -- directly from the migrations dir.
+        --
+        -- The wrapper is required so `require("conform.util")` is deferred
+        -- until the plugin is loaded. Previously this function dropped the
+        -- `return`, making cwd always nil and forcing BEAM to re-boot in a
+        -- deep subdirectory on every save.
         cwd = function(self, ctx)
-          (require("conform.util").root_file { "mix.exs" })(self, ctx)
+          return (require("conform.util").root_file { "mix.exs" })(self, ctx)
         end,
       },
     },

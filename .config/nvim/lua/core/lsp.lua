@@ -10,6 +10,14 @@ end
 
 vim.lsp.enable(servers)
 
+-- Disable vim.lsp.document_color (new in Nvim 0.12, enabled by default).
+-- Its on_lines hook races with apply_text_edits during blink.cmp completion
+-- accept and trips an assert in runtime/lua/vim/lsp/document_color.lua when a
+-- client_state entry outlives its client. We don't use color highlighting.
+if vim.lsp.document_color and vim.lsp.document_color.enable then
+  vim.lsp.document_color.enable(false)
+end
+
 require("config.keymaps").lsp_diagnostic_mappings()
 
 --- Sets up capability-guarded keymaps for a given client/buffer.
