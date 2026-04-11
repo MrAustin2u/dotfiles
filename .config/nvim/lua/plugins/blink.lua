@@ -131,25 +131,10 @@ return {
           "path",
           "snippets",
           "buffer",
-          "obsidian",
-          "obsidian_new",
-          "obsidian_tags",
           "dadbod",
         },
         providers = {
           codeium = { name = "Codeium", module = "codeium.blink", async = true },
-          obsidian = {
-            name = "obsidian",
-            module = "blink.compat.source",
-          },
-          obsidian_new = {
-            name = "obsidian_new",
-            module = "blink.compat.source",
-          },
-          obsidian_tags = {
-            name = "obsidian_tags",
-            module = "blink.compat.source",
-          },
           dadbod = {
             name = "Dadbod",
             module = "vim_dadbod_completion.blink",
@@ -161,7 +146,6 @@ return {
         },
         per_filetype = {
           codecompanion = { "codecompanion" },
-          markdown = { "codeium", "lsp", "path", "snippets", "buffer", "obsidian", "obsidian_new", "obsidian_tags" },
         },
       },
     },
