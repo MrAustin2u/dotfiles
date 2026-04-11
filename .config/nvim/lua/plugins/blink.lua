@@ -12,6 +12,7 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true },
+      "Exafunction/codeium.nvim",
     },
     version = "*",
 
@@ -49,10 +50,10 @@ return {
       },
       enabled = function()
         return vim.bo.buftype ~= "prompt"
-            and vim.bo.buftype ~= "NvimTree"
-            and vim.bo.buftype ~= "TelescopePrompt"
-            and vim.bo.filetype ~= "DressingInput"
-            and vim.b.completion ~= false
+          and vim.bo.buftype ~= "NvimTree"
+          and vim.bo.buftype ~= "TelescopePrompt"
+          and vim.bo.filetype ~= "DressingInput"
+          and vim.b.completion ~= false
       end,
       signature = {
         enabled = true,
@@ -75,8 +76,7 @@ return {
           },
           border = "rounded",
           winblend = 0,
-          winhighlight =
-          "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
+          winhighlight = "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
         },
       },
       appearance = {
@@ -114,7 +114,7 @@ return {
           Operator = "󰪚 ",
           TypeParameter = "󰬛 ",
 
-          Supermaven = " ",
+          Codeium = "",
         },
       },
       cmdline = {
@@ -125,7 +125,7 @@ return {
       },
       sources = {
         default = {
-          "supermaven",
+          "codeium",
           "codecompanion",
           "lsp",
           "path",
@@ -137,19 +137,7 @@ return {
           "dadbod",
         },
         providers = {
-          supermaven = {
-            name = "supermaven",
-            module = "blink.compat.source",
-            score_offset = 1,
-            transform_items = function(ctx, items)
-              local kind = "Supermaven"
-              require("blink.cmp.types").CompletionItemKind[kind] = kind
-              for i, _ in ipairs(items) do
-                items[i].kind = kind
-              end
-              return items
-            end,
-          },
+          codeium = { name = "Codeium", module = "codeium.blink", async = true },
           obsidian = {
             name = "obsidian",
             module = "blink.compat.source",
@@ -173,7 +161,7 @@ return {
         },
         per_filetype = {
           codecompanion = { "codecompanion" },
-          markdown = { "supermaven", "lsp", "path", "snippets", "buffer", "obsidian", "obsidian_new", "obsidian_tags" },
+          markdown = { "codeium", "lsp", "path", "snippets", "buffer", "obsidian", "obsidian_new", "obsidian_tags" },
         },
       },
     },
