@@ -173,6 +173,24 @@ vim.diagnostic.config {
   severity_sort = true,
 }
 
+-- Wrap virtual_text handler so the highest-severity diagnostic on a line
+-- wins the inline slot. `severity_sort = true` above only sorts the full
+-- diagnostic list; the virtual_text handler still renders whichever
+-- diagnostic happens to be first for that line, so an ERROR can be hidden
+-- behind a WARN. Sorting by severity (ascending = most-severe first) in a
+-- shallow copy before handing off to the default handler fixes that.
+do
+  local virt_text = vim.diagnostic.handlers.virtual_text
+  local default_show = assert(virt_text.show)
+  virt_text.show = function(namespace, bufnr, diagnostics, opts)
+    local sorted = vim.list_slice(diagnostics)
+    table.sort(sorted, function(a, b)
+      return a.severity < b.severity
+    end)
+    default_show(namespace, bufnr, sorted, opts)
+  end
+end
+
 -- Cap hover and signature help window sizes
 local hover = vim.lsp.buf.hover
 ---@diagnostic disable-next-line: duplicate-set-field
