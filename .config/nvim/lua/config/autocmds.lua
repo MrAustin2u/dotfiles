@@ -138,3 +138,23 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
+
+-- Enable treesitter-based folding for any buffer that has a parser loaded.
+-- Folds start open (foldenable=false) so nothing is hidden by default --
+-- `zc`/`zM` still work to close them on demand. Skipped for bigfiles
+-- (snacks.nvim marks them with vim.b.bigfile) since foldexpr gets slow.
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup "treesitter_folds",
+  callback = function(event)
+    if vim.b[event.buf].bigfile then
+      return
+    end
+    local ok, parser = pcall(vim.treesitter.get_parser, event.buf)
+    if not ok or not parser then
+      return
+    end
+    vim.wo.foldmethod = "expr"
+    vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+    vim.wo.foldenable = false
+  end,
+})
