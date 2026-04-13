@@ -1,74 +1,4 @@
 {
-  "alwaysThinkingEnabled": true,
-  "enabledPlugins": {
-    "atlassian@claude-plugins-official": true,
-    "blvd-reliability@blvd-ai-tools": true,
-    "elixir-phoenix-guide@elixir-phoenix-guide": true,
-    "sentry-mcp@sentry-mcp": true,
-    "sentry@claude-plugins-official": true
-  },
-  "hooks": {
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "command": "osascript -e 'display notification \"Claude is ready for input\" with title \"Claude Code\"'",
-            "type": "command"
-          }
-        ],
-        "matcher": "idle_prompt"
-      },
-      {
-        "hooks": [
-          {
-            "command": "osascript -e 'display notification \"Claude needs your permission\" with title \"Claude Code\"'",
-            "type": "command"
-          }
-        ],
-        "matcher": "permission_prompt"
-      },
-      {
-        "hooks": [
-          {
-            "command": "workmux set-window-status waiting",
-            "type": "command"
-          }
-        ],
-        "matcher": "permission_prompt|elicitation_dialog"
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "workmux set-window-status working",
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "command": "workmux set-window-status done",
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "command": "workmux set-window-status working",
-            "type": "command"
-          }
-        ]
-      }
-    ]
-  },
-  "model": "opus",
   "permissions": {
     "allow": [
       "Bash(GH_PAGER=\"\" gh pr create --fill --base develop)",
@@ -119,9 +49,78 @@
       "WebSearch"
     ]
   },
+  "model": "opus",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude is ready for input\" with title \"Claude Code\"'"
+          }
+        ]
+      },
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude needs your permission\" with title \"Claude Code\"'"
+          }
+        ]
+      },
+      {
+        "matcher": "permission_prompt|elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status waiting"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status working"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status done"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status working"
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
+    "type": "command",
     "command": "$HOME/.claude/statusline.sh",
-    "padding": 2,
-    "type": "command"
-  }
+    "padding": 2
+  },
+  "enabledPlugins": {
+    "atlassian@claude-plugins-official": true,
+    "blvd-reliability@blvd-ai-tools": true,
+    "elixir-phoenix-guide@elixir-phoenix-guide": true,
+    "sentry@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true
 }
