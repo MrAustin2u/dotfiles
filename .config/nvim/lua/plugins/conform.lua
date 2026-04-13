@@ -1,38 +1,29 @@
 -- Available formatters: https://github.com/stevearc/conform.nvim#formatters
 
--- Check if config files exists in the current working directory or any parent directory
--- Uses vim.fs.find for cross-platform compatibility and reasonable search limits
-local function has_config(files)
-  local root = vim.fs.find({ ".git", "package.json" }, { upward = true })[1]
+-- Check if config files exist, searching upward from `path` (defaults to cwd)
+local function has_config(files, path)
+  local root = vim.fs.find({ ".git", "package.json" }, { upward = true, path = path })[1]
   local config_files = vim.fs.find(files, {
     upward = true,
+    path = path,
     type = "file",
     stop = root and vim.fs.dirname(root) or nil,
   })
   return #config_files > 0
 end
 
-local function get_with_fallback(root_files, formatters, fallback)
-  if has_config(root_files) then
-    return formatters
-  else
-    return fallback or {}
-  end
-end
-
--- Use biome if config exists, otherwise use the provided fallback formatter
-local function get_biome_or_fallback(fallback)
-  return get_with_fallback({ "biome.json", "biome.jsonc" }, { "biome", "biome-check" }, fallback)
-end
-
 -- Use prettier as the fallback (removed dprint)
 local prettier_fallback = { "prettierd", "prettier", stop_after_first = true }
 
--- Compute formatters at setup time
-local js_formatters = get_biome_or_fallback(prettier_fallback)
-local json_formatters = get_biome_or_fallback(prettier_fallback)
-local css_formatters = get_biome_or_fallback(prettier_fallback)
-local graphql_formatters = get_biome_or_fallback(prettier_fallback)
+-- Evaluate biome vs prettier per-buffer so switching projects picks up the
+-- correct formatter without restarting Neovim.
+local function biome_or_prettier(bufnr)
+  local bufdir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h")
+  if has_config({ "biome.json", "biome.jsonc" }, bufdir) then
+    return { "biome", "biome-check" }
+  end
+  return prettier_fallback
+end
 
 ---@type LazySpec
 return {
@@ -47,17 +38,17 @@ return {
     formatters_by_ft = {
       lua = { "stylua" },
       python = { "isort", "black" },
-      javascript = js_formatters,
-      javascriptreact = js_formatters,
-      typescript = js_formatters,
-      typescriptreact = js_formatters,
-      json = json_formatters,
-      jsonc = json_formatters,
-      css = css_formatters,
-      vue = js_formatters,
-      svelte = js_formatters,
-      astro = js_formatters,
-      graphql = graphql_formatters,
+      javascript = biome_or_prettier,
+      javascriptreact = biome_or_prettier,
+      typescript = biome_or_prettier,
+      typescriptreact = biome_or_prettier,
+      json = biome_or_prettier,
+      jsonc = biome_or_prettier,
+      css = biome_or_prettier,
+      vue = biome_or_prettier,
+      svelte = biome_or_prettier,
+      astro = biome_or_prettier,
+      graphql = biome_or_prettier,
       markdown = prettier_fallback,
       html = prettier_fallback,
       go = { "gofmt", "goimports" },

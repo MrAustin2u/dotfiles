@@ -172,4 +172,4 @@ end
 ----------------------------------------------
 -- LSP and diagnostics
 ----------------------------------------------
-vim.lsp.log.set_level "off" -- Disable LSP logging
+vim.lsp.log.set_level "warn" -- Log warnings and errors for debuggability

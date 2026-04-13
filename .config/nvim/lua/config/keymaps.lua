@@ -549,14 +549,14 @@ M.snacks_mappings = {
   --------------
 
   {
-    "]]",
+    "]r",
     function()
       Snacks.words.jump(vim.v.count1)
     end,
     desc = "Next Reference",
   },
   {
-    "[[",
+    "[r",
     function()
       Snacks.words.jump(-vim.v.count1)
     end,

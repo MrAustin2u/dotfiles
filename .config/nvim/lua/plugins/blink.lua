@@ -134,15 +134,21 @@ return {
           "dadbod",
         },
         providers = {
-          codeium = { name = "Codeium", module = "codeium.blink", async = true },
+          lsp = { score_offset = 100 },
+          path = { score_offset = 80 },
+          snippets = { score_offset = 60 },
+          codeium = { name = "Codeium", module = "codeium.blink", async = true, score_offset = 50 },
           dadbod = {
             name = "Dadbod",
             module = "vim_dadbod_completion.blink",
+            score_offset = 90,
           },
           codecompanion = {
             name = "codecompanion",
             module = "codecompanion.providers.completion.blink",
+            score_offset = 40,
           },
+          buffer = { score_offset = 20 },
         },
         per_filetype = {
           codecompanion = { "codecompanion" },
