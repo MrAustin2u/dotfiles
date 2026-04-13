@@ -49,16 +49,9 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 eval "$(mise activate zsh)"
 
-for f in ${XDG_CONFIG_HOME}/zsh/*; do
+for f in ${XDG_CONFIG_HOME}/zsh/*.zsh(N); do
   source $f
 done
-
-# =====================================================
-# load dotfiles scripts
-# =====================================================
-
-export PATH="$HOME/dotfiles/.bin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
 
 # =====================================================
 # preferred editor

@@ -1,4 +1,4 @@
-alias stowdotfiles="z dotifles && stow --target="$HOME" --adopt ."
+alias stowdotfiles="z dotfiles && stow --target="$HOME" --adopt ."
 
 # Postings
 alias telgopostings="posting --collection postings/telgorithm"
