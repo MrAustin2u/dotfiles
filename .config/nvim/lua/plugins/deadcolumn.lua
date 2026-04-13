@@ -1,1 +1,0 @@
-return { "Bekaboo/deadcolumn.nvim" }

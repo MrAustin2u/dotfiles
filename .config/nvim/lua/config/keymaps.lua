@@ -602,15 +602,6 @@ M.snacks_mappings = {
   },
 }
 
-M.sort_mappings = {
-  { "go",   ":Sort<CR>",    mode = "v", desc = "Order (sort lines/line params)" },
-  { "goi'", "vi':Sort<CR>", mode = "n", desc = "Order in [']" },
-  { "goi(", "vi(:Sort<CR>", mode = "n", desc = "Order in (" },
-  { "goi[", "vi[:Sort<CR>", mode = "n", desc = "Order in [" },
-  { "goip", "vip:Sort<CR>", mode = "n", desc = "Order in [p]aragraph" },
-  { "goi{", "vi{:Sort<CR>", mode = "n", desc = "Order in {" },
-  { 'goi"', 'vi":Sort<CR>', mode = "n", desc = 'Order in ["]' },
-}
 
 M.tabby_mappings = {
   { "<leader>ta", ":$tabnew<CR>",  mode = "n", desc = "Tab new",      noremap = true },

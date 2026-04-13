@@ -42,3 +42,14 @@ require("lazy").setup({ import = "plugins" }, {
     },
   },
 })
+
+-- Load vim.pack plugins after init completes (vim_did_init=1 → load=true,
+-- which sources plugin/ scripts so commands like TmuxNavigate* are defined)
+vim.schedule(function()
+  -- Restore site directory in packpath (lazy.nvim's rtp reset removes it)
+  vim.opt.packpath:append(vim.fn.stdpath("data") .. "/site")
+
+  for _, f in ipairs(vim.fn.glob(vim.fn.stdpath("config") .. "/lua/packs/*.lua", false, true)) do
+    dofile(f)
+  end
+end)

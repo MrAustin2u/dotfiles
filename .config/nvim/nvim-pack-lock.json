@@ -1,0 +1,58 @@
+{
+  "plugins": {
+    "deadcolumn.nvim": {
+      "rev": "92c86f10bfba2717ca2280e2e759b047135d5288",
+      "src": "https://github.com/Bekaboo/deadcolumn.nvim"
+    },
+    "emmet-vim": {
+      "rev": "92ef2f74f4093edc99db5e9e4cf7e40116a85bd6",
+      "src": "https://github.com/mattn/emmet-vim"
+    },
+    "git-conflict.nvim": {
+      "rev": "4bbfdd92d547d2862a75b4e80afaf30e73f7bbb4",
+      "src": "https://github.com/akinsho/git-conflict.nvim",
+      "version": ">=0.0.0"
+    },
+    "img-clip.nvim": {
+      "rev": "b6ddfb97b5600d99afe3452d707444afda658aca",
+      "src": "https://github.com/HakonHarnes/img-clip.nvim"
+    },
+    "marks.nvim": {
+      "rev": "f353e8c08c50f39e99a9ed474172df7eddd89b72",
+      "src": "https://github.com/chentoast/marks.nvim"
+    },
+    "neoscroll.nvim": {
+      "rev": "c8d29979cb0cb3a2437a8e0ae683fd82f340d3b8",
+      "src": "https://github.com/karb94/neoscroll.nvim"
+    },
+    "nvim-colorizer.lua": {
+      "rev": "a065833f35a3a7cc3ef137ac88b5381da2ba302e",
+      "src": "https://github.com/norcalli/nvim-colorizer.lua"
+    },
+    "nvim-surround": {
+      "rev": "61319d4bd1c5e336e197defa15bd104c51f0fb29",
+      "src": "https://github.com/kylechui/nvim-surround",
+      "version": ">=0.0.0"
+    },
+    "sort.nvim": {
+      "rev": "3365768ad75fb7aa2a74ebaf609b7c802354fd46",
+      "src": "https://github.com/sQVe/sort.nvim"
+    },
+    "stay-centered.nvim": {
+      "rev": "e1a63ccaf2584e97c0ef8e64f9654c9a80d983f6",
+      "src": "https://github.com/arnamak/stay-centered.nvim"
+    },
+    "vim-repeat": {
+      "rev": "65846025c15494983dafe5e3b46c8f88ab2e9635",
+      "src": "https://github.com/tpope/vim-repeat"
+    },
+    "vim-tmux-navigator": {
+      "rev": "e41c431a0c7b7388ae7ba341f01a0d217eb3a432",
+      "src": "https://github.com/christoomey/vim-tmux-navigator"
+    },
+    "virt-column.nvim": {
+      "rev": "b87e3e0864211a32724a2ebf3be37e24e9e2fa99",
+      "src": "https://github.com/lukas-reineke/virt-column.nvim"
+    }
+  }
+}
