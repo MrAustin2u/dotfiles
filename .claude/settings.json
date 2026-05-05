@@ -120,7 +120,9 @@
     "atlassian@claude-plugins-official": true,
     "blvd-reliability@blvd-ai-tools": true,
     "elixir-phoenix-guide@elixir-phoenix-guide": true,
-    "sentry@claude-plugins-official": true
+    "sentry@claude-plugins-official": true,
+    "blvd-datadog@blvd-ai-tools": true,
+    "elixir-dexter-lsp@blvd-ai-tools": true
   },
   "alwaysThinkingEnabled": true
 }
