@@ -134,16 +134,22 @@ work() {
       tmux new-window
       tmux rename-window "Sched"
       tmux send-keys -t 0 "clear && sched" Enter &
+      tmux split-window -h
+      tmux send-keys -t 1 "clear && sched" Enter "claude" Enter &
 
        # Dashboard
       tmux new-window
       tmux rename-window "Dashboard"
       tmux send-keys -t 0 "clear && dashboard" Enter &
+      tmux split-window -h
+      tmux send-keys -t 1 "clear && dashboard" Enter "claude" Enter &
 
       #Dotfiles
       tmux new-window
       tmux rename-window "Nvim Config"
       tmux send-keys -t 0 "clear && cd ~/dotfiles && vim" Enter &
+      tmux split-window -h
+      tmux send-keys -t 1 "clear && cd ~/dotfiles && claude" Enter &
 
       #Ngrok
       tmux new-window
