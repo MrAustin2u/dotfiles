@@ -49,7 +49,6 @@
       "WebSearch"
     ]
   },
-  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -124,5 +123,8 @@
     "blvd-datadog@blvd-ai-tools": true,
     "elixir-dexter-lsp@blvd-ai-tools": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "autoUpdatesChannel": "latest",
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
