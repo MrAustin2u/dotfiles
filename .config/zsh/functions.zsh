@@ -219,3 +219,53 @@ jpb() {
 ff() {
   aerospace list-windows --all | fzf --bind 'enter:execute(bash -c "aerospace focus --window-id {1}")+abort'
 }
+
+# prunegitbranches <pattern> - clean up local branches matching <pattern>
+# (case-insensitive, extended regex) whose PR is MERGED or CLOSED on GitHub.
+# If the branch has an active git worktree managed by workmux, removes it via
+# `workmux remove` (which also drops the branch). For worktrees not managed by
+# workmux, falls back to `git worktree remove` + `git branch -D`.
+# Branches with no worktree are deleted with `git branch -D`.
+# Branches with an open PR, no PR, or unknown state are kept.
+# Requires `gh` (authenticated). `jq` is used for workmux handle lookup; without
+# it, all worktree removals fall through to the plain `git` path.
+prunegitbranches() {
+  local pattern="$1"
+  if [ -z "$pattern" ]; then
+    echo "usage: prunegitbranches <pattern>" >&2
+    echo "  e.g. prunegitbranches mktg" >&2
+    return 1
+  fi
+  local b state worktree_path wt_handle workmux_map
+  workmux_map=$(workmux list --json 2>/dev/null \
+    | jq -r '.[] | "\(.path)\t\(.handle)"' 2>/dev/null)
+  for b in $(git branch --format='%(refname:short)' | grep -iE "$pattern"); do
+    state=$(gh pr view "$b" --json state -q .state 2>/dev/null)
+    case "$state" in
+      MERGED|CLOSED)
+        worktree_path=$(git worktree list --porcelain \
+          | awk -v branch="refs/heads/$b" '
+              /^worktree / { wt = substr($0, 10) }
+              $0 == "branch " branch { print wt; exit }
+            ')
+        if [ -n "$worktree_path" ]; then
+          wt_handle=$(printf '%s\n' "$workmux_map" \
+            | awk -F'\t' -v p="$worktree_path" '$1 == p { print $2; exit }')
+          if [ -n "$wt_handle" ]; then
+            echo "Removing workmux worktree $wt_handle for $b (PR $state)"
+            workmux remove "$wt_handle"
+          else
+            echo "Removing unmanaged worktree $worktree_path for $b (PR $state)"
+            git worktree remove "$worktree_path" && git branch -D "$b"
+          fi
+        else
+          echo "Deleting $b (PR $state)"
+          git branch -D "$b"
+        fi
+        ;;
+      *)
+        echo "Keeping $b (PR state: ${state:-no PR found})"
+        ;;
+    esac
+  done
+}

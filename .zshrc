@@ -49,9 +49,12 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 eval "$(mise activate zsh)"
 
-for f in ${XDG_CONFIG_HOME}/zsh/*.zsh(N); do
-  source $f
-done
+() {
+  setopt local_options null_glob
+  for f in ${XDG_CONFIG_HOME}/zsh/*.zsh; do
+    source $f
+  done
+}
 
 # =====================================================
 # preferred editor

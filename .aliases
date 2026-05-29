@@ -65,7 +65,6 @@ alias migrations="cd ~/BLVD/PlatformMigrations/"
 alias booking="cd ~/BLVD/Booking/"
 alias vault="cd ~/BLVD/vault/"
 alias spa="npm run ng serve proposal-app"
-alias prunemktgprs="git branch | grep -E 'MKTG' | xargs git branch -D"
 alias cxp="cd ~/BLVD/client-portal/"
 
 # BLVD DB
@@ -75,6 +74,7 @@ alias blvdeventssnow="snowsql -c blvd.eventbridge.published"
 
 # BLVD
 alias yoinkdeploy="just yoink deploy"
+alias prunemktg="prunegitbranches mktg"
 
 # Git
 alias gpod="git pull origin develop"
@@ -96,7 +96,6 @@ alias gr="git restore ."
 alias gs="git status"
 alias lg="lazygit"
 alias stash="git stash save --include-untracked"
-alias pruneaaustinprs="git branch | grep -E 'aaustin' | xargs git branch -D"
 alias gcod="git checkout develop"
 alias copybranch="git branch --show-current | pbcopy"
 alias gssync="git stack sync"
