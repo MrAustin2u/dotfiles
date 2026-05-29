@@ -77,6 +77,7 @@ typos = "1.22.3"
 
 # Cloud & Infrastructure
 awscli = "latest"
+"pipx:awscli-local" = "latest"  # provides `awslocal` for LocalStack
 localstack = "latest"
 terraform = "latest"
 
@@ -98,7 +99,7 @@ tmux = "latest"
 usage = "latest"
 uv = "latest"
 zoxide = "latest"
-"ubi:sibprogrammer/xq" = "latest"
+"github:sibprogrammer/xq" = "latest"
 # Security & Authentication
 1password = "latest"
 1password-cli = "latest"
@@ -119,6 +120,9 @@ compile = true
 
 [settings.ruby]
 compile = true
+
+[settings.github]
+credential_command = "gh auth token"
 
 [tool_alias]
 
