@@ -72,7 +72,7 @@ post_create:
   - "[ -f .env ] && direnv allow && direnv reload || true"
   - "[ -f yarn.lock ] && yarn && yarn generate-types || true"
   - "[ -f mix.lock ] && mix deps.get && mix compile && mix ecto.migrate || true"
-  - "[ -f .scripts/download_config_json ] && ./scripts/download_config_json.sh --latest || true"
+  - "[ -f ./scripts/download_config_json ] && ./scripts/download_config_json.sh --latest || true"
 
 pre_merge:
   - "[ -f mix.exs ] && git diff --name-only $(git merge-base HEAD main)..HEAD -- '*.ex' '*.exs' | grep -v _test.exs | sed 's|lib/|test/|;s|\\.ex$|_test.exs|' | xargs -I{} sh -c 'test -f \"{}\" && echo \"{}\"' | xargs --no-run-if-empty mix test"
