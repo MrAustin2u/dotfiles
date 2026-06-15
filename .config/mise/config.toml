@@ -31,6 +31,7 @@ rust = "latest"
 "npm:pnpm" = "latest"
 "npm:wscat" = "latest"
 "npm:@forge/cli" = "latest"
+"npm:smee-client" = "latest"
 yarn = "1.22.5"
 
 # Language Servers

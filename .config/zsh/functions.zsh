@@ -269,3 +269,94 @@ prunegitbranches() {
     esac
   done
 }
+
+# tginbound - simulate a Telgorithm inbound SMS webhook against the local sched
+# server (origin :incoming_contact_center). Handy for exercising the messaging /
+# Beau pipeline without sending a real text. Run from the sched repo (a worktree
+# is fine) so the direnv-loaded TELGORITHM_PRIMARY_TOKEN is in the environment.
+#
+# Usage:
+#   tginbound                                    # sample text, default numbers
+#   tginbound --to +15551234567 --text "hi"      # customise recipient / body
+#   tginbound -f +15557654321 -t +15551234567 -m "any openings?"
+#   tginbound --smee                             # send via the smee proxy instead of direct
+#   tginbound https://my-tunnel.ngrok.app        # target a different domain (path is appended)
+#   tginbound --target http://localhost:4001/webhooks/telgorithm/inbound_message
+#
+# Defaults for --from/--to can be set once via $TG_INBOUND_FROM / $TG_INBOUND_TO.
+# Use a real booking-line number for --to to drive the full inbound routing.
+tginbound() {
+  emulate -L zsh
+  local from="${TG_INBOUND_FROM:-+19876543210}"
+  local to="${TG_INBOUND_TO:-+11234567890}"
+  local text="Hi, do you have any openings this week?"
+  local domain="http://localhost:4000"
+  local target=""
+  local smee_url="https://smee.io/blvd-telgorithm-inbound-message-dev"
+  local use_smee=0
+
+  while (( $# )); do
+    case "$1" in
+      -f|--from)            from="$2";   shift 2 ;;
+      -t|--to)              to="$2";     shift 2 ;;
+      -m|--text|--message)  text="$2";   shift 2 ;;
+      -d|--domain)          domain="$2"; shift 2 ;;
+      --target)             target="$2"; shift 2 ;;
+      --smee)               use_smee=1;  shift ;;
+      -h|--help)
+        print -r -- "usage: tginbound [DOMAIN] [-f FROM] [-t TO] [-m TEXT] [-d DOMAIN] [--target URL] [--smee]"
+        return 0 ;;
+      -*) print -ru2 -- "tginbound: unknown option: $1"; return 1 ;;
+      *)  domain="$1"; shift ;;
+    esac
+  done
+
+  # Build the target from the domain unless an explicit --target was given.
+  # Strip any trailing slash on the domain so we don't double up.
+  [[ -n "$target" ]] || target="${domain%/}/webhooks/telgorithm/inbound_message"
+
+  local bin
+  for bin in curl jq openssl; do
+    command -v "$bin" >/dev/null 2>&1 || { print -ru2 -- "tginbound: '$bin' not found"; return 1; }
+  done
+
+  # Only To/From/Text come from args; everything else in the body is generated
+  # dynamically each call: fresh Sid/WebhookSid (so per-Sid dedup doesn't drop
+  # it), current EventDate, and SegmentCount derived from the text length
+  # (160 chars for a single GSM-7 segment, 153 per part when concatenated).
+  local len=${#text} seg
+  if (( len <= 160 )); then seg=1; else seg=$(( (len + 152) / 153 )); fi
+
+  local body
+  body=$(jq -n \
+    --arg wsid "WH$(openssl rand -hex 24)" \
+    --arg sid  "IM$(openssl rand -hex 24)" \
+    --arg from "$from" \
+    --arg to   "$to" \
+    --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --arg text "$text" \
+    --argjson seg "$seg" \
+    '{WebhookSid:$wsid, Sid:$sid, From:$from, To:$to, AdditionalRecipients:[],
+      EventDate:$date, Text:$text, MediaUrls:[], SegmentCount:$seg,
+      ConversationMetadata:"{}"}') || return 1
+
+  if (( use_smee )); then
+    # The webhook proxy attaches the Bearer token on the way to the target.
+    print -r -- "→ POST $smee_url  (To: $to  From: $from)"
+    curl -sS -i -X POST "$smee_url" \
+      -H "Content-Type: application/json" \
+      -d "$body"
+    return
+  fi
+
+  if [[ -z "${TELGORITHM_PRIMARY_TOKEN:-}" ]]; then
+    print -ru2 -- "tginbound: TELGORITHM_PRIMARY_TOKEN is not set — is direnv loaded? (try 'direnv reload' in the repo)"
+    return 1
+  fi
+
+  print -r -- "→ POST $target  (To: $to  From: $from)"
+  curl -sS -i -X POST "$target" \
+    -H "Authorization: Bearer $TELGORITHM_PRIMARY_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "$body"
+}
