@@ -20,7 +20,7 @@ alias skbrestart="brew services restart sketchybar"
 alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time  --all"
 
 # Localstack
-alias sls="docker-compose up -d localstack"
+alias sls="docker-compose --profile backend up -d localstack"
 
 # Localstack EventBridge [BLVD]
 alias plseb="./scripts/provision_localstack_eventbridge"
