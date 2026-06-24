@@ -7,7 +7,8 @@ import fetch from "node-fetch";
 import { config } from "dotenv";
 import { getEnv } from "./utils.js";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, join, basename } from "path";
+import { readFile } from "fs/promises";
 
 // Load environment variables from .env file in the project root
 const __filename = fileURLToPath(import.meta.url);
@@ -214,6 +215,74 @@ server.registerTool(
         {
           type: "text",
           text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  },
+);
+
+server.registerTool(
+  "jira_add_attachment",
+  {
+    description:
+      "Upload a local file as an attachment to a Jira issue (e.g. a PDF deck or screenshot). Provide the absolute path to a file on disk.",
+    inputSchema: {
+      issueKey: z.string().describe("Jira issue key (e.g., 'PROJECT-123')"),
+      filePath: z
+        .string()
+        .describe("Absolute path to the local file to upload as an attachment"),
+      filename: z
+        .string()
+        .optional()
+        .describe(
+          "Optional override for the attached filename (defaults to the file's basename)",
+        ),
+    },
+  },
+  async ({ issueKey, filePath, filename }) => {
+    const data = await readFile(filePath);
+    const name = filename || basename(filePath);
+
+    // Jira attachments require a multipart/form-data upload with the
+    // X-Atlassian-Token: no-check header, and live under /rest/api/3 directly
+    // (not the JSON jiraRequest helper). Use the global fetch/FormData/Blob
+    // (undici) so the multipart body is serialized correctly.
+    const form = new FormData();
+    form.append("file", new Blob([new Uint8Array(data)]), name);
+
+    const url = `${JIRA_BASE_URL}/rest/api/3/issue/${encodeURIComponent(
+      issueKey,
+    )}/attachments`;
+
+    const response = await globalThis.fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: authHeader,
+        Accept: "application/json",
+        "X-Atlassian-Token": "no-check",
+      },
+      body: form,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Jira API error (${response.status}): ${errorText}`);
+    }
+
+    const result = (await response.json()) as any[];
+    const attached = (Array.isArray(result) ? result : []).map((a: any) => ({
+      id: a.id,
+      filename: a.filename,
+      size: a.size,
+      mimeType: a.mimeType,
+      url: a.content,
+    }));
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ issueKey, attached }, null, 2),
         },
       ],
     };

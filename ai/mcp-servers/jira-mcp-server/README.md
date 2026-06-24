@@ -7,6 +7,7 @@ A Model Context Protocol (MCP) server that provides integration with Jira Cloud,
 - **Read Jira Tickets**: Fetch detailed information about specific Jira issues including description, acceptance criteria, comments, and attachments
 - **Search Tickets**: Query Jira using JQL (Jira Query Language) to find relevant issues
 - **List Projects**: Retrieve all Jira projects accessible to the user
+- **Upload Attachments**: Attach a local file (PDF, screenshot, etc.) to a Jira issue
 - **ADF Rendering**: Converts Atlassian Document Format (ADF) to plain text for better readability
 
 ## Installation
@@ -106,6 +107,29 @@ List all Jira projects accessible to the user.
   "maxResults": 50
 }
 ```
+
+### jira_add_attachment
+
+Upload a local file as an attachment to a Jira issue.
+
+**Parameters:**
+- `issueKey` (string): Jira issue key (e.g., "PROJECT-123")
+- `filePath` (string): Absolute path to the local file to upload
+- `filename` (string, optional): Override for the attached filename (defaults to the file's basename)
+
+**Returns:**
+- The `issueKey` and an `attached` array with each uploaded attachment's `id`, `filename`, `size`, `mimeType`, and `url`
+
+**Example:**
+```typescript
+{
+  "issueKey": "PROJ-123",
+  "filePath": "/Users/me/Documents/deck.pdf"
+}
+```
+
+> Uses a multipart upload to `POST /rest/api/3/issue/{issueKey}/attachments` with the
+> `X-Atlassian-Token: no-check` header. Requires "Create Attachments" permission on the project.
 
 ## CLI Usage
 
