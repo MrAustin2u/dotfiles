@@ -137,8 +137,8 @@ Diff:
 """
 
 squash-template = """
-Combine these {{ commits | length }} commits into one message:
-{% for c in commits %}
+Combine these {{ commit_details | length }} commits into one message:
+{% for c in commit_details %}
 - {{ c }}
 {% endfor %}
 
