@@ -65,3 +65,4 @@ debug.log
 
 # Tmux plugins (managed by tpm)
 tmux/.config/tmux/plugins/
+.config/homebrew/trust.json.lock

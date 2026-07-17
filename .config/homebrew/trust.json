@@ -1,0 +1,13 @@
+{
+  "trustedtaps": [
+    "felixkratz/formulae",
+    "nikitabobko/tap",
+    "raine/workmux"
+  ],
+  "trustedformulae": [
+    "felixkratz/formulae/sketchybar"
+  ],
+  "trustedcasks": [
+    "nikitabobko/tap/aerospace"
+  ]
+}
