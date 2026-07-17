@@ -27,6 +27,30 @@ fgstash() {
   done
 }
 
+# killport <port> - kill whatever is listening on the given TCP port.
+# Tries a graceful SIGTERM first, then SIGKILL if it's still listening.
+killport() {
+  local port="$1"
+  if [ -z "$port" ]; then
+    echo "usage: killport <port>" >&2
+    return 1
+  fi
+  local pids
+  pids=$(lsof -ti tcp:"$port" -sTCP:LISTEN)
+  if [ -z "$pids" ]; then
+    echo "killport: nothing listening on port $port" >&2
+    return 1
+  fi
+  echo "Killing pid(s) on port $port: $pids"
+  kill $pids 2>/dev/null
+  sleep 1
+  pids=$(lsof -ti tcp:"$port" -sTCP:LISTEN)
+  if [ -n "$pids" ]; then
+    echo "Still alive, sending SIGKILL: $pids"
+    kill -9 $pids
+  fi
+}
+
 # fkill - kill process
 fkill() {
   pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
