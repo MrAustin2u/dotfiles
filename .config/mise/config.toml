@@ -3,6 +3,7 @@
 # Programming Languages & Runtimes
 elixir = "1.19.4-otp-27"
 erlang = "27.3.4.2"
+expert = "latest"
 gleam = "1.4.1"
 go = "1.22.0"
 java = "liberica-18.0.1+12"
@@ -55,7 +56,7 @@ terraform-ls = "latest"
 "npm:pyright" = "latest"                           # provides `pyright-langserver` for python LSP
 "cargo:typos-cli" = "latest"
 "github:tekumara/typos-lsp" = "latest"             # provides `typos-lsp` binary for typos_lsp nvim config
-"github:elixir-lang/expert" = "latest"             # official Elixir LSP (successor to ElixirLS/Lexical/Next LS)
+"github:remoteoss/dexter" = "latest"
 "go:golang.org/x/tools/gopls" = "latest"
 "go:go.k6.io/xk6/cmd/xk6" = "latest"
 
