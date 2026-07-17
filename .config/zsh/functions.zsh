@@ -244,6 +244,29 @@ ff() {
   aerospace list-windows --all | fzf --bind 'enter:execute(bash -c "aerospace focus --window-id {1}")+abort'
 }
 
+# dockerprune - show everything Docker is holding (containers, images,
+# volumes, networks), then confirm before removing ALL of it. Volumes are
+# removed unconditionally (not just dangling ones), so any data in named
+# volumes is lost.
+dockerprune() {
+  echo "=== Containers ==="
+  docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}'
+  echo "\n=== Images ==="
+  docker image ls --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}'
+  echo "\n=== Volumes ==="
+  docker volume ls --format 'table {{.Name}}\t{{.Driver}}'
+  echo "\n=== Networks (custom) ==="
+  docker network ls --filter type=custom --format 'table {{.Name}}\t{{.Driver}}'
+  echo ""
+  read -q "REPLY?Remove ALL of the above (containers, images, volumes, networks)? [y/N] " || { echo ""; return 1 }
+  echo ""
+  docker stop $(docker ps -aq) 2>/dev/null
+  docker rm $(docker ps -aq) 2>/dev/null
+  docker image prune -a -f
+  docker volume rm -f $(docker volume ls -q) 2>/dev/null
+  docker network prune -f
+}
+
 # prunegitbranches <pattern> - clean up local branches matching <pattern>
 # (case-insensitive, extended regex) whose PR is MERGED or CLOSED on GitHub.
 # If the branch has an active git worktree managed by workmux, removes it via
