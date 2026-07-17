@@ -49,7 +49,7 @@
       "WebSearch"
     ]
   },
-  "model": "opus[1m]",
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "Notification": [
       {
@@ -122,10 +122,12 @@
     "elixir-phoenix-guide@elixir-phoenix-guide": true,
     "sentry@claude-plugins-official": true,
     "blvd-datadog@blvd-ai-tools": true,
-    "elixir-dexter-lsp@blvd-ai-tools": true
+    "elixir-dexter-lsp@blvd-ai-tools": true,
+    "frontend-design@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }
