@@ -88,6 +88,54 @@
             "command": "workmux set-window-status working"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude postToolUseEvents || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude postToolUseFailureEvents || true"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude preCompactEventsEnhanced || true"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude preToolUseEvents || true"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude sessionEndEvents || true"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -98,6 +146,34 @@
             "command": "workmux set-window-status done"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude stopEventsEnhanced || true"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude subagentStartEvents || true"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude subagentStopEvents || true"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -106,6 +182,14 @@
           {
             "type": "command",
             "command": "workmux set-window-status working"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x ~/.span/bin/hook-dispatcher ] && ~/.span/bin/hook-dispatcher claude userPromptSubmitEvents || true"
           }
         ]
       }
