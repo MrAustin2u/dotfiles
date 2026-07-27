@@ -6,7 +6,7 @@ export PATH=".git/safe/../../bin:$PATH"
 
 # caching the brew prefix to speed up zshrc initialization
 if [[ "$(uname)" = "Darwin" ]]; then
-  if [[ "$(sysctl -n hw.optional.arm64)" = "1" ]]; then
+  if [[ "$(/usr/sbin/sysctl -n hw.optional.arm64)" = "1" ]]; then
     export BREW_PREFIX="/opt/homebrew"
   else
     export BREW_PREFIX="/usr/local"
