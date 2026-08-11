@@ -37,7 +37,23 @@ return {
     },
   },
   init = function()
-    vim.g["test#strategy"] = "vimux"
+    local runner = require "core.smart_vmux"
+
+    pcall(vim.api.nvim_create_user_command, "SmartVimuxSmoke", function(opts)
+      local cmd = opts.args ~= "" and opts.args or 'printf "smart-vimux smoke\n"'
+      runner.run(cmd)
+    end, { nargs = "*" })
+
+    local custom_strategies = vim.g["test#custom_strategies"] or {}
+    custom_strategies.smart_vimux = function(cmd)
+      runner.run(cmd)
+    end
+    vim.g["test#custom_strategies"] = custom_strategies
+
+    -- vim.g["test#strategy"] = "vimux"
+
+    vim.g["test#strategy"] = "smart_vimux"
+
     -- vim.g["test#strategy"] = "toggleterm"
     vim.g["test#preserve_screen"] = 0
     -- accommodations for Malomo's unusual folder structure on Dash
