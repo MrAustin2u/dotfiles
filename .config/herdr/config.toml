@@ -127,6 +127,19 @@ focus_pane_right = ""
 # The plugin lives in this repo and must be registered once per machine:
 #   herdr plugin link ~/.config/herdr/plugins/seamless-navigation
 
+# Opens every git worktree for the current repo as a workspace. workmux keeps
+# worktrees in a sibling <repo>__worktrees directory and herdr does not scan for
+# them at startup, so this populates them in one keystroke without changing which
+# tool creates them.
+#
+#   herdr plugin link ~/.config/herdr/plugins/worktrees
+
+[[keys.command]]
+key = "prefix+shift+o"
+type = "plugin_action"
+command = "dotfiles.worktrees.open-all"
+description = "open all worktrees for this repo"
+
 [[keys.command]]
 key = "ctrl+h"
 type = "plugin_action"
