@@ -50,6 +50,11 @@ claude = [
 ]
 
 [keys]
+# AeroSpace owns most alt chords system-wide and does not pass them through, so
+# an alt binding here is silently dead. ~/.config/aerospace/aerospace.toml
+# currently takes alt with 1..9, tab, comma, slash, e, f, g, h, j, k, l, w, y, z,
+# and every alt+shift pair. Check that file before binding alt to anything.
+#
 # Carried over from tmux (tmux.reset.conf: `set -g prefix C-z`).
 # This is the one binding worth keeping identical — everything else is new
 # muscle memory anyway.
@@ -65,16 +70,31 @@ previous_workspace = "ctrl+["
 next_workspace = "ctrl+]"
 switch_workspace = "prefix+shift+1..9"
 
-# Jump straight to an agent row in the sidebar.
-focus_agent = "prefix+alt+1..9"
+# Walk the agent rows in the sidebar. With agent_panel_sort = "priority" this
+# steps through the attention queue, so `prefix+a` repeatedly lands on whichever
+# agent is waiting on input.
+#
+# There is no indexed `focus_agent` binding because there is no modifier left to
+# put it on: prefix+1..9 is tabs, prefix+shift+1..9 is workspaces, and AeroSpace
+# takes both alt+1..9 and ctrl+1..9 before herdr sees them.
+next_agent = "prefix+a"
+previous_agent = "prefix+shift+a"
+
+# Pick one existing worktree and open it as a workspace. herdr leaves this
+# unset. It pairs with `prefix+shift+g` (create a new worktree) and with
+# `prefix+shift+o` below (open every worktree at once).
+#
+# A plain letter, because AeroSpace binds alt+g to focusing Ghostty and never
+# passes it through. See the note above about alt chords.
+open_worktree = "prefix+f"
 
 # Navigate mode moves between workspaces with the arrow keys by default.
 navigate_workspace_up = "k"
 navigate_workspace_down = "j"
 
-# Pane focus and resize move to plain ctrl+h/j/k/l and alt+h/j/k/l, handled by
-# the seamless-navigation plugin below. Clearing these four frees prefix+h/j/k/l
-# and is what the plugin's bindings replace.
+# Pane focus moves to plain ctrl+h/j/k/l, handled by the seamless-navigation
+# plugin below. Clearing these four frees prefix+h/j/k/l and is what the plugin's
+# bindings replace. Resizing stays on herdr's built-in resize mode, prefix+r.
 focus_pane_left = ""
 focus_pane_down = ""
 focus_pane_up = ""
@@ -102,6 +122,7 @@ focus_pane_right = ""
 #   prefix+1..9       jump to tab
 #   prefix+b          toggle sidebar
 #   prefix+z          zoom pane
+#   prefix+r          resize mode, then h/j/k/l
 
 # [worktrees]
 # Where `new_worktree` puts checkouts. Left at the herdr default
@@ -120,9 +141,8 @@ focus_pane_right = ""
 # both on by default, which already matches `set -g mouse on` plus the
 # copy-pipe-to-pbcopy binding from tmux.
 
-# Pane navigation and resizing without the prefix, replacing what
-# vim-tmux-navigator did under tmux. ctrl+h/j/k/l crosses freely between nvim
-# windows and herdr panes; alt+h/j/k/l resizes the split.
+# Pane navigation without the prefix, replacing what vim-tmux-navigator did under
+# tmux: ctrl+h/j/k/l crosses freely between nvim windows and herdr panes.
 #
 # The plugin lives in this repo and must be registered once per machine:
 #   herdr plugin link ~/.config/herdr/plugins/seamless-navigation
@@ -164,26 +184,8 @@ type = "plugin_action"
 command = "dotfiles.seamless-navigation.navigate-right"
 description = "navigate right"
 
-[[keys.command]]
-key = "alt+h"
-type = "plugin_action"
-command = "dotfiles.seamless-navigation.resize-left"
-description = "resize left"
-
-[[keys.command]]
-key = "alt+j"
-type = "plugin_action"
-command = "dotfiles.seamless-navigation.resize-down"
-description = "resize down"
-
-[[keys.command]]
-key = "alt+k"
-type = "plugin_action"
-command = "dotfiles.seamless-navigation.resize-up"
-description = "resize up"
-
-[[keys.command]]
-key = "alt+l"
-type = "plugin_action"
-command = "dotfiles.seamless-navigation.resize-right"
-description = "resize right"
+# Resize used to live on alt+h/j/k/l here. AeroSpace binds those four to
+# `focus left/down/up/right` system-wide, so the keys never reached herdr and the
+# bindings did nothing. Resizing is herdr's built-in resize mode instead:
+# prefix+r, then h/j/k/l. The plugin still exposes its resize-* actions if a
+# non-alt chord is ever worth binding.
