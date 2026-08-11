@@ -72,13 +72,21 @@ focus_agent = "prefix+alt+1..9"
 navigate_workspace_up = "k"
 navigate_workspace_down = "j"
 
+# Pane focus and resize move to plain ctrl+h/j/k/l and alt+h/j/k/l, handled by
+# the seamless-navigation plugin below. Clearing these four frees prefix+h/j/k/l
+# and is what the plugin's bindings replace.
+focus_pane_left = ""
+focus_pane_down = ""
+focus_pane_up = ""
+focus_pane_right = ""
+
 # Splits: `prefix+v` splits right, which already matches the old
 # `bind-key v split-window -h`.
 #
 # Split down is `prefix+minus`, NOT `prefix+h`. In tmux `h` was bound to
-# split-window -v, but herdr uses prefix+h/j/k/l to move focus between panes.
-# Rebinding split-down to prefix+h would cost focus-pane-left, which is the
-# same navigation vim-tmux-navigator provided. Keeping the herdr default.
+# split-window -v. prefix+h used to be focus-pane-left, so this could not move;
+# now that focus_pane_left is cleared, `split_horizontal = "prefix+h"` is free
+# to take if that habit is worth restoring.
 #
 # New tab is `prefix+c`, NOT `prefix+n`. tmux had `bind-key n new-window`,
 # but herdr uses prefix+n for next-tab and prefix+p for previous-tab.
@@ -111,3 +119,58 @@ navigate_workspace_down = "j"
 # Mouse behaviour needs no configuration: mouse_capture and copy_on_select are
 # both on by default, which already matches `set -g mouse on` plus the
 # copy-pipe-to-pbcopy binding from tmux.
+
+# Pane navigation and resizing without the prefix, replacing what
+# vim-tmux-navigator did under tmux. ctrl+h/j/k/l crosses freely between nvim
+# windows and herdr panes; alt+h/j/k/l resizes the split.
+#
+# The plugin lives in this repo and must be registered once per machine:
+#   herdr plugin link ~/.config/herdr/plugins/seamless-navigation
+
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.navigate-left"
+description = "navigate left"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.navigate-down"
+description = "navigate down"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.navigate-up"
+description = "navigate up"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.navigate-right"
+description = "navigate right"
+
+[[keys.command]]
+key = "alt+h"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.resize-left"
+description = "resize left"
+
+[[keys.command]]
+key = "alt+j"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.resize-down"
+description = "resize down"
+
+[[keys.command]]
+key = "alt+k"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.resize-up"
+description = "resize up"
+
+[[keys.command]]
+key = "alt+l"
+type = "plugin_action"
+command = "dotfiles.seamless-navigation.resize-right"
+description = "resize right"

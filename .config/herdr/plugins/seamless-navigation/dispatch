@@ -1,0 +1,58 @@
+#!/usr/bin/env zsh
+# Moves focus or resizes a split, forwarding the keypress into the pane's
+# program when that program manages its own splits.
+#
+# Navigation is forwarded to nvim, which decides whether to move between its
+# own windows or hand focus back to herdr (see herdr-navigator.nvim). Resize is
+# never forwarded, because nvim has no resize mappings here and a forwarded key
+# would silently do nothing.
+set -euo pipefail
+
+if (( $# != 3 )); then
+  print -u2 'usage: dispatch <navigate|resize> <left|down|up|right> <key>'
+  exit 2
+fi
+
+mode="$1"
+direction="$2"
+forward_key="$3"
+herdr_bin="${HERDR_BIN_PATH:-herdr}"
+pane_id="${HERDR_ACTIVE_PANE_ID:-${HERDR_PANE_ID:-}}"
+
+if [[ -z "$pane_id" ]]; then
+  pane_id="$("$herdr_bin" pane current --current 2>/dev/null \
+    | jq -r '.result.pane.pane_id // empty' 2>/dev/null || true)"
+fi
+
+if [[ -z "$pane_id" ]]; then
+  print -u2 'could not determine the active herdr pane'
+  exit 1
+fi
+
+if [[ "$mode" == navigate ]]; then
+  # `name` is the only field the API guarantees; basename it because argv0 may
+  # be a full path.
+  process_names="$("$herdr_bin" pane process-info --pane "$pane_id" 2>/dev/null \
+    | jq -r '.result.process_info.foreground_processes[]?.name // empty' 2>/dev/null || true)"
+
+  for process_name in ${(f)process_names}; do
+    case "${process_name:t:r}" in
+      nvim|vim|view|nvim-*|tmux|tmate)
+        exec "$herdr_bin" pane send-keys "$pane_id" "$forward_key"
+        ;;
+    esac
+  done
+fi
+
+case "$mode" in
+  navigate)
+    exec "$herdr_bin" pane focus --direction "$direction" --pane "$pane_id"
+    ;;
+  resize)
+    exec "$herdr_bin" pane resize --direction "$direction" --pane "$pane_id"
+    ;;
+  *)
+    print -u2 "unknown mode: $mode"
+    exit 2
+    ;;
+esac

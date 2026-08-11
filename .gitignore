@@ -70,3 +70,9 @@ tmux/.config/tmux/plugins/
 # App-generated state (~/.config is a symlink to .config in this repo, so apps
 # write their runtime files straight into the working tree)
 .config/1Password/
+
+# herdr's registry of linked plugins, which records absolute paths for this
+# machine. The plugins themselves live in .config/herdr/plugins/ and are
+# tracked; `herdr plugin link` rebuilds this file.
+.config/herdr/plugins.json
+.config/herdr/.plugins.lock

@@ -13,6 +13,10 @@
       "src": "https://github.com/akinsho/git-conflict.nvim",
       "version": ">=0.0.0"
     },
+    "herdr-navigator.nvim": {
+      "rev": "e6b05e6f99b4f99df42cd7e78ae33a066351138d",
+      "src": "https://github.com/willfish/herdr-navigator.nvim"
+    },
     "img-clip.nvim": {
       "rev": "b6ddfb97b5600d99afe3452d707444afda658aca",
       "src": "https://github.com/HakonHarnes/img-clip.nvim"
