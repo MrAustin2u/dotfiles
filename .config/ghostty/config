@@ -23,20 +23,35 @@ custom-shader-animation = true
 
 # Keybinds
 keybind = super+shift+r=reload_config
-keybind = super+d=text:\x02\x76
-keybind = super+shift+d=text:\x02\x73
-keybind = super+t=text:\x02\x63
-keybind = super+w=text:\x02\x78
-keybind = super+shift+o=text:\x02\x70
-keybind = super+shift+p=text:\x02\x6e
-keybind = ctrl+`=text:\x02\x7a
-keybind = ctrl+[=text:\x02\x5b
-keybind = super+shift+h=text:\x02\x3c
-keybind = super+shift+j=text:\x02\x2d
-keybind = super+shift+k=text:\x02\x2b
-keybind = super+shift+l=text:\x02\x3e
+
+# Command-key shortcuts for herdr actions. Each sends \x1a, which is Ctrl+Z and
+# the prefix set in .config/herdr/config.toml, followed by the action's key.
+#
+# Keep these comments on their own lines. Ghostty folds a trailing comment into
+# the text a `text:` binding sends, so `text:\x1av # split` would type the
+# comment into the pane.
+
+# split right
+keybind = super+d=text:\x1av
+# workspace picker
+keybind = super+shift+d=text:\x1aw
+# close pane
+keybind = super+w=text:\x1ax
+# previous tab
+keybind = super+shift+o=text:\x1ap
+# next tab
+keybind = super+shift+p=text:\x1an
+# zoom pane
+keybind = ctrl+`=text:\x1az
+
+# Pane resizing is deliberately absent. It used to sit on super+shift+h/j/k/l as
+# tmux resize-pane commands; the seamless-navigation herdr plugin now handles it
+# on alt+h/j/k/l, which reaches herdr directly and needs no Ghostty binding.
+#
+# ctrl+[ is also absent. It sent tmux copy-mode, and binding it here stopped the
+# key reaching herdr at all.
+
 keybind = super+k=text:\x63\x6C\x65\x61\x72\x0A
-keybind = ctrl+v=new_split:right
 keybind = ctrl+v=new_split:down
 keybind = super+t=new_tab
 
