@@ -26,6 +26,8 @@ return {
         { "g", group = "goto" },
         { "gz", group = "surround" },
         { "<leader>c", group = "code" },
+        { "<leader>cc", group = "AI/Claude Code" },
+        { "<leader>j", group = "grapple" },
         { "<leader>f", group = "file/find" },
         { "<leader>g", group = "git" },
         { "<leader>gh", group = "hunks" },

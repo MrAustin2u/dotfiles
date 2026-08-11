@@ -10,4 +10,4 @@ require("img-clip").setup {
   },
 }
 
-vim.keymap.set("n", "<leader>p", "<cmd>PasteImage<cr>", { desc = "Paste image from system clipboard" })
+vim.keymap.set("n", "<leader>pi", "<cmd>PasteImage<cr>", { desc = "Paste image from system clipboard" })

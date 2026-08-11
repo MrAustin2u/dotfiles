@@ -208,7 +208,9 @@ M.vim_test_mappings = function()
   nmap { "<leader>tn", ":TestNearest<CR>", { desc = "Test Nearest" } }
   nmap { "<leader>tf", ":TestFile<CR>", { desc = "Test File" } }
   nmap { "<leader>ts", ":TestSuite<CR>", { desc = "Test Suite" } }
-  nmap { "<leader>tl", ":TestLast<CR>", { desc = "Test Last" } }
+  -- <leader>tl belongs to "Tab next" further down this file; capital L keeps
+  -- Test Last reachable instead of being silently overwritten.
+  nmap { "<leader>tL", ":TestLast<CR>", { desc = "Test Last" } }
 end
 
 M.git_conflict_mappings = function()

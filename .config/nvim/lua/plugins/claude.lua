@@ -12,7 +12,9 @@ return {
     "ClaudeCodeDiffDeny",
   },
   keys = {
-    { "<leader>cc",   nil,                              desc = "AI/Claude Code" },
+    -- No bare <leader>cc entry: a lazy.nvim key stub is a real mapping and
+    -- puts every <leader>cc* binding behind a timeoutlen wait. The group
+    -- label is declared in whichkey.lua instead.
     { "<leader>cct",  "<cmd>ClaudeCode<cr>",            desc = "Toggle Claude" },
     { "<leader>ccf",  "<cmd>ClaudeCodeFocus<cr>",       desc = "Focus Claude" },
     { "<leader>ccr",  "<cmd>ClaudeCode --resume<cr>",   desc = "Resume Claude" },

@@ -5,7 +5,9 @@ return {
   main = "nvim-silicon",
   keys = {
     {
-      "<leader>sc",
+      -- <leader>sc is Snacks "Command History"; it won in normal mode and left
+      -- this reachable only from visual mode.
+      "<leader>sy",
       function()
         require("nvim-silicon").clip()
       end,

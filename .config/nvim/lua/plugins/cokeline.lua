@@ -7,8 +7,10 @@ return {
   keys = {
     { "<S-Tab>",   "<Plug>(cokeline-focus-prev)",  { silent = true, desc = "Prev Buffer" } },
     { "<Tab>",     "<Plug>(cokeline-focus-next)",  { silent = true, desc = "Next Buffer" } },
-    { "<Leader>p", "<Plug>(cokeline-switch-prev)", { silent = true, desc = "Switch Prev Buffer" } },
-    { "<Leader>n", "<Plug>(cokeline-switch-next)", { silent = true, desc = "Switch Next Buffer" } },
+    -- Under the <leader>b buffer prefix: bare letters shadow every
+    -- <leader>{n,p}* submapping behind a timeoutlen wait.
+    { "<Leader>bp", "<Plug>(cokeline-switch-prev)", { silent = true, desc = "Switch Prev Buffer" } },
+    { "<Leader>bn", "<Plug>(cokeline-switch-next)", { silent = true, desc = "Switch Next Buffer" } },
   },
   config = function()
     local hlgroups = require "cokeline.hlgroups"

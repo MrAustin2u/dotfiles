@@ -16,7 +16,9 @@ return {
       pattern = "mermaid",
       callback = function()
         local buf = vim.api.nvim_get_current_buf()
-        vim.keymap.set("n", "<leader>mp", "<cmd>MermaidPreview<CR>", { buffer = buf, desc = "Mermaid Preview" })
+        -- <leader>mp is the global conform format map; a buffer-local one here
+        -- made formatting unreachable inside mermaid files.
+        vim.keymap.set("n", "<leader>mv", "<cmd>MermaidPreview<CR>", { buffer = buf, desc = "Mermaid Preview" })
         vim.keymap.set("n", "<leader>mf", "<cmd>MermaidFormat<CR>", { buffer = buf, desc = "Mermaid Format" })
       end,
     })

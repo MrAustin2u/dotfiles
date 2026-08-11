@@ -60,9 +60,11 @@ local function on_attach(client, bufnr)
     vim.lsp.buf.format { async = true }
   end, "LSP: [f]or[m]at")
 
-  map("textDocument/inlayHint", "n", "<leader>th", function()
+  -- <leader>th is the global "Tab previous"; a buffer-local map here would
+  -- silently shadow it in every LSP-attached buffer. Lives under the ui group.
+  map("textDocument/inlayHint", "n", "<leader>uh", function()
     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = bufnr })
-  end, "LSP: [T]oggle Inlay [H]ints")
+  end, "LSP: [u]i Toggle Inlay [H]ints")
 
   -- nvim-navic breadcrumbs. Only the first client per buffer that
   -- supports documentSymbolProvider may attach -- navic errors out
