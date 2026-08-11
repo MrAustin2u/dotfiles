@@ -57,12 +57,12 @@ prefix = "ctrl+z"
 
 # Workspace cycling and indexed jumps. herdr leaves all four of these unset.
 #
-# These are `prefix+[` and `prefix+]` rather than plain `ctrl+[` and `ctrl+]`.
-# A terminal sends the same byte for `ctrl+[` and Escape, so a direct binding
-# risks Escape switching workspaces inside nvim. Ghostty can tell them apart
-# when the kitty keyboard protocol is active; drop the `prefix+` if that holds.
-previous_workspace = "prefix+["
-next_workspace = "prefix+]"
+# `ctrl+[` is the same byte as Escape unless the terminal reports the two
+# separately, which needs the kitty keyboard protocol's disambiguate flag. If
+# Escape starts switching workspaces in nvim, that flag is not reaching herdr:
+# set this back to `prefix+[`.
+previous_workspace = "ctrl+["
+next_workspace = "ctrl+]"
 switch_workspace = "prefix+shift+1..9"
 
 # Jump straight to an agent row in the sidebar.
