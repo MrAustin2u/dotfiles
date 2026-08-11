@@ -1,0 +1,56 @@
+# herdr configuration
+# Stows to ~/.config/herdr/config.toml
+#
+# Print every available option with its default: herdr --default-config
+# Apply changes to a running server:            herdr server reload-config
+# Anything not set here keeps the herdr default.
+
+[theme]
+# Matches the catppuccin theme used by the tmux setup this replaced.
+name = "catppuccin"
+
+[keys]
+# Carried over from tmux (tmux.reset.conf: `set -g prefix C-z`).
+# This is the one binding worth keeping identical — everything else is new
+# muscle memory anyway.
+prefix = "ctrl+z"
+
+# Splits: `prefix+v` splits right, which already matches the old
+# `bind-key v split-window -h`.
+#
+# Split down is `prefix+minus`, NOT `prefix+h`. In tmux `h` was bound to
+# split-window -v, but herdr uses prefix+h/j/k/l to move focus between panes.
+# Rebinding split-down to prefix+h would cost focus-pane-left, which is the
+# same navigation vim-tmux-navigator provided. Keeping the herdr default.
+#
+# New tab is `prefix+c`, NOT `prefix+n`. tmux had `bind-key n new-window`,
+# but herdr uses prefix+n for next-tab and prefix+p for previous-tab.
+# To restore the old habit, swap these three together — they conflict as a set:
+#   new_tab = "prefix+n"
+#   next_tab = "prefix+shift+n"      # or leave unset and use prefix+1..9
+#   previous_tab = "prefix+shift+p"
+
+# Worth knowing, no config needed:
+#   prefix+q          detach (work keeps running)
+#   prefix+shift+n    new workspace
+#   prefix+shift+g    new git worktree as a workspace
+#   prefix+1..9       jump to tab
+#   prefix+b          toggle sidebar
+#   prefix+z          zoom pane
+
+# [worktrees]
+# Where `new_worktree` puts checkouts. Left at the herdr default
+# (~/.herdr/worktrees) because it does not map onto the workmux layout, which
+# keeps them in <repo>__worktrees beside each repo. Set this only after
+# deciding which tool owns worktree creation.
+# directory = "~/.herdr/worktrees"
+
+# [experimental]
+# Do not enable pane_history without thinking about it. It writes recent
+# terminal contents to session-history.json in plaintext, which would capture
+# signing secrets, `op inject` output, and client message bodies.
+# pane_history = true
+
+# Mouse behaviour needs no configuration: mouse_capture and copy_on_select are
+# both on by default, which already matches `set -g mouse on` plus the
+# copy-pipe-to-pbcopy binding from tmux.
