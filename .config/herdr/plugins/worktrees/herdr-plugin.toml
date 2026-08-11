@@ -1,8 +1,8 @@
 id = "dotfiles.worktrees"
 name = "Worktrees"
-version = "0.1.0"
+version = "0.2.0"
 min_herdr_version = "0.7.4"
-description = "Opens every existing git worktree for the current repo as a workspace"
+description = "Opens git worktrees for the current repo as workspaces, and removes them without leaving the parent directory behind"
 platforms = ["macos"]
 
 [[actions]]
@@ -10,3 +10,20 @@ id = "open-all"
 title = "Open all worktrees for this repo"
 contexts = ["workspace"]
 command = ["./open-all"]
+
+[[actions]]
+id = "remove"
+title = "Remove this worktree"
+contexts = ["workspace"]
+command = ["./remove"]
+
+# The confirmation for `remove`. It has to be a popup rather than a split: a
+# pane inside the target workspace would be destroyed halfway through, when the
+# workspace it lives in closes.
+[[panes]]
+id = "confirm-remove"
+title = "Remove worktree"
+placement = "popup"
+width = "60%"
+height = 12
+command = ["./confirm-remove"]

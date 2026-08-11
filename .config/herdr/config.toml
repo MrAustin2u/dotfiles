@@ -88,6 +88,11 @@ previous_agent = "prefix+shift+a"
 # passes it through. See the note above about alt chords.
 open_worktree = "prefix+f"
 
+# Removal is bound to the plugin action below, not to herdr's built-in
+# `remove_worktree`, because the built-in leaves the empty <repo>__worktrees
+# directory behind. Left unset so there is only one way to do this.
+remove_worktree = ""
+
 # Navigate mode moves between workspaces with the arrow keys by default.
 navigate_workspace_up = "k"
 navigate_workspace_down = "j"
@@ -159,6 +164,16 @@ key = "prefix+shift+o"
 type = "plugin_action"
 command = "dotfiles.worktrees.open-all"
 description = "open all worktrees for this repo"
+
+# `k` for kill, and deliberately nowhere near `prefix+f`: a slipped modifier
+# should not turn "open this worktree" into "delete this worktree". prefix+k is
+# free because focus_pane_up is cleared above. Asks for confirmation in a popup
+# before deleting anything.
+[[keys.command]]
+key = "prefix+shift+k"
+type = "plugin_action"
+command = "dotfiles.worktrees.remove"
+description = "remove this worktree"
 
 [[keys.command]]
 key = "ctrl+h"

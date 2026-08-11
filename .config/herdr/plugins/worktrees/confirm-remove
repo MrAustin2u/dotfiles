@@ -1,0 +1,100 @@
+#!/usr/bin/env zsh
+# Confirms, removes the worktree, then removes the directory workmux put it in
+# once that directory is empty.
+#
+# `herdr worktree remove` deletes the checkout, deregisters it from git, and
+# closes the workspace, but leaves the sibling <repo>__worktrees directory in
+# place and keeps the branch. Only the empty directory is cleaned up here; the
+# branch is deliberately left alone, because it is the only remaining handle on
+# the work that was in the checkout.
+set -euo pipefail
+
+herdr_bin="${HERDR_BIN_PATH:-herdr}"
+workspace_id="${WORKTREE_WORKSPACE_ID:-}"
+checkout="${WORKTREE_PATH:-}"
+label="${WORKTREE_LABEL:-}"
+repo_root="${WORKTREE_REPO_ROOT:-}"
+parent="${checkout:h}"
+
+notify() {
+  "$herdr_bin" notification show "$1" --body "$2" >/dev/null 2>&1 || true
+}
+
+# The popup closes the moment this script exits, so anything the user still
+# needs to read has to hold the window open.
+die() {
+  print "\n$1"
+  print -n "\nPress any key to close. "
+  # -u 0 keeps this on stdin. Without it zsh reads /dev/tty, which fails
+  # outright when the script is driven by anything other than a terminal.
+  read -k 1 -u 0 >/dev/null || true
+  exit 1
+}
+
+confirm() {
+  print -n "$1 [y/N] "
+  local answer=""
+  read -k 1 -u 0 answer || true
+  print
+  [[ "$answer" == (y|Y) ]]
+}
+
+# Reads the human-readable message out of a herdr CLI error response.
+error_message() {
+  jq -r '.error.message // empty' <<<"$1" 2>/dev/null || true
+}
+
+if [[ -z "$workspace_id" || -z "$checkout" ]]; then
+  die "No worktree was passed to this popup."
+fi
+
+branch="$(git -C "$checkout" branch --show-current 2>/dev/null || true)"
+dirty_count="$(git -C "$checkout" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+
+print "Remove worktree ${label:-$checkout}"
+print ""
+print "  checkout   $checkout"
+[[ -n "$branch" ]] && print "  branch     $branch (kept)"
+[[ "$dirty_count" != 0 ]] && print "  uncommitted $dirty_count file(s)"
+print ""
+
+if ! confirm "Delete the checkout and close the workspace?"; then
+  print "Cancelled."
+  exit 0
+fi
+
+if ! response="$("$herdr_bin" worktree remove --workspace "$workspace_id" 2>&1)"; then
+  message="$(error_message "$response")"
+  print "\nherdr refused: ${message:-$response}"
+
+  if ! confirm "\nForce removal, discarding anything not committed?"; then
+    print "Cancelled. The worktree is untouched."
+    exit 0
+  fi
+
+  if ! response="$("$herdr_bin" worktree remove --workspace "$workspace_id" --force 2>&1)"; then
+    message="$(error_message "$response")"
+    die "Forced removal failed: ${message:-$response}"
+  fi
+fi
+
+# Guard the rmdir on the workmux naming convention: this should never be able to
+# walk up into a directory that holds anything other than worktrees.
+if [[ "${parent:t}" == *__worktrees && "$parent" != "$repo_root" && "$parent" != "$HOME" && -d "$parent" ]]; then
+  # A Finder visit leaves a .DS_Store behind, which would make the directory
+  # non-empty forever and silently defeat the cleanup.
+  remaining=("$parent"/*(DN))
+  if (( ${#remaining} == 1 )) && [[ "${remaining[1]:t}" == .DS_Store ]]; then
+    rm -f "${remaining[1]}"
+  fi
+
+  if rmdir "$parent" 2>/dev/null; then
+    notify "Removed ${label:-worktree}" "Also removed the empty ${parent:t}"
+    exit 0
+  fi
+
+  notify "Removed ${label:-worktree}" "${parent:t} still holds other worktrees"
+  exit 0
+fi
+
+notify "Removed ${label:-worktree}" "$checkout"

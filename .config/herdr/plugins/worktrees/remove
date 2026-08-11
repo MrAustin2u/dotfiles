@@ -1,0 +1,41 @@
+#!/usr/bin/env zsh
+# Starts removal of the worktree backing the current workspace.
+#
+# This only resolves and validates the target, then hands off to the popup that
+# asks for confirmation and does the work. Plugin actions have no confirmation
+# step of their own, and this one deletes a checkout.
+set -euo pipefail
+
+herdr_bin="${HERDR_BIN_PATH:-herdr}"
+
+notify() {
+  "$herdr_bin" notification show "$1" --body "$2" >/dev/null 2>&1 || true
+}
+
+context_value() {
+  [[ -n "${HERDR_PLUGIN_CONTEXT_JSON:-}" ]] || return 0
+  jq -er "$1 // empty" <<<"$HERDR_PLUGIN_CONTEXT_JSON" 2>/dev/null || true
+}
+
+workspace_id="${HERDR_WORKSPACE_ID:-$(context_value '.workspace_id')}"
+
+if [[ -z "$workspace_id" ]]; then
+  notify "Remove worktree failed" "Could not determine the current workspace"
+  exit 1
+fi
+
+checkout="$(context_value '.worktree.checkout_path')"
+is_linked="$(context_value '.worktree.is_linked_worktree')"
+
+if [[ -z "$checkout" || "$is_linked" != true ]]; then
+  notify "Nothing to remove" "This workspace is not a linked worktree"
+  exit 0
+fi
+
+exec "$herdr_bin" plugin pane open \
+  --plugin "${HERDR_PLUGIN_ID:-dotfiles.worktrees}" \
+  --entrypoint confirm-remove \
+  --env "WORKTREE_WORKSPACE_ID=$workspace_id" \
+  --env "WORKTREE_PATH=$checkout" \
+  --env "WORKTREE_LABEL=$(context_value '.workspace_label')" \
+  --env "WORKTREE_REPO_ROOT=$(context_value '.worktree.repo_root')"
