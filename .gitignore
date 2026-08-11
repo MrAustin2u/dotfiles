@@ -76,3 +76,8 @@ tmux/.config/tmux/plugins/
 # tracked; `herdr plugin link` rebuilds this file.
 .config/herdr/plugins.json
 .config/herdr/.plugins.lock
+
+# herdr's runtime state: the live workspace layout and the client and server
+# logs. All three are specific to one machine's running session.
+.config/herdr/session.json
+.config/herdr/*.log
