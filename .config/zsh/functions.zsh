@@ -407,3 +407,193 @@ tginbound() {
     -H "Content-Type: application/json" \
     -d "$body"
 }
+
+# pgfix - diagnose, and optionally repair, a Homebrew Postgres that won't start.
+#
+# The usual cause is a stale postmaster.pid left behind by a reboot or a hard
+# kill. On the way back up the PID recorded in that file has been recycled by an
+# unrelated process, so Postgres's "is another postmaster alive?" check gets a
+# false positive and refuses to boot; launchd then retries every 10s forever and
+# `brew services list` shows `error`. What you see at the prompt is:
+#
+#   psql: error: connection to server on socket "/tmp/.s.PGSQL.5432" failed:
+#         No such file or directory
+#
+# Clearing that lock file while a server really is running risks corruption, so
+# pgfix proves no postmaster is alive first: it probes the socket and port, and
+# identifies the process holding the recorded PID. Everything is read-only until
+# you answer the prompt, and it refuses outright if anything looks like Postgres.
+#
+# Usage:
+#   pgfix                # auto-detect the formula, diagnose, prompt to fix
+#   pgfix -n             # diagnose only, never prompt
+#   pgfix -y             # skip the prompt (the checks above still gate the fix)
+#   pgfix postgresql@16  # pin the formula (or set $PGFIX_FORMULA)
+pgfix() {
+  emulate -L zsh
+
+  local formula="" dry=0 assume_yes=0
+  while (( $# )); do
+    case "$1" in
+      -n|--dry-run) dry=1; shift ;;
+      -y|--yes)     assume_yes=1; shift ;;
+      -h|--help)
+        print -r -- "usage: pgfix [-n|--dry-run] [-y|--yes] [FORMULA]"
+        return 0 ;;
+      -*) print -ru2 -- "pgfix: unknown option: $1"; return 1 ;;
+      *)  formula="$1"; shift ;;
+    esac
+  done
+  [[ -n "$formula" ]] || formula="${PGFIX_FORMULA:-}"
+
+  command -v brew >/dev/null 2>&1 || { print -ru2 -- "pgfix: brew not found"; return 1 }
+  local prefix
+  prefix=$(brew --prefix) || return 1
+
+  if [[ -z "$formula" ]]; then
+    formula=$(brew services list 2>/dev/null \
+      | awk '$1 ~ /^postgresql(@[0-9.]+)?$/ { print $1; exit }')
+  fi
+  if [[ -z "$formula" ]]; then
+    print -ru2 -- "pgfix: no postgresql formula in 'brew services list' — pass one explicitly"
+    return 1
+  fi
+
+  local datadir="$prefix/var/$formula"
+  local logfile="$prefix/var/log/$formula.log"
+  local pidfile="$datadir/postmaster.pid"
+  if [[ ! -d "$datadir" ]]; then
+    print -ru2 -- "pgfix: data directory not found: $datadir"
+    return 1
+  fi
+
+  # Prefer the formula's own binaries; it's keg-only, so PATH may not have them.
+  local isready="$prefix/opt/$formula/bin/pg_isready"
+  local psqlbin="$prefix/opt/$formula/bin/psql"
+  [[ -x "$isready" ]] || isready=$(command -v pg_isready)
+  [[ -x "$psqlbin" ]] || psqlbin=$(command -v psql)
+
+  print -r -- "=== Service ==="
+  brew services list 2>/dev/null | awk -v f="$formula" 'NR == 1 || $1 == f'
+
+  # postmaster.pid is positional: pid, data dir, start epoch, port, socket dir,
+  # listen address, shmem key, status. Fall back to Homebrew's defaults.
+  local pid="" port=5432 sockdir=/tmp pgstatus=""
+  if [[ -r "$pidfile" ]]; then
+    local -a pidlines
+    pidlines=("${(@f)$(<$pidfile)}")
+    pid="${pidlines[1]}"
+    port="${pidlines[4]:-5432}"
+    sockdir="${pidlines[5]:-/tmp}"
+    pgstatus="${pidlines[8]}"
+  fi
+  local sock="$sockdir/.s.PGSQL.$port"
+
+  print -- "\n=== Is a server actually up? ==="
+  local alive=0
+  if [[ -n "$isready" ]] && "$isready" -h "$sockdir" -p "$port" >/dev/null 2>&1; then
+    alive=1
+    print -r -- "pg_isready : accepting connections on $sockdir:$port"
+  elif [[ -n "$isready" ]]; then
+    print -r -- "pg_isready : no response on $sockdir:$port"
+  else
+    print -r -- "pg_isready : not found, relying on socket and port checks"
+  fi
+
+  if [[ -S "$sock" ]]; then
+    print -r -- "socket     : $sock exists"
+  else
+    print -r -- "socket     : $sock missing"
+  fi
+
+  local listeners
+  listeners=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | sed 1d)
+  if [[ -n "$listeners" ]]; then
+    print -r -- "port $port  : in use by"
+    print -r -- "$listeners" | sed 's/^/             /'
+  else
+    print -r -- "port $port  : nothing listening"
+  fi
+
+  if (( alive )); then
+    print -- "\npgfix: Postgres is up and accepting connections — nothing to fix."
+    return 0
+  fi
+
+  # A postmaster on this data directory means the diagnosis above is wrong
+  # somehow; never clear a lock file out from under a live server.
+  local same
+  same=$(pgrep -fl -- "postgres.*-D $datadir" 2>/dev/null)
+  if [[ -n "$same" ]]; then
+    print -u2 -- "\npgfix: a postmaster is already running on $datadir:"
+    print -ru2 -- "$same"
+    print -ru2 -- "       Refusing to touch $pidfile. Investigate by hand."
+    return 1
+  fi
+
+  local need_unlock=0
+  if [[ -n "$pid" ]]; then
+    local owner
+    owner=$(ps -p "$pid" -o command= 2>/dev/null)
+    print -- "\n=== Recorded lock holder ==="
+    print -r -- "postmaster.pid : pid $pid, port $port, socket dir $sockdir, status ${pgstatus:-unknown}"
+    if [[ -z "$owner" ]]; then
+      print -r -- "pid $pid        : not running"
+    else
+      print -r -- "pid $pid        : $owner"
+    fi
+    if [[ "$owner" == *postgres* ]]; then
+      print -u2 -- "\npgfix: pid $pid looks like Postgres. Refusing to remove $pidfile."
+      return 1
+    fi
+    need_unlock=1
+  else
+    print -- "\nNo postmaster.pid — the server is stopped, not lock-jammed."
+  fi
+
+  if [[ -r "$logfile" ]]; then
+    print -- "\n=== Last log lines ($logfile) ==="
+    tail -5 "$logfile"
+  fi
+
+  print -r -- ""
+  if (( need_unlock )); then
+    print -r -- "Verdict: no server on $sock, nothing listening on $port, and pid $pid is not"
+    print -r -- "         a Postgres process — $pidfile is stale."
+  else
+    print -r -- "Verdict: $formula is simply not running."
+  fi
+
+  if (( dry )); then
+    print -r -- "(dry run, stopping here)"
+    return 0
+  fi
+
+  if (( ! assume_yes )); then
+    local prompt_msg="Restart $formula? [y/N] "
+    (( need_unlock )) && prompt_msg="Remove the stale lock file and restart $formula? [y/N] "
+    read -q "REPLY?$prompt_msg" || { print ""; return 1 }
+    print ""
+  fi
+
+  if (( need_unlock )); then
+    rm -f "$pidfile" || return 1
+  fi
+  brew services restart "$formula" || return 1
+
+  # The postmaster needs a moment to create its socket; don't call it a win early.
+  local i
+  for i in {1..15}; do
+    if [[ -n "$isready" ]] && "$isready" -h "$sockdir" -p "$port" >/dev/null 2>&1; then
+      print -- "\npgfix: $formula is up on $sock"
+      [[ -n "$psqlbin" ]] && "$psqlbin" -l 2>/dev/null | head -20
+      return 0
+    fi
+    [[ -z "$isready" && -S "$sock" ]] && { print -- "\npgfix: socket $sock is back"; return 0 }
+    sleep 1
+  done
+
+  print -u2 -- "\npgfix: $formula still isn't accepting connections. Recent log:"
+  tail -20 "$logfile" >&2
+  return 1
+}
