@@ -15,6 +15,28 @@ return {
         mode = "cursor",
       }
 
+      -- `tmux` is not in the main branch parser registry, so register it by hand.
+      -- Must happen on `User TSUpdate`: install() re-requires nvim-treesitter.parsers
+      -- before validating the language list, so a plain assignment gets wiped.
+      -- The repo ships only grammar.js, so the parser is generated from it (needs
+      -- the tree-sitter CLI) and the queries come from the grammar's own repo.
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "TSUpdate",
+        group = vim.api.nvim_create_augroup("user_treesitter_custom_parsers", { clear = true }),
+        callback = function()
+          require("nvim-treesitter.parsers").tmux = {
+            install_info = {
+              url = "https://github.com/Freed-Wu/tree-sitter-tmux",
+              revision = "71c78208a42bbe85309a9276317c1f7cde2dc070",
+              generate = true,
+              generate_from_json = false,
+              queries = "queries",
+            },
+            tier = 3,
+          }
+        end,
+      })
+
       -- Ensure parsers are installed. On the main branch rewrite the old
       -- `ensure_installed` setup field is gone -- users must call install()
       -- explicitly. This is async and skips already-installed parsers.
