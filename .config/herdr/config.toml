@@ -5,15 +5,72 @@
 # Apply changes to a running server:            herdr server reload-config
 # Anything not set here keeps the herdr default.
 
+onboarding = false
+
 [theme]
-# Matches the catppuccin theme used by the tmux setup this replaced.
-name = "catppuccin"
+# Matches `theme = TokyoNight Moon` in .config/ghostty/config.
+name = "tokyo-night"
+
+[ui]
+# Show the detected agent name in a split pane's border, so a pane running
+# claude is identifiable without reading its output.
+show_agent_labels_on_pane_borders = true
+
+# A single-tab workspace has nothing to switch between, so the tab row is
+# wasted height. New tabs still work via prefix+c.
+hide_tab_bar_when_single_tab = true
+
+# "hidden" gives the collapsed sidebar zero width instead of keeping a narrow
+# status rail.
+sidebar_collapsed_mode = "hidden"
+
+# "priority" orders the agent panel as an attention queue: agents that need
+# input come first. The default groups them by workspace instead.
+agent_panel_sort = "priority"
+
+# Ask Ghostty to raise a desktop notification when a background agent finishes
+# or needs input.
+[ui.toast]
+delivery = "terminal"
+
+# Sidebar rows for agent panes. Colors are tokyo-night: cyan for the agent
+# name, light foreground for the reported title.
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", { token = "workspace", bold = true }],
+  [{ token = "agent", fg = "#7dcfff" }],
+]
+
+# Coding agents set a terminal title describing what they are doing. Showing
+# that beats a second row that always reads "claude".
+[ui.sidebar.agents.rows_by_agent]
+claude = [
+  ["state_icon", { token = "workspace", bold = true }],
+  [{ token = "terminal_title_stripped", fg = "#c0caf5" }],
+]
 
 [keys]
 # Carried over from tmux (tmux.reset.conf: `set -g prefix C-z`).
 # This is the one binding worth keeping identical — everything else is new
 # muscle memory anyway.
 prefix = "ctrl+z"
+
+# Workspace cycling and indexed jumps. herdr leaves all four of these unset.
+#
+# These are `prefix+[` and `prefix+]` rather than plain `ctrl+[` and `ctrl+]`.
+# A terminal sends the same byte for `ctrl+[` and Escape, so a direct binding
+# risks Escape switching workspaces inside nvim. Ghostty can tell them apart
+# when the kitty keyboard protocol is active; drop the `prefix+` if that holds.
+previous_workspace = "prefix+["
+next_workspace = "prefix+]"
+switch_workspace = "prefix+shift+1..9"
+
+# Jump straight to an agent row in the sidebar.
+focus_agent = "prefix+alt+1..9"
+
+# Navigate mode moves between workspaces with the arrow keys by default.
+navigate_workspace_up = "k"
+navigate_workspace_down = "j"
 
 # Splits: `prefix+v` splits right, which already matches the old
 # `bind-key v split-window -h`.
