@@ -66,3 +66,7 @@ debug.log
 # Tmux plugins (managed by tpm)
 tmux/.config/tmux/plugins/
 .config/homebrew/trust.json.lock
+
+# App-generated state (~/.config is a symlink to .config in this repo, so apps
+# write their runtime files straight into the working tree)
+.config/1Password/
