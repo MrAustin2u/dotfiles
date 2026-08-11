@@ -1,0 +1,77 @@
+#!/usr/bin/env zsh
+# Opens every git worktree for the current repo as a herdr workspace.
+#
+# workmux creates worktrees in a sibling <repo>__worktrees directory, which herdr
+# does not scan at startup. It does know about them, because `herdr worktree
+# list` asks git rather than reading the [worktrees] directory setting, so this
+# opens whatever git already tracks regardless of where the checkouts live.
+set -euo pipefail
+
+herdr_bin="${HERDR_BIN_PATH:-herdr}"
+
+notify() {
+  "$herdr_bin" notification show "$1" --body "$2" >/dev/null 2>&1 || true
+}
+
+context_value() {
+  [[ -n "${HERDR_PLUGIN_CONTEXT_JSON:-}" ]] || return 0
+  jq -er "$1 // empty" <<<"$HERDR_PLUGIN_CONTEXT_JSON" 2>/dev/null || true
+}
+
+cwd="$(context_value '.focused_pane.foreground_cwd // .focused_pane.cwd // .pane.foreground_cwd // .pane.cwd')"
+
+if [[ -z "$cwd" ]]; then
+  cwd="${HERDR_ACTIVE_PANE_CWD:-}"
+fi
+
+if [[ -z "$cwd" ]]; then
+  cwd="$("$herdr_bin" pane current --current 2>/dev/null \
+    | jq -r '.result.pane.foreground_cwd // .result.pane.cwd // empty' 2>/dev/null || true)"
+fi
+
+if [[ -z "$cwd" ]]; then
+  notify "Open worktrees failed" "Could not determine the focused pane's directory"
+  exit 1
+fi
+
+if ! repo_root="$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null)"; then
+  notify "Open worktrees failed" "$cwd is not in a git repository"
+  exit 1
+fi
+
+if ! worktrees_json="$("$herdr_bin" worktree list --cwd "$repo_root" 2>&1)"; then
+  notify "Open worktrees failed" "$worktrees_json"
+  exit 1
+fi
+
+# Skip the primary checkout, stale checkouts git would prune, and any worktree
+# already backing a workspace.
+candidates="$(jq -r '
+  .result.worktrees[]?
+  | select(.is_linked_worktree and (.is_prunable | not) and (.open_workspace_id == null))
+  | [.path, .label] | @tsv
+' <<<"$worktrees_json")"
+
+if [[ -z "$candidates" ]]; then
+  notify "No worktrees to open" "Every worktree for $(basename "$repo_root") is already open"
+  exit 0
+fi
+
+opened=0
+failed=0
+
+while IFS=$'\t' read -r path label; do
+  [[ -n "$path" ]] || continue
+
+  if "$herdr_bin" worktree open --path "$path" --label "$label" >/dev/null 2>&1; then
+    opened=$(( opened + 1 ))
+  else
+    failed=$(( failed + 1 ))
+  fi
+done <<< "$candidates"
+
+if (( failed > 0 )); then
+  notify "Opened $opened worktrees" "$failed could not be opened"
+else
+  notify "Opened $opened worktrees" "$(basename "$repo_root")"
+fi

@@ -164,4 +164,9 @@ alias openslidev="pnpx @slidev/cli $1"
 alias wm='workmux'
 alias wmadd='wm add -w -u $1'
 
+# herdr
+# Applies .config/herdr/config.toml to the running server, so keybinding and UI
+# changes take effect without losing the session.
+alias reloadherdr="herdr server reload-config"
+
 [ -f ~/.aliases.local ] && source ~/.aliases.local

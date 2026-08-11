@@ -38,21 +38,32 @@ return {
   },
   init = function()
     local runner = require "core.smart_vmux"
+    local herdr_runner = require "core.smart_herdr"
 
     pcall(vim.api.nvim_create_user_command, "SmartVimuxSmoke", function(opts)
       local cmd = opts.args ~= "" and opts.args or 'printf "smart-vimux smoke\n"'
       runner.run(cmd)
     end, { nargs = "*" })
 
+    pcall(vim.api.nvim_create_user_command, "SmartHerdrSmoke", function(opts)
+      local cmd = opts.args ~= "" and opts.args or 'printf "smart-herdr smoke\n"'
+      herdr_runner.run(cmd)
+    end, { nargs = "*" })
+
     local custom_strategies = vim.g["test#custom_strategies"] or {}
     custom_strategies.smart_vimux = function(cmd)
       runner.run(cmd)
+    end
+    custom_strategies.smart_herdr = function(cmd)
+      herdr_runner.run(cmd)
     end
     vim.g["test#custom_strategies"] = custom_strategies
 
     -- vim.g["test#strategy"] = "vimux"
 
-    vim.g["test#strategy"] = "smart_vimux"
+    -- smart_vimux drives tmux, which herdr replaced. Keep both so a tmux
+    -- session still works.
+    vim.g["test#strategy"] = herdr_runner.in_herdr() and "smart_herdr" or "smart_vimux"
 
     -- vim.g["test#strategy"] = "toggleterm"
     vim.g["test#preserve_screen"] = 0

@@ -1,0 +1,12 @@
+id = "dotfiles.worktrees"
+name = "Worktrees"
+version = "0.1.0"
+min_herdr_version = "0.7.4"
+description = "Opens every existing git worktree for the current repo as a workspace"
+platforms = ["macos"]
+
+[[actions]]
+id = "open-all"
+title = "Open all worktrees for this repo"
+contexts = ["workspace"]
+command = ["./open-all"]
