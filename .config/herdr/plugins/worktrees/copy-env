@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
-# Copies the primary checkout's .env into a newly created worktree.
+# Gives a newly created worktree a .env, from the primary checkout's file when
+# there is one and from .env.default otherwise.
 #
 # Copied rather than symlinked: a worktree may need its own values (a different
 # port, a different queue prefix), and editing a symlink would rewrite the
@@ -45,16 +46,34 @@ if [[ -z "$repo_root" || "$repo_root" == "$checkout" ]]; then
   exit 0
 fi
 
-source_env="$repo_root/.env"
 target_env="$checkout/.env"
 
-# Repos without a .env, and worktrees that already have one, are both no-ops.
-[[ -f "$source_env" ]] || exit 0
+# A worktree that already has a .env keeps it.
 [[ -e "$target_env" ]] && exit 0
 
-if ! cp "$source_env" "$target_env" 2>/dev/null; then
+# .env.default is the file repos commit; .env is gitignored and each person
+# creates their own. So a repo with a .env.default needs a .env even when the
+# primary checkout has none, and the defaults are the only thing left to seed
+# from. Prefer the worktree's own copy, which matches the branch checked out
+# there and may list keys the primary checkout's copy does not.
+default_env="$checkout/.env.default"
+[[ -f "$default_env" ]] || default_env="$repo_root/.env.default"
+
+if [[ -f "$repo_root/.env" ]]; then
+  seed="$repo_root/.env"
+elif [[ -f "$default_env" ]]; then
+  seed="$default_env"
+else
+  exit 0
+fi
+
+if ! cp "$seed" "$target_env" 2>/dev/null; then
   notify "Copy .env failed" "Could not write $target_env"
   exit 1
 fi
 
-notify "Copied .env" "$(basename "$repo_root") → $(basename "$checkout")"
+if [[ "$seed" == "$default_env" ]]; then
+  notify "Created .env from .env.default" "Fill in values in $(basename "$checkout")"
+else
+  notify "Copied .env" "$(basename "$repo_root") → $(basename "$checkout")"
+fi
