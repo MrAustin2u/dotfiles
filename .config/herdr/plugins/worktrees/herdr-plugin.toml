@@ -1,8 +1,8 @@
 id = "dotfiles.worktrees"
 name = "Worktrees"
-version = "0.2.0"
+version = "0.3.0"
 min_herdr_version = "0.7.4"
-description = "Opens git worktrees for the current repo as workspaces, and removes them without leaving the parent directory behind"
+description = "Opens git worktrees for the current repo as workspaces, removes them without leaving the parent directory behind, and seeds new ones with the primary checkout's .env"
 platforms = ["macos"]
 
 [[actions]]
@@ -27,3 +27,12 @@ placement = "popup"
 width = "60%"
 height = 12
 command = ["./confirm-remove"]
+
+# Only fires for worktrees herdr itself creates. workmux already copies .env on
+# `workmux add` through its own files.copy setting.
+#
+# An event name herdr does not recognise is a non-fatal warning, not an error, so
+# a misspelling here leaves a silently dead hook. `herdr plugin list` reports it.
+[[events]]
+on = "worktree.created"
+command = ["./copy-env"]

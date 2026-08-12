@@ -1,0 +1,60 @@
+#!/usr/bin/env zsh
+# Copies the primary checkout's .env into a newly created worktree.
+#
+# Copied rather than symlinked: a worktree may need its own values (a different
+# port, a different queue prefix), and editing a symlink would rewrite the
+# primary checkout's file. An existing .env in the destination is left alone.
+#
+# herdr runs event hooks asynchronously, so a pane's startup command can begin
+# before this finishes. Nothing here is safe to depend on at pane start.
+set -euo pipefail
+
+herdr_bin="${HERDR_BIN_PATH:-herdr}"
+
+notify() {
+  "$herdr_bin" notification show "$1" --body "$2" >/dev/null 2>&1 || true
+}
+
+event_value() {
+  [[ -n "${HERDR_PLUGIN_EVENT_JSON:-}" ]] || return 0
+  jq -er "$1 // empty" <<<"$HERDR_PLUGIN_EVENT_JSON" 2>/dev/null || true
+}
+
+checkout="$(event_value '.worktree.path')"
+
+if [[ -z "$checkout" || ! -d "$checkout" ]]; then
+  notify "Copy .env skipped" "Could not determine the new worktree's path"
+  exit 1
+fi
+
+# Copying onto the primary checkout would overwrite the source with itself.
+if [[ "$(event_value '.worktree.is_linked_worktree')" != true ]]; then
+  exit 0
+fi
+
+repo_root="$(event_value '.workspace.worktree.repo_root')"
+
+# git knows where the primary checkout is even when the event payload does not:
+# --git-common-dir resolves to that checkout's .git, unlike --git-dir.
+if [[ -z "$repo_root" ]]; then
+  common_dir="$(git -C "$checkout" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+  [[ -n "$common_dir" ]] && repo_root="${common_dir:h}"
+fi
+
+if [[ -z "$repo_root" || "$repo_root" == "$checkout" ]]; then
+  exit 0
+fi
+
+source_env="$repo_root/.env"
+target_env="$checkout/.env"
+
+# Repos without a .env, and worktrees that already have one, are both no-ops.
+[[ -f "$source_env" ]] || exit 0
+[[ -e "$target_env" ]] && exit 0
+
+if ! cp "$source_env" "$target_env" 2>/dev/null; then
+  notify "Copy .env failed" "Could not write $target_env"
+  exit 1
+fi
+
+notify "Copied .env" "$(basename "$repo_root") → $(basename "$checkout")"
