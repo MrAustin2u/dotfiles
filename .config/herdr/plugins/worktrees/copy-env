@@ -16,9 +16,14 @@ notify() {
   "$herdr_bin" notification show "$1" --body "$2" >/dev/null 2>&1 || true
 }
 
+# Event payloads arrive wrapped as {"event": ..., "data": {...}}, so every query
+# resolves against .data rather than the top level. Unlike
+# HERDR_PLUGIN_CONTEXT_JSON, which the action scripts read and which has no
+# envelope. Falling back to the whole document keeps a query working if a payload
+# ever arrives unwrapped.
 event_value() {
   [[ -n "${HERDR_PLUGIN_EVENT_JSON:-}" ]] || return 0
-  jq -er "$1 // empty" <<<"$HERDR_PLUGIN_EVENT_JSON" 2>/dev/null || true
+  jq -er "(.data // .) | $1 // empty" <<<"$HERDR_PLUGIN_EVENT_JSON" 2>/dev/null || true
 }
 
 checkout="$(event_value '.worktree.path')"

@@ -1,6 +1,6 @@
 id = "dotfiles.worktrees"
 name = "Worktrees"
-version = "0.4.0"
+version = "0.4.1"
 min_herdr_version = "0.7.4"
 description = "Opens git worktrees for the current repo as workspaces, removes them without leaving the parent directory behind, and gives new ones a .env from the primary checkout or from .env.default"
 platforms = ["macos"]
