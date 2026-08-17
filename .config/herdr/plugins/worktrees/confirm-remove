@@ -1,12 +1,13 @@
 #!/usr/bin/env zsh
-# Confirms, removes the worktree, then removes the directory workmux put it in
-# once that directory is empty.
+# Confirms, removes the worktree, removes the directory workmux put it in once
+# that directory is empty, and deletes the branch when its work has already
+# landed on the repo's base branch.
 #
 # `herdr worktree remove` deletes the checkout, deregisters it from git, and
 # closes the workspace, but leaves the sibling <repo>__worktrees directory in
-# place and keeps the branch. Only the empty directory is cleaned up here; the
-# branch is deliberately left alone, because it is the only remaining handle on
-# the work that was in the checkout.
+# place and always keeps the branch. An unmerged branch is the only remaining
+# handle on the work that was in the checkout, so it is still kept; a merged one
+# is not, and it would otherwise pile up until `prunegitbranches` ran.
 set -euo pipefail
 
 herdr_bin="${HERDR_BIN_PATH:-herdr}"
@@ -51,14 +52,92 @@ fi
 branch="$(git -C "$checkout" branch --show-current 2>/dev/null || true)"
 dirty_count="$(git -C "$checkout" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
 
+# Deleting a branch has to run somewhere other than the checkout being deleted,
+# and the action cannot always name the primary checkout. git can: unlike
+# --git-dir, --git-common-dir resolves to the primary checkout's .git from inside
+# any worktree. Resolved before the removal, while the checkout still exists.
+if [[ -z "$repo_root" ]]; then
+  common_dir="$(git -C "$checkout" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+  [[ -n "$common_dir" ]] && repo_root="${common_dir:h}"
+fi
+
+# The branch the repo merges into, which is not always main or master: sched uses
+# develop. `git remote set-head origin --auto` refreshes origin/HEAD when it is
+# missing or stale.
+base=""
+base_ref="$(git -C "$checkout" symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null || true)"
+if [[ -n "$base_ref" ]]; then
+  base="${base_ref#refs/remotes/origin/}"
+else
+  for candidate in main master; do
+    if git -C "$checkout" show-ref --verify --quiet "refs/remotes/origin/$candidate"; then
+      base="$candidate"
+      break
+    fi
+  done
+fi
+
+# Reachable from the base branch, checked against origin's copy first because the
+# local one sits wherever it was last pulled to.
+is_merged_into_base() {
+  local ref
+  for ref in "refs/remotes/origin/$base" "refs/heads/$base"; do
+    git -C "$checkout" show-ref --verify --quiet "$ref" || continue
+    git -C "$checkout" merge-base --is-ancestor "refs/heads/$branch" "$ref" 2>/dev/null && return 0
+  done
+  return 1
+}
+
+# A squash or rebase merge rewrites the commits, so a branch whose work has
+# landed is usually not an ancestor of the base branch. GitHub knows anyway, and
+# the PR state is what `prunegitbranches` goes by. Only reached when the cheap
+# local check has already said no, so the usual removal makes no network call.
+# Anything that goes wrong here — no gh, not authenticated, no network, no PR —
+# leaves the state empty and the branch is kept.
+pull_request_state() {
+  command -v gh >/dev/null 2>&1 || return 0
+  local -a limit=()
+  # gh waits on the network, and this popup is blocking a keystroke.
+  command -v timeout >/dev/null 2>&1 && limit=(timeout 8)
+  (cd "$repo_root" 2>/dev/null && "${limit[@]}" gh pr view "$branch" --json state -q .state 2>/dev/null) || true
+}
+
+# CLOSED is deliberately not enough. `prunegitbranches` deletes those too, but it
+# runs over a pattern of branches whose work was abandoned; here the branch is
+# all that is left of this checkout.
+delete_branch=false
+branch_status="kept"
+if [[ -n "$branch" && -n "$base" && "$branch" != "$base" ]]; then
+  if is_merged_into_base; then
+    delete_branch=true
+    branch_status="merged into $base, will be deleted"
+  else
+    pr_state="$(pull_request_state)"
+    if [[ "$pr_state" == MERGED ]]; then
+      delete_branch=true
+      branch_status="merged in its pull request, will be deleted"
+    elif [[ -n "$pr_state" ]]; then
+      branch_status="pull request is ${pr_state:l}, kept"
+    else
+      branch_status="not merged into $base, kept"
+    fi
+  fi
+fi
+
 print "Remove worktree ${label:-$checkout}"
 print ""
 print "  checkout   $checkout"
-[[ -n "$branch" ]] && print "  branch     $branch (kept)"
+[[ -n "$branch" ]] && print "  branch     $branch ($branch_status)"
 [[ "$dirty_count" != 0 ]] && print "  uncommitted $dirty_count file(s)"
 print ""
 
-if ! confirm "Delete the checkout and close the workspace?"; then
+if [[ "$delete_branch" == true ]]; then
+  prompt="Delete the checkout and the branch, and close the workspace?"
+else
+  prompt="Delete the checkout and close the workspace?"
+fi
+
+if ! confirm "$prompt"; then
   print "Cancelled."
   exit 0
 fi
@@ -78,8 +157,25 @@ if ! response="$("$herdr_bin" worktree remove --workspace "$workspace_id" 2>&1)"
   fi
 fi
 
+# Only now that the checkout is gone: git refuses to delete a branch that is
+# checked out in a worktree.
+branch_summary=""
+if [[ "$delete_branch" == true ]]; then
+  if [[ -z "$repo_root" ]]; then
+    branch_summary="Kept $branch, could not find the primary checkout"
+  # -D rather than -d, because -d refuses a squash-merged branch: its own commits
+  # are unreachable from the base branch even though the work landed there. That
+  # the work landed is already established above.
+  elif git -C "$repo_root" branch -D "$branch" >/dev/null 2>&1; then
+    branch_summary="Deleted branch $branch"
+  else
+    branch_summary="Branch $branch could not be deleted"
+  fi
+fi
+
 # Guard the rmdir on the workmux naming convention: this should never be able to
 # walk up into a directory that holds anything other than worktrees.
+parent_summary="$checkout"
 if [[ "${parent:t}" == *__worktrees && "$parent" != "$repo_root" && "$parent" != "$HOME" && -d "$parent" ]]; then
   # A Finder visit leaves a .DS_Store behind, which would make the directory
   # non-empty forever and silently defeat the cleanup.
@@ -89,12 +185,10 @@ if [[ "${parent:t}" == *__worktrees && "$parent" != "$repo_root" && "$parent" !=
   fi
 
   if rmdir "$parent" 2>/dev/null; then
-    notify "Removed ${label:-worktree}" "Also removed the empty ${parent:t}"
-    exit 0
+    parent_summary="Also removed the empty ${parent:t}"
+  else
+    parent_summary="${parent:t} still holds other worktrees"
   fi
-
-  notify "Removed ${label:-worktree}" "${parent:t} still holds other worktrees"
-  exit 0
 fi
 
-notify "Removed ${label:-worktree}" "$checkout"
+notify "Removed ${label:-worktree}" "$parent_summary${branch_summary:+ · $branch_summary}"

@@ -168,7 +168,9 @@ description = "open all worktrees for this repo"
 # `k` for kill, and deliberately nowhere near `prefix+f`: a slipped modifier
 # should not turn "open this worktree" into "delete this worktree". prefix+k is
 # free because focus_pane_up is cleared above. Asks for confirmation in a popup
-# before deleting anything.
+# before deleting anything, and says up front whether the branch is going with
+# the checkout: it is deleted only when its work has already landed on the base
+# branch.
 [[keys.command]]
 key = "prefix+shift+k"
 type = "plugin_action"
