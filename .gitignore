@@ -71,6 +71,8 @@ tmux/.config/tmux/plugins/
 # write their runtime files straight into the working tree)
 .config/1Password/
 
+# Herdr
+
 # herdr's registry of linked plugins, which records absolute paths for this
 # machine. The plugins themselves live in .config/herdr/plugins/ and are
 # tracked; `herdr plugin link` rebuilds this file.
@@ -81,3 +83,7 @@ tmux/.config/tmux/plugins/
 # logs. All three are specific to one machine's running session.
 .config/herdr/session.json
 .config/herdr/*.log
+.config/herdr/release-notes.json
+
+# ignore herdr worktree config (custom homebrewed thing)
+.herdr-worktree.yaml
