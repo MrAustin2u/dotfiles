@@ -6,94 +6,34 @@ allowed-tools: Bash(git *), Bash(gh *), Bash(biome *), Bash(mix format), Bash(sc
 
 # Create Pull Request Command
 
-Create a new branch, commit changes, and submit a pull request.
+Get local changes onto a branch as reviewable commits, then hand off to the
+`open-pr` skill to write the description and open the PR.
 
-## Behavior
+Everything about the PR itself — base branch and stack detection, template
+discovery, description, title, reviewers, labels, draft mode — lives in `open-pr`.
+Do not restate it here; the two drifted apart once already.
 
-- Creates a new branch based on current changes, only if in develop, master or main
-- Formats modified files
-- Analyzes changes and automatically splits into logical commits when appropriate
-- Each commit focuses on a single logical change or feature
-- Creates descriptive commit messages for each logical unit
-- Pushes branch to remote
-- Creates pull request with proper summary and description
-- Never ever reference Claude, Anthropic, or any AI reference
+## Branch
 
-## Guidelines for Automatic Commit Splitting
+1. Read the current stack with the `gh-stack` skill (`git stack` as the fallback)
+2. If the current branch is `develop`, `master`, or `main`, create a new branch
+   for the work. Never commit to one of those directly
+3. Check whether the current branch already has an open PR:
+   `gh pr list --head "$(git branch --show-current)"`. If it does, branch off it
+   for the new changes rather than adding to it
 
-- Split commits by feature, component, or concern
-- Keep related file changes together in the same commit
-- Separate refactoring from feature additions
-- Ensure each commit can be understood independently
-- Multiple unrelated changes should be split into separate commits
+## Commit
 
-## Guidelines for Creating Pull Requests
+1. Format the modified files (`mix format`, `biome`, whatever the repo uses)
+2. Split the changes into logical commits:
+   - Split by feature, component, or concern
+   - Keep related file changes together
+   - Separate refactoring from feature additions
+   - Each commit should be understandable on its own
+3. Write the messages in the repo's existing style. In repos that use emoji
+   conventional commits, match that
+4. Never reference Claude, Anthropic, or any AI tool in a commit message
 
-- Use Jira ticket number in pull request title if available in branch name
-- Check for pull request template, and fill all the requirements
-- If in a stack, use `git stack` to find the base branch for the pull request, and put the stack in the description in a nice format
-- Assign the PR to me
-- Add reviewers: include CODEOWNERS for modified files AND any teams referenced in the changes
-- Add labels: use `COMMS` and `needs review` if labels are available
-- **PRIMARY METHOD**: Try using the github-mcp-server tools first:
-  - Use `mcp__github__github-create-pr` tool to create the pull request
-  - Use `mcp__github__github-get-push-branch` to check if branch exists remotely
-  - Use `mcp__github__github-list-prs` to check for existing PRs
-  - Extract owner/repo from git remote URL using `git config --get remote.origin.url`
-  - Parse remote URL formats: `git@github.com:owner/repo.git` or `https://github.com/owner/repo.git`
-- **FALLBACK METHOD**: If github-mcp-server is not available or fails, use gh CLI:
-  - **CRITICAL**: Always wrap `gh` commands with `script -q /dev/null` to provide a pseudo-terminal and avoid "interactive IO not available" errors
-  - **CRITICAL**: Always use non-interactive flags for `gh pr create`:
-    - `--title "PR Title"` - Required: Set PR title
-    - `--body "PR Description"` or `--body-file path/to/file` - Required: Set PR description
-    - `--base branch-name` - Required: Set base branch (usually develop, main, or master)
-    - `--draft` - Optional: Create as draft PR
-    - `--web` - Optional: Open in browser after creation
-  - Never use interactive `gh pr create` without these flags as it will fail in non-interactive environments
-- If a pull request template exists (.github/pull_request_template.md), read it and format the --body accordingly
+## Open the PR
 
-## Stack Detection (REQUIRED before creating PR)
-
-- ALWAYS run `git stack` first to check if the branch is part of a stack
-- If `git stack` shows multiple branches, the PR base should be the branch ABOVE the current branch in the stack output (the parent)
-- Use `--base <parent-branch>` flag with `gh pr create`
-- If not in a stack (or git stack fails), use the default base branch (develop/main/master)
-
-## Branch Creation Rules (REQUIRED)
-
-1. ALWAYS run `git stack` first to understand the current stack state
-2. Check if current branch already has an open PR: `gh pr list --head <current-branch>`
-3. If the branch already has a PR:
-
-- Create a NEW branch from the current branch for new changes
-- Use the current branch as the `--base` for the new PR
-
-4. If NOT in a stack and no existing PR, use develop/main as base
-5. NEVER commit directly to a branch that already has an open PR
-
-## Example PR Creation with MCP Server
-
-```
-1. Get current branch: git branch --show-current
-2. Get remote URL: git config --get remote.origin.url
-3. Parse owner/repo from URL (e.g., "git@github.com:owner/repo.git" -> owner="owner", repo="repo")
-4. Check if branch exists remotely: mcp__github__github-get-push-branch with owner, repo, branch
-5. Push branch: mcp__github__github-push-branch with owner, repo, branch, sha
-6. Create PR: mcp__github__github-create-pr with owner, repo, title, body, head (branch), base (e.g., "develop"), draft
-```
-
-## Example PR Creation Commands (Fallback)
-
-```bash
-# Standard PR (use script wrapper to avoid interactive IO errors)
-script -q /dev/null gh pr create --title "[TICKET-123] Add feature" --body "Description here" --base develop
-
-# Using PR template
-script -q /dev/null gh pr create --title "[TICKET-123] Add feature" --body-file /tmp/pr-body.txt --base develop
-
-# Draft PR
-script -q /dev/null gh pr create --draft --title "[TICKET-123] WIP: Add feature" --body "Work in progress" --base develop
-
-# Check if PR already exists for current branch
-script -q /dev/null gh pr list --head "$(git branch --show-current)"
-```
+Invoke the `open-pr` skill. It handles the rest.
