@@ -19,8 +19,16 @@ Do not restate it here; the two drifted apart once already.
 2. If the current branch is `develop`, `master`, or `main`, create a new branch
    for the work. Never commit to one of those directly
 3. Check whether the current branch already has an open PR:
-   `gh pr list --head "$(git branch --show-current)"`. If it does, branch off it
-   for the new changes rather than adding to it
+   `gh pr list --head "$(git branch --show-current)"`. If it does, the new changes
+   belong on their own branch rather than being added to one under review
+
+Route branch creation by what the work needs, per the rules in `CLAUDE.md`:
+
+- The current branch is in a stack, or the work is a layer on top of it: use
+  `gh stack add <branch>` from the `gh-stack` skill. It branches from the current
+  layer and registers the new one, which plain `git checkout -b` does not
+- The work needs its own directory: use the `create-worktree` skill
+- Neither applies: plain `git`
 
 ## Commit
 
