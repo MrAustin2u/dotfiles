@@ -68,3 +68,54 @@ _mfeserve() {
 }
 
 compdef _mfeserve mfeserve
+
+# mfetypes [package] - refresh the graphql types, then typecheck a package.
+#
+# The generated types are built from packages/graphql's schema file, so running tsc
+# without refreshing it compares the code against whichever schema was fetched last. A
+# field added to sched this morning is invisible until the schema is fetched again, which
+# is how a clean tsc run can still fail the moment webpack regenerates the types.
+#
+# Needs sched running on localhost:4000, which is where fetch-schema reads from.
+mfetypes() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    echo "mfetypes: not inside a git repository" >&2
+    return 1
+  }
+
+  if [[ ! -d "$root/packages" || ! -f "$root/turbo.json" ]]; then
+    echo "mfetypes: $root is not the micro-frontends repo" >&2
+    return 1
+  fi
+
+  local package=$1
+
+  if [[ -z "$package" && "$PWD" == "$root/packages/"* ]]; then
+    local relative=${PWD#$root/packages/}
+    package=${relative%%/*}
+  fi
+
+  if [[ -z "$package" ]]; then
+    echo "usage: mfetypes <package>" >&2
+    return 1
+  fi
+
+  if [[ ! -f "$root/packages/$package/tsconfig.json" ]]; then
+    echo "mfetypes: no package named $package, or it has no tsconfig" >&2
+    return 1
+  fi
+
+  echo "mfetypes: fetching the private schema"
+  (cd "$root/packages/graphql" && yarn fetch-schema:private) || return 1
+
+  # generate-types is a root task in turbo.json, not a package one, so filtering to
+  # packages/graphql matches nothing and silently generates nothing.
+  echo "mfetypes: generating types"
+  (cd "$root/packages/graphql" && yarn generate-types:private) || return 1
+
+  echo "mfetypes: $package"
+  (cd "$root/packages/$package" && yarn tsc --noEmit -p tsconfig.json)
+}
+
+compdef _mfeserve mfetypes
