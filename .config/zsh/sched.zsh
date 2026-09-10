@@ -8,6 +8,33 @@
 # Every step goes through `direnv exec`. `direnv allow` grants the directory but does not
 # export anything into the shell already running, so the variables do not appear until the
 # next prompt, which is too late for the commands below.
+# Runs one of sched's localstack provisioning scripts, forgiving the one failure a worktree
+# other than the first always hits.
+#
+# Each script keeps its terraform state inside the worktree it runs from, and localstack is
+# shared, so a fresh worktree starts with empty state while the queues, buckets and keys are
+# already there, and terraform stops with an already-exists error. That one error is benign,
+# and only that one: forgiving every failure once hid a localstack that was not running at
+# all, and the function still reported success.
+_provision_sched_localstack() {
+  # Not `status`: zsh reserves it as a read-only alias for $?, and assigning to it fails
+  # the whole function.
+  local root=$1 script=$2 log exit_code
+  log=$(cd "$root" && direnv exec . "./scripts/$script" 2>&1)
+  exit_code=$?
+
+  (( exit_code == 0 )) && return 0
+
+  if [[ "$log" == *AlreadyExists* ]]; then
+    echo "provision_sched: $script found its resources already there" >&2
+    return 0
+  fi
+
+  echo "provision_sched: $script failed for a reason other than existing resources" >&2
+  printf '%s\n' "$log" >&2
+  return 1
+}
+
 provision_sched() {
   local root
   root=$(git rev-parse --show-toplevel 2>/dev/null) || {
@@ -85,8 +112,8 @@ provision_sched() {
   # A prune takes the localstack volume, so the queues and buckets go with it. Without these
   # sched boots and then floods the log with econnrefused against every SQS queue.
   echo "provision_sched: localstack eventbridge and s3"
-  (cd "$root" && direnv exec . ./scripts/provision_localstack_eventbridge) || return 1
-  (cd "$root" && direnv exec . ./scripts/provision_localstack_s3) || return 1
+  _provision_sched_localstack "$root" provision_localstack_eventbridge || return 1
+  _provision_sched_localstack "$root" provision_localstack_s3 || return 1
 
   echo "provision_sched: deps"
   "${mix[@]}" deps.get || return 1
@@ -99,28 +126,11 @@ provision_sched() {
   echo "provision_sched: migrate"
   "${mix[@]}" ecto.migrate || return 1
 
-  # Last, because the terraform in terraform/sched_localstack_kms stops with
-  # AlreadyExistsException once alias/phi/secure-messaging and alias/phi/isolation-fixture
-  # exist in localstack, which is every run after the first. That one error is benign, and
-  # only that one: treating every failure as expected once hid a localstack that was not
-  # running at all, and the function still reported success.
-  #
-  # The same apply is what writes .env.localstack-kms, so an alias error aborts before the
-  # file appears, which is why its absence is checked separately below.
+  # Last, because this is the one whose already-exists error costs something. The same apply
+  # writes .env.localstack-kms through local_file.local_dotenv, so stopping on the aliases
+  # aborts before the file appears, which is why its absence is checked separately below.
   echo "provision_sched: localstack kms"
-  local kms_log kms_status
-  kms_log=$(cd "$root" && direnv exec . ./scripts/provision_localstack_kms 2>&1)
-  kms_status=$?
-
-  if (( kms_status != 0 )); then
-    if [[ "$kms_log" == *AlreadyExistsException* ]]; then
-      echo "provision_sched: kms aliases already exist, which is expected after the first run" >&2
-    else
-      echo "provision_sched: kms apply failed for a reason other than existing aliases" >&2
-      printf '%s\n' "$kms_log" >&2
-      return 1
-    fi
-  fi
+  _provision_sched_localstack "$root" provision_localstack_kms || return 1
 
   if [[ -e "$root/.env.localstack-kms" ]]; then
     echo "provision_sched: done"
