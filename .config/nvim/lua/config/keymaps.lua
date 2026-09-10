@@ -88,7 +88,7 @@ vim.keymap.set("v", ">", ">gv")
 vim.keymap.set("n", "<leader>so", function()
   local file = vim.fn.expand "%:p"
   local config_dir = vim.uv.fs_realpath(vim.fn.stdpath "config") or vim.fn.stdpath "config"
-  if not file:match("%.lua$") or not vim.startswith(file, config_dir) then
+  if not file:match "%.lua$" or not vim.startswith(file, config_dir) then
     vim.notify("Only sources Lua files inside " .. config_dir, vim.log.levels.WARN)
     return
   end
@@ -501,8 +501,8 @@ M.snacks_mappings = {
     desc = "Git Browse",
     mode = { "n", "v" },
   },
-  { "<leader>gY", git_copy_file_url, mode = { "n", "x" },       desc = "Git Copy File URL" },
-  { "<leader>gy", git_copy_line_url, mode = { "n", "x" },       desc = "Git Copy Line(s) URL" },
+  { "<leader>gY", git_copy_file_url, mode = { "n", "x" }, desc = "Git Copy File URL" },
+  { "<leader>gy", git_copy_line_url, mode = { "n", "x" }, desc = "Git Copy Line(s) URL" },
   {
     "<leader>gf",
     function()
@@ -522,7 +522,7 @@ M.snacks_mappings = {
   -- Buffer
   --------------
 
-  { "<Tab>",   "<cmd>bnext<CR>", desc = "Next buffer" },
+  { "<Tab>", "<cmd>bnext<CR>", desc = "Next buffer" },
   { "<S-Tab>", "<cmd>bprev<CR>", desc = "Previous buffer" },
   {
     "<leader>,",
@@ -604,13 +604,12 @@ M.snacks_mappings = {
   },
 }
 
-
 M.tabby_mappings = {
-  { "<leader>ta", ":$tabnew<CR>",  mode = "n", desc = "Tab new",      noremap = true },
-  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose",  noremap = true },
-  { "<leader>to", ":tabonly<CR>",  mode = "n", desc = "Tab only",     noremap = true },
-  { "<leader>tl", ":tabn<CR>",     mode = "n", desc = "Tab next",     noremap = true },
-  { "<leader>th", ":tabp<CR>",     mode = "n", desc = "Tab previous", noremap = true },
+  { "<leader>ta", ":$tabnew<CR>", mode = "n", desc = "Tab new", noremap = true },
+  { "<leader>tc", ":tabclose<CR>", mode = "n", desc = "Tab [c]lose", noremap = true },
+  { "<leader>to", ":tabonly<CR>", mode = "n", desc = "Tab only", noremap = true },
+  { "<leader>tl", ":tabn<CR>", mode = "n", desc = "Tab next", noremap = true },
+  { "<leader>th", ":tabp<CR>", mode = "n", desc = "Tab previous", noremap = true },
 }
 
 return M
