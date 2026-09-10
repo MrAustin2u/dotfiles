@@ -49,8 +49,22 @@ provision_sched() {
   # localstack as well as typesense. redis and postgres are in the backend profile too but
   # run natively on this machine, so bringing up the whole profile would collide with them
   # on 5432 and 6379.
-  echo "provision_sched: containers"
-  (cd "$root" && docker compose --profile backend up -d localstack typesense) || return 1
+  #
+  # Compose names its project after the directory it runs in, so each worktree asks for its
+  # own pair of containers and the second one to start fails with "port is already
+  # allocated". One container serves every worktree, because they all reach it on localhost,
+  # so start only what is not already answering.
+  local -a needed
+  needed=()
+  curl -fsS --max-time 2 http://localhost:4566/_localstack/health >/dev/null 2>&1 || needed+=(localstack)
+  curl -fsS --max-time 2 http://localhost:8108/health >/dev/null 2>&1 || needed+=(typesense)
+
+  if (( ${#needed} )); then
+    echo "provision_sched: containers ($needed)"
+    (cd "$root" && docker compose --profile backend up -d "${needed[@]}") || return 1
+  else
+    echo "provision_sched: containers already running"
+  fi
 
   # Nothing provisioned into localstack lands until it answers, and a docker prune leaves it
   # rebuilding from an empty volume, which takes longer than `up -d` returning.
