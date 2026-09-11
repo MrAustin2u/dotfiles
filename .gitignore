@@ -9,6 +9,9 @@
 nvim/.config/nvim/plugin/
 packer_compiled.lua
 
+# Devin: generated hook config, plus symlinks into the private skills repo
+.config/devin/
+
 # Claude Code
 .claude/cache
 .claude/debug
